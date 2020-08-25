@@ -98,7 +98,6 @@ class ExampleBuilder(object):
 
   def _make_tf_example(self, first_segment, second_segment):
     """Converts two "segments" of text into a tf.train.Example."""
-    vocab = self._tokenizer.vocab
     input_ids = [0]
     input_ids.extend(first_segment)
     input_ids.append(1)
