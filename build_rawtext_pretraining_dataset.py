@@ -57,7 +57,7 @@ def write_examples(job_id, args):
               file_no, len(fnames), 100.0 * file_no / len(fnames), int(elapsed),
               int((len(fnames) - file_no) / (file_no / elapsed)),
               example_writer.n_written))
-    example_writer.write_examples(os.path.join(owt_dir, fname))
+    example_writer.write_examples(os.path.join(args.data_dir, fname))
     
   example_writer.finish()
   log("Done!")
