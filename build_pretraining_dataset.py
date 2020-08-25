@@ -50,6 +50,8 @@ class ExampleBuilder(object):
     encoded = self._tokenizer.encode(line)
     # bert_tokens = encoded.tokens
     bert_tokids = encoded.ids 
+    if bert_tokids.count(4) > 5:
+      return None
     self._current_sentences.append(bert_tokids)
     self._current_length += len(bert_tokids)
     if self._current_length >= self._target_length:
