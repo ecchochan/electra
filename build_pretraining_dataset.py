@@ -25,6 +25,7 @@ import tensorflow.compat.v1 as tf
 from model import tokenization
 from util import utils
 
+from cantokenizer import CanTokenizer
 
 def create_int_feature(values):
   feature = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
