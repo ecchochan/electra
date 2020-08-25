@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Preprocessess the Open WebText corpus for ELECTRA pre-training."""
+"""Preprocessess raw corpus for ELECTRA pre-training."""
 
 import argparse
 import multiprocessing
@@ -29,9 +29,6 @@ from util import utils
 
 def write_examples(job_id, args):
   """A single process creating and writing out pre-processed examples."""
-  job_tmp_dir = os.path.join(args.data_dir, "tmp", "job_" + str(job_id))
-  owt_dir = os.path.join(args.data_dir, "openwebtext")
-
   def log(*args):
     msg = " ".join(map(str, args))
     print("Job {}:".format(job_id), msg)
@@ -39,7 +36,7 @@ def write_examples(job_id, args):
   log("Creating example writer")
   example_writer = build_pretraining_dataset.ExampleWriter(
       job_id=job_id,
-      vocab_file=os.path.join(args.data_dir, "vocab.txt"),
+      vocab_file=args.vocab_file,
       output_dir=os.path.join(args.data_dir, "pretrain_tfrecords"),
       max_seq_length=args.max_seq_length,
       num_jobs=args.num_processes,
@@ -47,7 +44,7 @@ def write_examples(job_id, args):
       do_lower_case=args.do_lower_case
   )
   log("Writing tf examples")
-  fnames = sorted(tf.io.gfile.listdir(owt_dir))
+  fnames = sorted(tf.io.gfile.listdir(raw_dir))
   fnames = [f for (i, f) in enumerate(fnames)
             if i % args.num_processes == job_id]
   random.shuffle(fnames)
@@ -60,13 +57,8 @@ def write_examples(job_id, args):
               file_no, len(fnames), 100.0 * file_no / len(fnames), int(elapsed),
               int((len(fnames) - file_no) / (file_no / elapsed)),
               example_writer.n_written))
-    utils.rmkdir(job_tmp_dir)
-    with tarfile.open(os.path.join(owt_dir, fname)) as f:
-      f.extractall(job_tmp_dir)
-    extracted_files = tf.io.gfile.listdir(job_tmp_dir)
-    random.shuffle(extracted_files)
-    for txt_fname in extracted_files:
-      example_writer.write_examples(os.path.join(job_tmp_dir, txt_fname))
+    example_writer.write_examples(os.path.join(owt_dir, fname))
+    
   example_writer.finish()
   log("Done!")
 
@@ -74,7 +66,9 @@ def write_examples(job_id, args):
 def main():
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument("--data-dir", required=True,
-                      help="Location of data (vocab file, corpus, etc).")
+                      help="Location of data (vocab file).")
+  parser.add_argument("--vocab-file", required=True,
+                      help="Location of vocabulary file.")
   parser.add_argument("--max-seq-length", default=128, type=int,
                       help="Number of tokens per example.")
   parser.add_argument("--num-processes", default=1, type=int,
