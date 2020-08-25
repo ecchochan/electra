@@ -64,10 +64,13 @@ class SingleOutputTask(task.Task):
 
   def featurize(self, example: InputExample, is_training, log=False):
     """Turn an InputExample into a dict of features."""
-    tokens_a = self._tokenizer.tokenize(example.text_a)
+    encoded_a = self._tokenizer.encode(example.text_a)
+    encoded_b = self._tokenizer.encode(example.text_b)
+    tokens_a = self._tokenizer.encode(example.text_a)
+    tokens_a = self._tokenizer.encode(example.text_a)
     tokens_b = None
     if example.text_b:
-      tokens_b = self._tokenizer.tokenize(example.text_b)
+      tokens_b = self._tokenizer.encode(example.text_b)
 
     if tokens_b:
       # Modifies `tokens_a` and `tokens_b` in place so that the total
@@ -99,19 +102,19 @@ class SingleOutputTask(task.Task):
     # the entire model is fine-tuned.
     tokens = []
     segment_ids = []
-    tokens.append("[CLS]")
+    tokens.append("<s>")
     segment_ids.append(0)
     for token in tokens_a:
       tokens.append(token)
       segment_ids.append(0)
-    tokens.append("[SEP]")
+    tokens.append("</s>")
     segment_ids.append(0)
 
     if tokens_b:
       for token in tokens_b:
         tokens.append(token)
         segment_ids.append(1)
-      tokens.append("[SEP]")
+      tokens.append("</s>")
       segment_ids.append(1)
 
     input_ids = self._tokenizer.convert_tokens_to_ids(tokens)

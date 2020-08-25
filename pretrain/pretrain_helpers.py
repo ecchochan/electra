@@ -115,10 +115,10 @@ def scatter_update(sequence, updates, positions):
   return updated_sequence, updates_mask
 
 
+ignore_ids = [0, 1, 5] # [vocab["[SEP]"], vocab["[CLS]"], vocab["[MASK]"]]
 def _get_candidates_mask(inputs: pretrain_data.Inputs, vocab,
                          disallow_from_mask=None):
   """Returns a mask tensor of positions in the input that can be masked out."""
-  ignore_ids = [vocab["[SEP]"], vocab["[CLS]"], vocab["[MASK]"]]
   candidates_mask = tf.ones_like(inputs.input_ids, tf.bool)
   for ignore_id in ignore_ids:
     candidates_mask &= tf.not_equal(inputs.input_ids, ignore_id)
@@ -188,7 +188,7 @@ def mask(config: configure_pretraining.PretrainingConfig,
   replace_with_mask_positions = masked_lm_positions * tf.cast(
       tf.less(tf.random.uniform([B, N]), 0.85), tf.int32)
   inputs_ids, _ = scatter_update(
-      inputs.input_ids, tf.fill([B, N], vocab["[MASK]"]),
+      inputs.input_ids, tf.fill([B, N], 5), # vocab["[MASK]"] = 5
       replace_with_mask_positions)
 
   return pretrain_data.get_updated_inputs(

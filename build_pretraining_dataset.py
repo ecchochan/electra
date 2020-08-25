@@ -46,8 +46,9 @@ class ExampleBuilder(object):
     line = line.strip().replace("\n", " ")
     if (not line) and self._current_length != 0:  # empty lines separate docs
       return self._create_example()
-    bert_tokens = self._tokenizer.tokenize(line)
-    bert_tokids = self._tokenizer.convert_tokens_to_ids(bert_tokens)
+    encoded = self._tokenizer.encode(line)
+    # bert_tokens = encoded.tokens
+    bert_tokids = encoded.ids 
     self._current_sentences.append(bert_tokids)
     self._current_length += len(bert_tokids)
     if self._current_length >= self._target_length:
@@ -97,10 +98,14 @@ class ExampleBuilder(object):
   def _make_tf_example(self, first_segment, second_segment):
     """Converts two "segments" of text into a tf.train.Example."""
     vocab = self._tokenizer.vocab
-    input_ids = [vocab["[CLS]"]] + first_segment + [vocab["[SEP]"]]
+    input_ids = [0]
+    input_ids.extend(first_segment)
+    input_ids.append(1)
+    #input_ids = [0] + first_segment + [1]
+    
     segment_ids = [0] * len(input_ids)
     if second_segment:
-      input_ids += second_segment + [vocab["[SEP]"]]
+      input_ids += second_segment + [1]
       segment_ids += [1] * (len(second_segment) + 1)
     input_mask = [1] * len(input_ids)
     input_ids += [0] * (self._max_length - len(input_ids))
@@ -121,9 +126,7 @@ class ExampleWriter(object):
                num_jobs, blanks_separate_docs, do_lower_case,
                num_out_files=1000):
     self._blanks_separate_docs = blanks_separate_docs
-    tokenizer = tokenization.FullTokenizer(
-        vocab_file=vocab_file,
-        do_lower_case=do_lower_case)
+    tokenizer = CanTokenizer(vocab_file)
     self._example_builder = ExampleBuilder(tokenizer, max_seq_length)
     self._writers = []
     for i in range(num_out_files):
