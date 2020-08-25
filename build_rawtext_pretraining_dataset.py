@@ -31,7 +31,7 @@ def write_examples(job_id, args):
   """A single process creating and writing out pre-processed examples."""
   def log(*args):
     msg = " ".join(map(str, args))
-    print("Job {}:".format(job_id), msg)
+    print("Job {}:".format(job_id), msg, flush=True)
 
   log("Creating example writer")
   example_writer = build_pretraining_dataset.ExampleWriter(

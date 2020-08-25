@@ -156,7 +156,7 @@ class ExampleWriter(object):
       bucket = []
       for line in f:
         line = line.strip()
-        if lines:
+        if line:
           bucket.append(line)
         else:
           sub_doc = '\n'.join(bucket)
