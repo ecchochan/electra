@@ -81,6 +81,9 @@ def main():
   args = parser.parse_args()
 
   utils.rmkdir(os.path.join(args.data_dir, "pretrain_tfrecords"))
+
+  print("Starting %s processes"%args.num_processes)
+
   if args.num_processes == 1:
     write_examples(0, args)
   else:
