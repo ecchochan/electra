@@ -119,6 +119,17 @@ class ExampleBuilder(object):
     return tf_example
 
 
+import re
+
+remove_url_re = re.compile(r' ?(?:https?:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z_0-9\-]+)+|[a-zA-Z_0-9\-]+(?:\.[a-zA-Z_0-9\-]+)+)(?:\/(?:\?(?:<nl>)?\n *[a-zA-Z0-9\-\._… &%\+]+|[a-zA-Z0-9\.\?\:@\-_=#…&%!\+])+)+ *(?:<nl>\n * ?(?:https?:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)+|[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)+)(?:\/(?:\?(?:<nl>)?\n *[a-zA-Z0-9\-\._… &%\+]+|[a-zA-Z0-9\.\?\:@\-_=#…&%!\+])+)+ *)*')
+remove_speakers = re.compile(r'^#\d+ ([A-Z]+: )?(#\d+ )?', re.MULTILINE)
+
+def remove_url(x):
+    x = remove_url_re.sub(' [url] ',x)
+    x = remove_speakers.sub('',x)
+    return x
+    
+
 class ExampleWriter(object):
   """Writes pre-training examples to disk."""
 
@@ -140,14 +151,41 @@ class ExampleWriter(object):
   def write_examples(self, input_file):
     """Writes out examples from the provided input file."""
     with tf.io.gfile.GFile(input_file) as f:
+      cached = []
+      bucket = []
       for line in f:
         line = line.strip()
-        if line or self._blanks_separate_docs:
-          example = self._example_builder.add_line(line)
-          if example:
-            self._writers[self.n_written % len(self._writers)].write(
-                example.SerializeToString())
-            self.n_written += 1
+        if lines:
+          bucket.append(line)
+        else:
+          sub_doc = '\n'.join(bucket)
+          sub_doc = remove_url(sub_doc)
+          bad = False
+          if not sub_doc.strip() or too_many_repeat(sub_doc):
+            bad = True
+          if not bad:
+            for e in re.finditer(r'[\da-zA-Z_]{10,}', sub_doc):
+              g = e.group()
+              if re.search(r'\d', g) and re.search(r'[A-Z]{3,}', g):
+                  pass
+              elif re.search(r'[a-z]+[A-Z]{2,}[a-z]+[A-Z]+', g):
+                  pass
+              else:
+                  continue
+              bad = True
+              break
+          if not bad:
+            cached.append(bucket)
+          bucket = []
+
+      for bucket in cached:
+        for line in bucket:
+          if line or self._blanks_separate_docs:
+            example = self._example_builder.add_line(line)
+            if example:
+              self._writers[self.n_written % len(self._writers)].write(
+                  example.SerializeToString())
+              self.n_written += 1
       example = self._example_builder.add_line("")
       if example:
         self._writers[self.n_written % len(self._writers)].write(
