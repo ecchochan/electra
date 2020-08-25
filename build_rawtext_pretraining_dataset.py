@@ -37,7 +37,7 @@ def write_examples(job_id, args):
   example_writer = build_pretraining_dataset.ExampleWriter(
       job_id=job_id,
       vocab_file=args.vocab_file,
-      output_dir=os.path.join(args.data_dir, "pretrain_tfrecords"),
+      output_dir=os.path.join(args.output_dir, "pretrain_tfrecords"),
       max_seq_length=args.max_seq_length,
       num_jobs=args.num_processes,
       blanks_separate_docs=False,
@@ -69,6 +69,8 @@ def main():
                       help="Location of data (vocab file).")
   parser.add_argument("--vocab-file", required=True,
                       help="Location of vocabulary file.")
+  parser.add_argument("--output-dir", required=True,
+                      help="Where to write out the tfrecords.")
   parser.add_argument("--max-seq-length", default=128, type=int,
                       help="Number of tokens per example.")
   parser.add_argument("--num-processes", default=1, type=int,
