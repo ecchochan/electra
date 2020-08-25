@@ -44,7 +44,7 @@ def write_examples(job_id, args):
       do_lower_case=args.do_lower_case
   )
   log("Writing tf examples")
-  fnames = sorted(tf.io.gfile.listdir(raw_dir))
+  fnames = sorted(tf.io.gfile.listdir(args.data_dir))
   fnames = [f for (i, f) in enumerate(fnames)
             if i % args.num_processes == job_id]
   random.shuffle(fnames)
