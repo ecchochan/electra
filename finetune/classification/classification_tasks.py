@@ -65,12 +65,11 @@ class SingleOutputTask(task.Task):
   def featurize(self, example: InputExample, is_training, log=False):
     """Turn an InputExample into a dict of features."""
     encoded_a = self._tokenizer.encode(example.text_a)
-    encoded_b = self._tokenizer.encode(example.text_b)
-    tokens_a = self._tokenizer.encode(example.text_a)
-    tokens_a = self._tokenizer.encode(example.text_a)
+    tokens_a = encoded_a.ids
     tokens_b = None
     if example.text_b:
-      tokens_b = self._tokenizer.encode(example.text_b)
+      encoded_b = self._tokenizer.encode(example.text_b)
+      tokens_b = encoded_b.ids
 
     if tokens_b:
       # Modifies `tokens_a` and `tokens_b` in place so that the total
@@ -102,22 +101,22 @@ class SingleOutputTask(task.Task):
     # the entire model is fine-tuned.
     tokens = []
     segment_ids = []
-    tokens.append("<s>")
+    tokens.append(0) #("<s>")
     segment_ids.append(0)
     for token in tokens_a:
       tokens.append(token)
       segment_ids.append(0)
-    tokens.append("</s>")
+    tokens.append(1) #("</s>")
     segment_ids.append(0)
 
     if tokens_b:
       for token in tokens_b:
         tokens.append(token)
         segment_ids.append(1)
-      tokens.append("</s>")
+      tokens.append(1) #("</s>")
       segment_ids.append(1)
 
-    input_ids = self._tokenizer.convert_tokens_to_ids(tokens)
+    input_ids = tokens # self._tokenizer.convert_tokens_to_ids(tokens)
 
     # The mask has 1 for real tokens and 0 for padding tokens. Only real
     # tokens are attended to.
@@ -136,7 +135,7 @@ class SingleOutputTask(task.Task):
     if log:
       utils.log("  Example {:}".format(example.eid))
       utils.log("    tokens: {:}".format(" ".join(
-          [tokenization.printable_text(x) for x in tokens])))
+          [tokenization.printable_text(tokenizer.id_to_token(x)) for x in tokens])))
       utils.log("    input_ids: {:}".format(" ".join(map(str, input_ids))))
       utils.log("    input_mask: {:}".format(" ".join(map(str, input_mask))))
       utils.log("    segment_ids: {:}".format(" ".join(map(str, segment_ids))))
