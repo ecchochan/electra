@@ -143,7 +143,7 @@ class BertModel(object):
   """
 
   def __init__(self,
-               config,
+               bert_config,
                is_training,
                input_ids,
                input_mask=None,
@@ -154,7 +154,7 @@ class BertModel(object):
                untied_embeddings=False):
     """Constructor for AlbertModel.
     Args:
-      config: `AlbertConfig` instance.
+      bert_config: `AlbertConfig` instance.
       is_training: bool. true for training model, false for eval model. Controls
         whether dropout will be applied.
       input_ids: int32 Tensor of shape [batch_size, seq_length].
@@ -169,7 +169,7 @@ class BertModel(object):
       ValueError: The config is invalid or one of the input tensor shapes
         is invalid.
     """
-    config = copy.deepcopy(config)
+    config = copy.deepcopy(bert_config)
     if not is_training:
       config.hidden_dropout_prob = 0.0
       config.attention_probs_dropout_prob = 0.0
