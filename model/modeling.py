@@ -82,7 +82,6 @@ class BertConfig(object):
       initializer_range: The stdev of the truncated_normal_initializer for
         initializing all weight matrices.
     """
-    print('BertConfig (Albert)')
     self.vocab_size = vocab_size
     self.embedding_size = embedding_size
     self.hidden_size = hidden_size
