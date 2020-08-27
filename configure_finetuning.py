@@ -36,6 +36,7 @@ class FinetuningConfig(object):
     self.do_train = True  # train a model
     self.do_eval = True  # evaluate the model
     self.keep_all_models = True  # if False, only keep the last trial's ckpt
+    self.albert = False  # use albert
 
     # model
     self.model_size = "small"  # one of "small", "base", or "large"
