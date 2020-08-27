@@ -333,7 +333,7 @@ class QATask(task.Task):
       tokens.append(1) # ("[SEP]")
       segment_ids.append(1)
 
-      tokens = input_ids #input_ids = self._tokenizer.convert_tokens_to_ids(tokens)
+      input_ids = tokens #input_ids = self._tokenizer.convert_tokens_to_ids(tokens)
 
       # The mask has 1 for real tokens and 0 for padding tokens. Only real
       # tokens are attended to.
@@ -376,7 +376,7 @@ class QATask(task.Task):
         utils.log("*** Example ***")
         utils.log("doc_span_index: %s" % doc_span_index)
         utils.log("tokens: %s" % " ".join(
-            [tokenization.printable_text(tokenizer.id_to_token(x)) for x in tokens])))
+            [tokenization.printable_text(self._tokenizer.id_to_token(x)) for x in tokens]))
         utils.log("token_to_orig_map: %s" % " ".join(
             ["%d:%d" % (x, y) for (x, y) in six.iteritems(token_to_orig_map)]))
         utils.log("token_is_max_context: %s" % " ".join([
@@ -388,7 +388,7 @@ class QATask(task.Task):
         if is_training and example.is_impossible:
           utils.log("impossible example")
         if is_training and not example.is_impossible:
-          answer_text = " ".join(tokenizer.id_to_token(x)) for x in tokens[start_position:(end_position + 1)])
+          answer_text = " ".join(self._tokenizer.id_to_token(x) for x in tokens[start_position:(end_position + 1)])
           utils.log("start_position: %d" % start_position)
           utils.log("end_position: %d" % end_position)
           utils.log("answer: %s" % (tokenization.printable_text(answer_text)))
@@ -403,7 +403,7 @@ class QATask(task.Task):
       if for_eval:
         features.update({
             self.name + "_doc_span_index": doc_span_index,
-            self.name + "_tokens": [tokenizer.id_to_token(x)) for x in tokens],
+            self.name + "_tokens": [self._tokenizer.id_to_token(x) for x in tokens],
             self.name + "_token_to_orig_map": token_to_orig_map,
             self.name + "_token_is_max_context": token_is_max_context,
         })
