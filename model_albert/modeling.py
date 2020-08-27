@@ -150,7 +150,8 @@ class BertModel(object):
                token_type_ids=None,
                use_one_hot_embeddings=False,
                use_einsum=True,
-               scope=None):
+               scope=None,
+               untied_embeddings=False):
     """Constructor for AlbertModel.
     Args:
       config: `AlbertConfig` instance.
@@ -163,7 +164,7 @@ class BertModel(object):
         embeddings or tf.embedding_lookup() for the word embeddings.
       use_einsum: (optional) bool. Whether to use einsum or reshape+matmul for
         dense layers
-      scope: (optional) variable scope. Defaults to "bert".
+      scope: (optional) variable scope. Defaults to "electra".
     Raises:
       ValueError: The config is invalid or one of the input tensor shapes
         is invalid.
@@ -183,8 +184,9 @@ class BertModel(object):
     if token_type_ids is None:
       token_type_ids = tf.zeros(shape=[batch_size, seq_length], dtype=tf.int32)
 
-    with tf.variable_scope(scope, default_name="bert"):
-      with tf.variable_scope("embeddings"):
+    with tf.variable_scope(
+        (scope if untied_embeddings else "electra") + "/embeddings",
+        reuse=tf.AUTO_REUSE):
         # Perform embedding lookup on the word ids.
         (self.word_embedding_output,
          self.output_embedding_table) = embedding_lookup(
@@ -210,6 +212,7 @@ class BertModel(object):
             dropout_prob=config.hidden_dropout_prob,
             use_one_hot_embeddings=use_one_hot_embeddings)
 
+    with tf.variable_scope(scope, default_name="electra"):
       with tf.variable_scope("encoder"):
         # Run the stacked transformer.
         # `sequence_output` shape = [batch_size, seq_length, hidden_size].
