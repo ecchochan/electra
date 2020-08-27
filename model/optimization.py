@@ -150,6 +150,7 @@ class AdamWeightDecayOptimizer(tf.train.Optimizer):
             if key not in key_to_grads_and_vars:
               key_to_grads_and_vars[key] = []
             key_to_grads_and_vars[key].append((grad, var))
+            break
         if not update_for_var:
           raise ValueError("No learning rate specified for variable", var)
       assignments = []
