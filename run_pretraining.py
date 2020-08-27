@@ -27,7 +27,6 @@ import tensorflow.compat.v1 as tf
 
 import configure_pretraining
 from model import modeling
-from model_albert import modeling as modeling_albert
 from model import optimization
 from pretrain import pretrain_data
 from pretrain import pretrain_helpers
@@ -373,18 +372,16 @@ def main():
                       help="The name of the model being fine-tuned.")
   parser.add_argument("--hparams", default="{}",
                       help="JSON dict of model hyperparameters.")
-  parser.add_argument("--albert", action='store_true', default=False,
-                      help="Use albert")
+                      
   args = parser.parse_args()
-  if args.albert:
-    modeling = modeling_albert
+  
   if args.hparams.endswith(".json"):
     hparams = utils.load_json(args.hparams)
   else:
     hparams = json.loads(args.hparams)
   tf.logging.set_verbosity(tf.logging.ERROR)
   train_or_eval(configure_pretraining.PretrainingConfig(
-      args.model_name, args.data_dir, albert=args.albert, **hparams))
+      args.model_name, args.data_dir, albert=True, **hparams))
 
 
 if __name__ == "__main__":
