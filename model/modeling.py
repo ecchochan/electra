@@ -73,6 +73,8 @@ class BertConfig(object):
         initializing all weight matrices.
     """
     print('BertConfig (BERT)')
+    import traceback
+    traceback.print_stack()
     self.vocab_size = vocab_size
     self.hidden_size = hidden_size
     self.num_hidden_layers = num_hidden_layers
