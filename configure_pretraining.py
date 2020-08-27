@@ -31,6 +31,9 @@ class PretrainingConfig(object):
     self.do_train = True  # pre-train ELECTRA
     self.do_eval = False  # evaluate generator/discriminator on unlabeled data
     self.albert = False  # use albert
+    self.num_hidden_groups = 1
+    self.down_scale_factor = 1
+    self.inner_group_num = 1
 
     # loss functions
     self.electra_objective = True  # if False, use the BERT objective instead

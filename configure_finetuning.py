@@ -37,6 +37,9 @@ class FinetuningConfig(object):
     self.do_eval = True  # evaluate the model
     self.keep_all_models = True  # if False, only keep the last trial's ckpt
     self.albert = False  # use albert
+    self.num_hidden_groups = 1
+    self.down_scale_factor = 1
+    self.inner_group_num = 1
 
     # model
     self.model_size = "small"  # one of "small", "base", or "large"
