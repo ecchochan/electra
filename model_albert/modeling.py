@@ -150,6 +150,7 @@ class BertModel(object):
                token_type_ids=None,
                use_one_hot_embeddings=False,
                use_einsum=True,
+               embedding_size=None,
                scope=None,
                untied_embeddings=False):
     """Constructor for AlbertModel.
@@ -188,11 +189,13 @@ class BertModel(object):
         (scope if untied_embeddings else "electra") + "/embeddings",
         reuse=tf.AUTO_REUSE):
         # Perform embedding lookup on the word ids.
+        if embedding_size is None:
+          embedding_size = config.hidden_size
         (self.word_embedding_output,
          self.output_embedding_table) = embedding_lookup(
              input_ids=input_ids,
              vocab_size=config.vocab_size,
-             embedding_size=config.embedding_size,
+             embedding_size=embedding_size,
              initializer_range=config.initializer_range,
              word_embedding_name="word_embeddings",
              use_one_hot_embeddings=use_one_hot_embeddings)
