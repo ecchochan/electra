@@ -141,7 +141,7 @@ def _improve_answer_span(doc_tokens, input_start, input_end, tokenizer,
   # the word "Japanese". Since our WordPiece tokenizer does not split
   # "Japanese", we just use "Japanese" as the annotation. This is fairly rare
   # in SQuAD, but does happen.
-  tok_answer_text = " ".join(tokenizer.tokenize(orig_answer_text))
+  tok_answer_text = " ".join(tokenizer.encode(orig_answer_text).tokens)
 
   for new_start in range(input_start, input_end + 1):
     for new_end in range(input_end, new_start - 1, -1):
@@ -259,7 +259,7 @@ class QATask(task.Task):
   def featurize(self, example: QAExample, is_training, log=False,
                 for_eval=False):
     all_features = []
-    query_tokens = self._tokenizer.tokenize(example.question_text)
+    query_tokens = self._tokenizer.encode(example.question_text).ids
 
     if len(query_tokens) > self.config.max_query_length:
       query_tokens = query_tokens[0:self.config.max_query_length]
@@ -269,7 +269,7 @@ class QATask(task.Task):
     all_doc_tokens = []
     for (i, token) in enumerate(example.doc_tokens):
       orig_to_tok_index.append(len(all_doc_tokens))
-      sub_tokens = self._tokenizer.tokenize(token)
+      sub_tokens = self._tokenizer.encode(token).ids
       for sub_token in sub_tokens:
         tok_to_orig_index.append(i)
         all_doc_tokens.append(sub_token)
@@ -313,12 +313,12 @@ class QATask(task.Task):
       token_to_orig_map = {}
       token_is_max_context = {}
       segment_ids = []
-      tokens.append("[CLS]")
+      tokens.append(0) # ("[CLS]")
       segment_ids.append(0)
       for token in query_tokens:
         tokens.append(token)
         segment_ids.append(0)
-      tokens.append("[SEP]")
+      tokens.append(1) # ("[SEP]")
       segment_ids.append(0)
 
       for i in range(doc_span.length):
@@ -330,10 +330,10 @@ class QATask(task.Task):
         token_is_max_context[len(tokens)] = is_max_context
         tokens.append(all_doc_tokens[split_token_index])
         segment_ids.append(1)
-      tokens.append("[SEP]")
+      tokens.append(1) # ("[SEP]")
       segment_ids.append(1)
 
-      input_ids = self._tokenizer.convert_tokens_to_ids(tokens)
+      tokens = input_ids #input_ids = self._tokenizer.convert_tokens_to_ids(tokens)
 
       # The mask has 1 for real tokens and 0 for padding tokens. Only real
       # tokens are attended to.
@@ -376,7 +376,7 @@ class QATask(task.Task):
         utils.log("*** Example ***")
         utils.log("doc_span_index: %s" % doc_span_index)
         utils.log("tokens: %s" % " ".join(
-            [tokenization.printable_text(x) for x in tokens]))
+            [tokenization.printable_text(tokenizer.id_to_token(x)) for x in tokens])))
         utils.log("token_to_orig_map: %s" % " ".join(
             ["%d:%d" % (x, y) for (x, y) in six.iteritems(token_to_orig_map)]))
         utils.log("token_is_max_context: %s" % " ".join([
@@ -388,7 +388,7 @@ class QATask(task.Task):
         if is_training and example.is_impossible:
           utils.log("impossible example")
         if is_training and not example.is_impossible:
-          answer_text = " ".join(tokens[start_position:(end_position + 1)])
+          answer_text = " ".join(tokenizer.id_to_token(x)) for x in tokens[start_position:(end_position + 1)])
           utils.log("start_position: %d" % start_position)
           utils.log("end_position: %d" % end_position)
           utils.log("answer: %s" % (tokenization.printable_text(answer_text)))
@@ -403,7 +403,7 @@ class QATask(task.Task):
       if for_eval:
         features.update({
             self.name + "_doc_span_index": doc_span_index,
-            self.name + "_tokens": tokens,
+            self.name + "_tokens": [tokenizer.id_to_token(x)) for x in tokens],
             self.name + "_token_to_orig_map": token_to_orig_map,
             self.name + "_token_is_max_context": token_is_max_context,
         })
@@ -601,6 +601,11 @@ class SQuADTask(QATask):
 class SQuAD(SQuADTask):
   def __init__(self, config: configure_finetuning.FinetuningConfig, tokenizer):
     super(SQuAD, self).__init__(config, "squad", tokenizer, v2=True)
+
+
+class DRCD(SQuADTask):
+  def __init__(self, config: configure_finetuning.FinetuningConfig, tokenizer):
+    super(SQuAD, self).__init__(config, "drcd", tokenizer)
 
 
 class SQuADv1(SQuADTask):

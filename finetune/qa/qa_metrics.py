@@ -80,7 +80,7 @@ class SpanBasedQAScorer(scorer.Scorer):
       squad_official_eval.main()
       return sorted(utils.load_json(
           self._config.qa_eval_file(self._name)).items())
-    elif self._name == "squadv1":
+    elif self._name == "squadv1" or self._name == "drcd":
       return sorted(squad_official_eval_v1.main(
           self._config, self._split).items())
     else:
@@ -103,7 +103,7 @@ class SpanBasedQAScorer(scorer.Scorer):
     scores_diff_json = collections.OrderedDict()
 
     for example in self._eval_examples:
-      example_id = example.qas_id if "squad" in self._name else example.qid
+      example_id = example.qas_id if "squad" in self._name or "drcd" in self._name else example.qid
       features = self._task.featurize(example, False, for_eval=True)
 
       prelim_predictions = []
