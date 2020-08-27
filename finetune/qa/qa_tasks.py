@@ -145,7 +145,7 @@ def _improve_answer_span(doc_tokens, input_start, input_end, tokenizer,
 
   for new_start in range(input_start, input_end + 1):
     for new_end in range(input_end, new_start - 1, -1):
-      text_span = " ".join(doc_tokens[new_start:(new_end + 1)])
+      text_span = " ".join(self._tokenizer.id_to_token(x) for x in doc_tokens[new_start:(new_end + 1)])
       if text_span == tok_answer_text:
         return new_start, new_end
 
