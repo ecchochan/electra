@@ -26,7 +26,7 @@ import json
 import tensorflow.compat.v1 as tf
 
 import configure_pretraining
-from model import modeling
+from modeling_albert import modeling
 from model import optimization
 from pretrain import pretrain_data
 from pretrain import pretrain_helpers
@@ -373,7 +373,7 @@ def main():
   parser.add_argument("--hparams", default="{}",
                       help="JSON dict of model hyperparameters.")
   args = parser.parse_args()
-  setattr(args, 'albert', False)
+  setattr(args, 'albert', True)
   if args.hparams.endswith(".json"):
     hparams = utils.load_json(args.hparams)
   else:
