@@ -374,7 +374,6 @@ def main():
                       help="JSON dict of model hyperparameters.")
                       
   args = parser.parse_args()
-  
   if args.hparams.endswith(".json"):
     hparams = utils.load_json(args.hparams)
   else:
