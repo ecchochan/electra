@@ -384,7 +384,7 @@ def main():
     hparams = json.loads(args.hparams)
   tf.logging.set_verbosity(tf.logging.ERROR)
   train_or_eval(configure_pretraining.PretrainingConfig(
-      args.model_name, args.data_dir, **hparams))
+      args.model_name, args.data_dir, albert=args.albert, **hparams))
 
 
 if __name__ == "__main__":

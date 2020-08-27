@@ -151,7 +151,8 @@ class FinetuningConfig(object):
       self.layerwise_lr_decay = 0.9
     elif self.model_size == "small":
       self.embedding_size = 128
-
+    if self.albert:
+      self.embedding_size = 128
     # debug-mode settings
     if self.debug:
       self.save_checkpoints_steps = 1000000
