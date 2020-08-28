@@ -232,8 +232,8 @@ class QATask(task.Task):
                           tokenization.printable_text(cleaned_answer_text)))
             example_failures[0] += 1
             continue
-          continue
-
+            
+          """
           start_position = char_to_word_offset[answer_offset]
           if answer_offset + answer_length - 1 >= len(char_to_word_offset):
             utils.log("End position is out of document!")
@@ -264,7 +264,7 @@ class QATask(task.Task):
                           tokenization.printable_text(actual_text),
                           tokenization.printable_text(cleaned_answer_text)))
             example_failures[0] += 1
-            continue
+            continue"""
         else:
           start_position = -1
           end_position = -1
