@@ -338,6 +338,7 @@ def model_fn_builder(config: configure_pretraining.PretrainingConfig):
           mode=mode,
           loss=model.total_loss,
           train_op=train_op,
+          eval_metrics=model.eval_metrics,
           training_hooks=[training_utils.ETAHook(
               {} if config.use_tpu else dict(loss=model.total_loss),
               config.num_train_steps, config.iterations_per_loop,
