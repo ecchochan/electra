@@ -82,7 +82,7 @@ class SpanBasedQAScorer(scorer.Scorer):
           self._config.qa_eval_file(self._name)).items())
     elif self._name == "squadv1" or self._name == "drcd":
       return sorted(squad_official_eval_v1.main(
-          self._config, self._split).items())
+          self._config, self._split, self._name).items())
     else:
       return sorted(mrqa_official_eval.main(
           self._config, self._split, self._name).items())
