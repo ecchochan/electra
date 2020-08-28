@@ -195,8 +195,18 @@ class SpanBasedQAScorer(scorer.Scorer):
         feature = features[pred.feature_index]
         offset = feature[self._name + "_doc_span_offset"]
         N = feature['segment_ids'].index(1)
-        char_start = offsets[offset+pred.start_index - N][0]  # -N for [CLS]
-        char_end = offsets[offset+pred.end_index - N][1]
+        try:
+          char_start = offsets[offset+pred.start_index - N][0]  # -N for [CLS]
+          char_end = offsets[offset+pred.end_index - N][1]
+        except Exception as e:
+          import traceback
+          traceback.print_exc()
+          print('char_start/char_end cannot be found')
+          print('feature =', feature)
+          print('N =', N)
+          print('offset =', pred.offset)
+          print('pred.start_index =', pred.start_index)
+          print('len(offsets) =', len(offsets))
         final_text = paragraph_text[char_start:char_end]
 
 
