@@ -92,19 +92,27 @@ class Preprocessor(object):
 
     return input_fn, steps
 
+
+  def serialize_work(self, ex_index, example, is_training, log_examples):
+    bucket = []
+    for tf_example in self._example_to_tf_example(
+        example, is_training,
+        log=self._config.log_examples and ex_index < 1):
+        bucket.append(tf_example.SerializeToString())
+    return bucket
+
+
   def serialize_examples(self, examples, is_training, output_file, batch_size):
     """Convert a set of `InputExample`s to a TFRecord file."""
     n_examples = 0
+    from joblib import Parallel, delayed
+    results = Parallel(n_jobs=2)(delayed(self.serialize_work)(ex_index, example, is_training) for (ex_index, example) in enumerate(examples))
     with tf.io.TFRecordWriter(output_file) as writer:
-      for (ex_index, example) in tqdm(enumerate(examples)):
-        #if ex_index % 2000 == 0:
-        #  utils.log("Writing example {:} of {:}".format(
-        #      ex_index, len(examples)))
-        for tf_example in self._example_to_tf_example(
-            example, is_training,
-            log=self._config.log_examples and ex_index < 1):
-          writer.write(tf_example.SerializeToString())
+      for r in results:
+        for r in r:
+          writer.write(r)
           n_examples += 1
+
       # add padding so the dataset is a multiple of batch_size
       while n_examples % batch_size != 0:
         writer.write(self._make_tf_example(task_id=len(self._config.task_names))
