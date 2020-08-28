@@ -158,6 +158,7 @@ class FinetuningConfig(object):
       self.learning_rate = 5e-5
       self.layerwise_lr_decay = 0.9
     elif self.model_size == "small":
+      self.learning_rate = 3e-4
       self.embedding_size = 128
     if self.albert:
       self.embedding_size = 128

@@ -356,12 +356,12 @@ class QATask(task.Task):
       #token_to_orig_map = {}
       token_is_max_context = {}
       segment_ids = []
-      tokens.append(1) # ("[CLS]")
+      tokens.append(0) # ("[CLS]")
       segment_ids.append(0)
       for token in query_tokens:
         tokens.append(token)
         segment_ids.append(0)
-      tokens.append(2) # ("[SEP]")
+      tokens.append(1) # ("[SEP]")
       segment_ids.append(0)
 
       for i in range(doc_span.length):
