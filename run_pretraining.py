@@ -27,7 +27,6 @@ import tensorflow.compat.v1 as tf
 
 import configure_pretraining
 from model import modeling
-from model_albert import modeling as modeling_albert
 from model import optimization
 from pretrain import pretrain_data
 from pretrain import pretrain_helpers
