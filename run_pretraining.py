@@ -85,6 +85,13 @@ class PretrainingModel(object):
       disc_output = self._get_discriminator_output(
           fake_data.inputs, discriminator, fake_data.is_fake_tokens)
       self.total_loss += config.disc_weight * disc_output.loss
+      sop_pred_model = discriminator
+    else:
+      sop_pred_model = generator
+
+    if mased_inputs.sop_label is not None:
+      sop_output = _get_sentence_order_output(sop_pred_model.get_pooled_output(), mased_inputs.sop_label)
+      self.total_loss += config.sop_weight * sop_output.loss
 
     # Evaluation
     eval_fn_inputs = {
@@ -94,6 +101,7 @@ class PretrainingModel(object):
         "masked_lm_ids": masked_inputs.masked_lm_ids,
         "masked_lm_weights": masked_inputs.masked_lm_weights,
         "input_mask": masked_inputs.input_mask
+        "sop_label": masked_inputs.sop_label
     }
     if config.electra_objective:
       eval_fn_inputs.update({
@@ -104,6 +112,12 @@ class PretrainingModel(object):
           "sampled_tokids": tf.argmax(fake_data.sampled_tokens, -1,
                                       output_type=tf.int32)
       })
+    if mased_inputs.sop_label is not None:
+      eval_fn_inputs.update({
+        'sop_loss': sop_output.per_example_loss,
+        'sop_log_probs': sop_output.log_probs,
+        'sop_labels': sop_output.labels,
+      }
     eval_fn_keys = eval_fn_inputs.keys()
     eval_fn_values = [eval_fn_inputs[k] for k in eval_fn_keys]
 
@@ -137,6 +151,25 @@ class PretrainingModel(object):
           metrics["disc_recall"] = tf.metrics.accuracy(
               labels=d["disc_labels"], predictions=d["disc_preds"],
               weights=d["disc_labels"] * d["input_mask"])
+      if 'sop_loss' in metrics:
+        sentence_order_example_loss = metrics['sop_loss']
+        sentence_order_log_probs    = metrics['sop_log_probs']
+        sentence_order_labels       = metrics['sop_labels']
+
+        sentence_order_log_probs = tf.reshape(
+            sentence_order_log_probs, [-1, sentence_order_log_probs.shape[-1]])
+        sentence_order_predictions = tf.argmax(
+            sentence_order_log_probs, axis=-1, output_type=tf.int32)
+        sentence_order_labels = tf.reshape(sentence_order_labels, [-1])
+        sentence_order_accuracy = tf.metrics.accuracy(
+            labels=sentence_order_labels,
+            predictions=sentence_order_predictions)
+        sentence_order_mean_loss = tf.metrics.mean(
+            values=sentence_order_example_loss)
+        metrics.update({
+            "sentence_order_accuracy": sentence_order_accuracy,
+            "sentence_order_loss": sentence_order_mean_loss
+        })
       return metrics
     self.eval_metrics = (metric_fn, eval_fn_values)
 
@@ -214,6 +247,27 @@ class PretrainingModel(object):
           loss=loss, per_example_loss=per_example_loss, probs=probs,
           preds=preds, labels=labels,
       )
+
+  def _get_sentence_order_output(self, input_tensor, labels):
+    with tf.variable_scope("cls/seq_relationship"):
+      output_weights = tf.get_variable(
+          "output_weights",
+          shape=[2, self._bert_config.hidden_size],
+          initializer=modeling.create_initializer(
+              self._bert_config.initializer_range))
+      output_bias = tf.get_variable(
+          "output_bias", shape=[2], initializer=tf.zeros_initializer())
+
+    logits = tf.matmul(input_tensor, output_weights, transpose_b=True)
+    logits = tf.nn.bias_add(logits, output_bias)
+    log_probs = tf.nn.log_softmax(logits, axis=-1)
+    labels = tf.reshape(labels, [-1])
+    one_hot_labels = tf.one_hot(labels, depth=2, dtype=tf.float32)
+    per_example_loss = -tf.reduce_sum(one_hot_labels * log_probs, axis=-1)
+    loss = tf.reduce_mean(per_example_loss)
+    SOPOutput = collections.namedtuple(
+        "SOPOutput", ["loss", "per_example_loss", "log_probs", "labels"])
+    return SOPOutput(loss, per_example_loss, log_probs, labels)
 
   def _get_fake_data(self, inputs, mlm_logits):
     """Sample from the generator to create corrupted input."""
