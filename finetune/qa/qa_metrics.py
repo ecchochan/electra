@@ -206,6 +206,7 @@ class SpanBasedQAScorer(scorer.Scorer):
           print('N =', N)
           print('offset =', offset)
           print('pred.start_index =', pred.start_index)
+          print('pred.end_index =', pred.end_index)
           print('len(offsets) =', len(offsets))
           continue
         final_text = paragraph_text[char_start:char_end]
