@@ -63,9 +63,9 @@ class ExampleBuilder(object):
   def _create_example(self):
     """Creates a pre-training example from the current list of sentences."""
     # small chance to only have one segment as in classification tasks
-    if self.do_sop:
-      import warnings
-      warnings.warn("Creating tfrecords with SOP objective.")
+    if not self.warned and self.do_sop:
+      print("Creating tfrecords with SOP objective.")
+      self.warned = True
       
     if not self.do_sop and random.random() < 0.1:
       first_segment_target_length = 100000
