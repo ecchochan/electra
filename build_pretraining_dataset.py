@@ -62,6 +62,9 @@ class ExampleBuilder(object):
   def _create_example(self):
     """Creates a pre-training example from the current list of sentences."""
     # small chance to only have one segment as in classification tasks
+    if self.do_sop:
+      import warnings
+      warnings.warn("Creating tfrecords with SOP objective.")
     if not self.do_sop and random.random() < 0.1:
       first_segment_target_length = 100000
     else:
@@ -290,7 +293,7 @@ def main():
   parser.add_argument("--blanks-separate-docs", default=True, type=bool,
                       help="Whether blank lines indicate document boundaries.")
   parser.add_argument("--do-sop", dest='do_sop',
-                      action='store_false', help="Add SOP features.")
+                      action='store_true', help="Add SOP features.")
   parser.add_argument("--do-lower-case", dest='do_lower_case',
                       action='store_true', help="Lower case input text.")
   parser.add_argument("--no-lower-case", dest='do_lower_case',
