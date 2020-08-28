@@ -71,8 +71,9 @@ class ExampleBuilder(object):
       first_segment_target_length = 100000
     else:
       # -3 due to not yet having [CLS]/[SEP] tokens in the input text
-      first_segment_target_length = (self._target_length - 3) // 2 if not self.do_sop else \
-                                    (random.randint(8, (self._target_length - 3) // 2) if random.random() > 0.5 else (self._target_length - 3) // 2
+      ss = (self._target_length - 3) // 2
+      first_segment_target_length = ss if not self.do_sop else \
+                                    (random.randint(min(8,ss), ss) if random.random() > 0.5 else ss
                                     )
 
     first_segment = []
