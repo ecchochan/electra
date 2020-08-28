@@ -204,7 +204,7 @@ class SpanBasedQAScorer(scorer.Scorer):
           print('char_start/char_end cannot be found')
           print('feature =', feature)
           print('N =', N)
-          print('offset =', pred.offset)
+          print('offset =', offset)
           print('pred.start_index =', pred.start_index)
           print('len(offsets) =', len(offsets))
           continue
