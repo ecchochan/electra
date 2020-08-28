@@ -220,7 +220,7 @@ class QATask(task.Task):
           start_position = encoded.char_to_token(answer_offset)
           end_position = encoded.char_to_token(answer_offset + answer_length - 1)
 
-          actual_text = paragraph_text[offsets[start_position[0]]: offsets[end_position[1]+1]]
+          actual_text = paragraph_text[offsets[start_position][0]: offsets[end_position][1]]
           cleaned_answer_text = orig_answer_text
 
           actual_text = actual_text.lower()
