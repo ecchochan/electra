@@ -31,6 +31,7 @@ from finetune.qa import squad_official_eval_v1
 from model import tokenization
 from util import utils
 
+from cantokenizer import CanTokenizer
 
 RawResult = collections.namedtuple("RawResult", [
     "unique_id", "start_logits", "end_logits", "answerable_logit",
@@ -54,6 +55,7 @@ class SpanBasedQAScorer(scorer.Scorer):
     self._total_loss = 0
     self._split = split
     self._eval_examples = task.get_examples(split)
+    self.tokenizer = CanTokenizer(config.vocab_file)
 
   def update(self, results):
     super(SpanBasedQAScorer, self).update(results)
@@ -89,6 +91,7 @@ class SpanBasedQAScorer(scorer.Scorer):
 
   def write_predictions(self):
     """Write final predictions to the json file."""
+    tokenizer = self.tokenizer
     unique_id_to_result = {}
     for result in self._all_results:
       unique_id_to_result[result.unique_id] = result
@@ -103,6 +106,9 @@ class SpanBasedQAScorer(scorer.Scorer):
     scores_diff_json = collections.OrderedDict()
 
     for example in self._eval_examples:
+      paragraph_text = example.paragraph_text
+      context_encoded = example.context_encoded
+      offsets = context_encoded.offsets
       example_id = example.qas_id if "squad" in self._name or "drcd" in self._name else example.qid
       features = self._task.featurize(example, False, for_eval=True)
 
@@ -139,10 +145,10 @@ class SpanBasedQAScorer(scorer.Scorer):
               continue
             if start_index == 0:
               continue
-            if start_index not in feature[self._name + "_token_to_orig_map"]:
-              continue
-            if end_index not in feature[self._name + "_token_to_orig_map"]:
-              continue
+            #if start_index not in feature[self._name + "_token_to_orig_map"]:
+            #  continue
+            #if end_index not in feature[self._name + "_token_to_orig_map"]:
+            #  continue
             if not feature[self._name + "_token_is_max_context"].get(
                 start_index, False):
               continue
@@ -166,12 +172,11 @@ class SpanBasedQAScorer(scorer.Scorer):
                     end_logit=end_logit))
 
       if self._v2:
-        if len(prelim_predictions) == 0 and self._config.debug:
-          tokid = sorted(feature[self._name + "_token_to_orig_map"].keys())[0]
+        if False and len(prelim_predictions) == 0 and self._config.debug:
           prelim_predictions.append(_PrelimPrediction(
               feature_index=0,
-              start_index=tokid,
-              end_index=tokid + 1,
+              start_index=0,
+              end_index=0 + 1,
               start_logit=1.0,
               end_logit=1.0))
       prelim_predictions = sorted(
@@ -188,6 +193,15 @@ class SpanBasedQAScorer(scorer.Scorer):
         if len(nbest) >= self._config.n_best_size:
           break
         feature = features[pred.feature_index]
+        offset = feature[self._name + "_doc_span_offset"]
+        char_start = offsets[pred.start_index][0] - 1  # -1 for [CLS]
+        char_end = offsets[pred.end_index][1] - 1
+        final_text = paragraph_text[char_start:char_end+1]
+
+
+        # Find final_text
+
+        """
         tok_tokens = feature[self._name + "_tokens"][
             pred.start_index:(pred.end_index + 1)]
         orig_doc_start = feature[
@@ -206,7 +220,11 @@ class SpanBasedQAScorer(scorer.Scorer):
         tok_text = " ".join(tok_text.split())
         orig_text = " ".join(orig_tokens)
 
-        final_text = get_final_text(self._config, tok_text, orig_text)
+        final_text = get_final_text(self._config, tok_text, orig_text, tokenizer)
+        """
+
+
+
         if final_text in seen_predictions:
           continue
 
@@ -305,7 +323,7 @@ def _compute_softmax(scores):
 
 
 def get_final_text(config: configure_finetuning.FinetuningConfig, pred_text,
-                   orig_text):
+                   orig_text, tokenizer):
   """Project the tokenized prediction back to the original text."""
 
   # When we created the data, we kept track of the alignment between original
@@ -348,7 +366,7 @@ def get_final_text(config: configure_finetuning.FinetuningConfig, pred_text,
   # and `pred_text`, and check if they are the same length. If they are
   # NOT the same length, the heuristic has failed. If they are the same
   # length, we assume the characters are one-to-one aligned.
-  tokenizer = tokenization.BasicTokenizer(do_lower_case=config.do_lower_case)
+  # tokenizer = tokenization.BasicTokenizer(do_lower_case=config.do_lower_case)
 
   tok_text = " ".join(tokenizer.tokenize(orig_text))
 

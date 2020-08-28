@@ -43,22 +43,28 @@ class QAExample(task.Example):
                eid,
                qas_id,
                qid,
+               paragraph_text,
                question_text,
                doc_tokens,
+               doc_ids,
                orig_answer_text=None,
                start_position=None,
                end_position=None,
-               is_impossible=False):
+               is_impossible=False,
+               context_encoded=None):
     super(QAExample, self).__init__(task_name)
     self.eid = eid
     self.qas_id = qas_id
     self.qid = qid
+    self.paragraph_text = paragraph_text
     self.question_text = question_text
     self.doc_tokens = doc_tokens
+    self.doc_ids = doc_ids
     self.orig_answer_text = orig_answer_text
     self.start_position = start_position
     self.end_position = end_position
     self.is_impossible = is_impossible
+    self.context_encoded = context_encoded
 
   def __str__(self):
     return self.__repr__()
@@ -169,8 +175,14 @@ class QATask(task.Task):
     self.v2 = v2
 
   def _add_examples(self, examples, example_failures, paragraph, split):
+    tokenizer = self.tokenizer
     paragraph_text = paragraph["context"]
-    doc_tokens = []
+    encoded = tokenizer.encode(paragraph_text)
+    offsets = encoded.offsets
+    doc_tokens = encoded.tokens
+    doc_ids = encoded.ids
+
+    '''
     char_to_word_offset = []
     prev_is_whitespace = True
     for c in paragraph_text:
@@ -182,7 +194,7 @@ class QATask(task.Task):
         else:
           doc_tokens[-1] += c
         prev_is_whitespace = False
-      char_to_word_offset.append(len(doc_tokens) - 1)
+      char_to_word_offset.append(len(doc_tokens) - 1)'''
 
     for qa in paragraph["qas"]:
       qas_id = qa["id"] if "id" in qa else None
@@ -204,6 +216,24 @@ class QATask(task.Task):
             answer_offset = answer["answer_start"]
           orig_answer_text = answer["text"]
           answer_length = len(orig_answer_text)
+
+          start_position = encoded.char_to_token(answer_offset)
+          end_position = encoded.char_to_token(answer_offset + answer_length - 1)
+
+          actual_text = paragraph_text[offsets[start_position[0]]: offsets[end_position[1]+1]]
+          cleaned_answer_text = orig_answer_text
+
+          actual_text = actual_text.lower()
+          cleaned_answer_text = cleaned_answer_text.lower()
+          if actual_text.find(cleaned_answer_text) == -1:
+            utils.log("Could not find answer: '{:}' in doc vs. "
+                      "'{:}' in provided answer".format(
+                          tokenization.printable_text(actual_text),
+                          tokenization.printable_text(cleaned_answer_text)))
+            example_failures[0] += 1
+            continue
+          continue
+
           start_position = char_to_word_offset[answer_offset]
           if answer_offset + answer_length - 1 >= len(char_to_word_offset):
             utils.log("End position is out of document!")
@@ -221,6 +251,11 @@ class QATask(task.Task):
               doc_tokens[start_position:(end_position + 1)])
           cleaned_answer_text = " ".join(
               tokenization.whitespace_tokenize(orig_answer_text))
+
+
+
+
+
           actual_text = actual_text.lower()
           cleaned_answer_text = cleaned_answer_text.lower()
           if actual_text.find(cleaned_answer_text) == -1:
@@ -240,12 +275,15 @@ class QATask(task.Task):
           eid=len(examples),
           qas_id=qas_id,
           qid=qid,
+          paragraph_text=paragraph_text,
           question_text=question_text,
           doc_tokens=doc_tokens,
+          doc_ids=doc_ids,
           orig_answer_text=orig_answer_text,
           start_position=start_position,
           end_position=end_position,
-          is_impossible=is_impossible)
+          is_impossible=is_impossible,
+          context_encoded=encoded)
       examples.append(example)
 
   def get_feature_specs(self):
@@ -260,10 +298,12 @@ class QATask(task.Task):
                 for_eval=False):
     all_features = []
     query_tokens = self._tokenizer.encode(example.question_text).ids
+    all_doc_tokens = example.doc_ids
 
     if len(query_tokens) > self.config.max_query_length:
       query_tokens = query_tokens[0:self.config.max_query_length]
 
+    '''
     tok_to_orig_index = []
     orig_to_tok_index = []
     all_doc_tokens = []
@@ -273,13 +313,15 @@ class QATask(task.Task):
       for sub_token in sub_tokens:
         tok_to_orig_index.append(i)
         all_doc_tokens.append(sub_token)
+    '''
 
-    tok_start_position = None
-    tok_end_position = None
     if is_training and example.is_impossible:
       tok_start_position = -1
       tok_end_position = -1
     if is_training and not example.is_impossible:
+      tok_start_position = example.start_position
+      tok_end_position = example.end_position
+      '''
       tok_start_position = orig_to_tok_index[example.start_position]
       if example.end_position < len(example.doc_tokens) - 1:
         tok_end_position = orig_to_tok_index[example.end_position + 1] - 1
@@ -288,6 +330,7 @@ class QATask(task.Task):
       (tok_start_position, tok_end_position) = _improve_answer_span(
           all_doc_tokens, tok_start_position, tok_end_position, self._tokenizer,
           example.orig_answer_text)
+          '''
 
     # The -3 accounts for [CLS], [SEP] and [SEP]
     max_tokens_for_doc = self.config.max_seq_length - len(query_tokens) - 3
@@ -310,7 +353,7 @@ class QATask(task.Task):
 
     for (doc_span_index, doc_span) in enumerate(doc_spans):
       tokens = []
-      token_to_orig_map = {}
+      #token_to_orig_map = {}
       token_is_max_context = {}
       segment_ids = []
       tokens.append(0) # ("[CLS]")
@@ -323,7 +366,7 @@ class QATask(task.Task):
 
       for i in range(doc_span.length):
         split_token_index = doc_span.start + i
-        token_to_orig_map[len(tokens)] = tok_to_orig_index[split_token_index]
+        #token_to_orig_map[len(tokens)] = tok_to_orig_index[split_token_index]
 
         is_max_context = _check_is_max_context(doc_spans, doc_span_index,
                                                split_token_index)
@@ -377,8 +420,8 @@ class QATask(task.Task):
         utils.log("doc_span_index: %s" % doc_span_index)
         utils.log("tokens: %s" % " ".join(
             [tokenization.printable_text(self._tokenizer.id_to_token(x)) for x in tokens]))
-        utils.log("token_to_orig_map: %s" % " ".join(
-            ["%d:%d" % (x, y) for (x, y) in six.iteritems(token_to_orig_map)]))
+        #utils.log("token_to_orig_map: %s" % " ".join(
+        #    ["%d:%d" % (x, y) for (x, y) in six.iteritems(token_to_orig_map)]))
         utils.log("token_is_max_context: %s" % " ".join([
             "%d:%s" % (x, y) for (x, y) in six.iteritems(token_is_max_context)
         ]))
@@ -403,8 +446,9 @@ class QATask(task.Task):
       if for_eval:
         features.update({
             self.name + "_doc_span_index": doc_span_index,
+            self.name + "_doc_span_offset": doc_span.start,
             self.name + "_tokens": [self._tokenizer.id_to_token(x) for x in tokens], 
-            self.name + "_token_to_orig_map": token_to_orig_map,
+            #self.name + "_token_to_orig_map": token_to_orig_map,
             self.name + "_token_is_max_context": token_is_max_context,
         })
       if is_training:
