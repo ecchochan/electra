@@ -42,6 +42,7 @@ class ExampleBuilder(object):
     self._max_length = max_length
     self._target_length = max_length
     self.do_sop = do_sop
+    self.warned = False
 
   def add_line(self, line):
     """Adds a line of text to the current example being built."""
@@ -62,9 +63,9 @@ class ExampleBuilder(object):
   def _create_example(self):
     """Creates a pre-training example from the current list of sentences."""
     # small chance to only have one segment as in classification tasks
-    if self.do_sop:
-      import warnings
-      warnings.warn("Creating tfrecords with SOP objective.")
+    if not self.warned and self.do_sop:
+      log("Creating tfrecords with SOP objective.")
+      
     if not self.do_sop and random.random() < 0.1:
       first_segment_target_length = 100000
     else:
@@ -242,6 +243,7 @@ class ExampleWriter(object):
 
 
 def write_examples(job_id, args):
+  global log
   """A single process creating and writing out pre-processed examples."""
 
   def log(*args):
