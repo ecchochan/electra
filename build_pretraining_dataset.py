@@ -137,7 +137,7 @@ class ExampleBuilder(object):
         "input_mask": create_int_feature(input_mask),
         "segment_ids": create_int_feature(segment_ids)
     }
-    if sop is not None:
+    if sop_label is not None:
       feature["sop_label"] = create_int_feature([sop_label])
 
     tf_example = tf.train.Example(features=tf.train.Features(feature=feature))
