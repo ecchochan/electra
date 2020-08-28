@@ -104,13 +104,14 @@ def get_bert_config(config):
   elif config.model_size == "small24":
     args = {"hidden_size": 256, "num_hidden_layers": 24, "embedding_size": 256}
   elif config.model_size == "small24x":
-    args = {"hidden_size": 512, "num_hidden_layers": 24, "embedding_size": 512}
+    args = {"hidden_size": 256, "num_hidden_layers": 24, "embedding_size": 256, "num_attention_heads": 12}
   else:
     raise ValueError("Unknown model size", config.model_size)
   args["vocab_size"] = config.vocab_size
   args.update(**config.model_hparam_overrides)
   # by default the ff size and num attn heads are determined by the hidden size
-  args["num_attention_heads"] = max(1, args["hidden_size"] // 64)
+  if "num_attention_heads" not in args:
+    args["num_attention_heads"] = max(1, args["hidden_size"] // 64)
   args["intermediate_size"] = 4 * args["hidden_size"]
   args.update(**config.model_hparam_overrides)
   return modeling.BertConfig.from_dict(args)
