@@ -42,11 +42,15 @@ class FinetuningModel(object):
     # Create a shared transformer encoder
     bert_config = training_utils.get_bert_config(config)
     self.bert_config = bert_config
+
+    '''
     if config.debug:
       bert_config.num_hidden_layers = 3
       bert_config.hidden_size = 144
       bert_config.intermediate_size = 144 * 4
       bert_config.num_attention_heads = 4
+      '''
+
     assert config.max_seq_length <= bert_config.max_position_embeddings
     bert_model = modeling.BertModel(
         bert_config=bert_config,
