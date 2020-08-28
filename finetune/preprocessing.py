@@ -106,7 +106,7 @@ class Preprocessor(object):
     """Convert a set of `InputExample`s to a TFRecord file."""
     n_examples = 0
     from joblib import Parallel, delayed
-    results = Parallel(n_jobs=-1)(delayed(self.serialize_work)(ex_index, example, is_training) for (ex_index, example) in enumerate(examples))
+    results = Parallel(n_jobs=-1, verbose=10)(delayed(self.serialize_work)(ex_index, example, is_training) for (ex_index, example) in enumerate(examples))
     with tf.io.TFRecordWriter(output_file) as writer:
       for r in results:
         for r in r:
