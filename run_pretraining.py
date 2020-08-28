@@ -100,7 +100,7 @@ class PretrainingModel(object):
         "mlm_loss": mlm_output.per_example_loss,
         "masked_lm_ids": masked_inputs.masked_lm_ids,
         "masked_lm_weights": masked_inputs.masked_lm_weights,
-        "input_mask": masked_inputs.input_mask
+        "input_mask": masked_inputs.input_mask,
         "sop_label": masked_inputs.sop_label
     }
     if config.electra_objective:
