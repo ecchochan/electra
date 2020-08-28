@@ -66,12 +66,14 @@ class ExampleBuilder(object):
       first_segment_target_length = 100000
     else:
       # -3 due to not yet having [CLS]/[SEP] tokens in the input text
-      first_segment_target_length = (self._target_length - 3) // 2
+      first_segment_target_length = (self._target_length - 3) // 2 if not self.do_sop else \
+                                    (random.randint(8, (self._target_length - 3) // 2) if random.random() > 0.5 else (self._target_length - 3) // 2
+                                    )
 
     first_segment = []
     second_segment = []
     if self.do_sop and len(self._current_sentences) == 1:
-      length = len(self._current_sentences[0])
+      length = len(first_segment_target_length)
       a = self._current_sentences[0][:length // 2]
       b = self._current_sentences[0][length // 2:]
       self._current_sentences = [a, b]
@@ -89,9 +91,25 @@ class ExampleBuilder(object):
         second_segment.extend(sentence)
 
     # trim to max_length while accounting for not-yet-added [CLS]/[SEP] tokens
-    first_segment = first_segment[:self._max_length - 2]
-    second_segment = second_segment[:max(0, self._max_length -
-                                         len(first_segment) - 3)]
+    if self.do_sop:
+      min_seg_length = random.randint(8, 32)
+      first_max_length = (self._max_length - 3 - min_seg_length)             # 256 - 3 - 32 = 221
+      first_segment = first_segment[max(0,                                   # 
+                                    len(first_segment) - first_max_length):] # len(segment) = 300
+                                                                             # -> 300- 221 = 79
+                                                                             # -> [79:] 
+                                                                             # 
+                                                                             # len(segment) = 64
+                                                                             # -> 64 - 221 = 0
+                                                                             # -> [0:] 
+                                                                             # 
+
+      second_max_length = self._max_length - 3 - len(first_segment)          # 256 - 3 - 221 = 32
+      second_segment = second_segment[:second_max_length]
+    else:
+      first_segment = first_segment[:self._max_length - 2]
+      second_segment = second_segment[:max(0, self._max_length -
+                                          len(first_segment) - 3)]
     
     if self.do_sop:
       sop = 1
