@@ -175,7 +175,7 @@ class QATask(task.Task):
     self.v2 = v2
 
   def _add_examples(self, examples, example_failures, paragraph, split):
-    tokenizer = self.tokenizer
+    tokenizer = self._tokenizer
     paragraph_text = paragraph["context"]
     encoded = tokenizer.encode(paragraph_text)
     offsets = encoded.offsets
