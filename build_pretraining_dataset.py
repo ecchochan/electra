@@ -79,7 +79,7 @@ class ExampleBuilder(object):
     first_segment = []
     second_segment = []
     if self.do_sop and len(self._current_sentences) == 1:
-      length = len(first_segment_target_length)
+      length = first_segment_target_length
       a = self._current_sentences[0][:length // 2]
       b = self._current_sentences[0][length // 2:]
       self._current_sentences = [a, b]
