@@ -605,7 +605,7 @@ class SQuAD(SQuADTask):
 
 class DRCD(SQuADTask):
   def __init__(self, config: configure_finetuning.FinetuningConfig, tokenizer):
-    super(SQuAD, self).__init__(config, "drcd", tokenizer)
+    super(DRCD, self).__init__(config, "drcd", tokenizer)
 
 
 class SQuADv1(SQuADTask):
