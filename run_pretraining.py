@@ -88,8 +88,8 @@ class PretrainingModel(object):
     else:
       sop_pred_model = generator
 
-    if mased_inputs.sop_label is not None:
-      sop_output = _get_sentence_order_output(sop_pred_model.get_pooled_output(), mased_inputs.sop_label)
+    if masked_inputs.sop_label is not None:
+      sop_output = _get_sentence_order_output(sop_pred_model.get_pooled_output(), masked_inputs.sop_label)
       self.total_loss += config.sop_weight * sop_output.loss
 
     # Evaluation
@@ -111,7 +111,7 @@ class PretrainingModel(object):
           "sampled_tokids": tf.argmax(fake_data.sampled_tokens, -1,
                                       output_type=tf.int32)
       })
-    if mased_inputs.sop_label is not None:
+    if masked_inputs.sop_label is not None:
       eval_fn_inputs.update({
         'sop_loss': sop_output.per_example_loss,
         'sop_log_probs': sop_output.log_probs,
