@@ -117,7 +117,7 @@ class PretrainingModel(object):
         'sop_loss': sop_output.per_example_loss,
         'sop_log_probs': sop_output.log_probs,
         'sop_labels': sop_output.labels,
-      }
+      })
     eval_fn_keys = eval_fn_inputs.keys()
     eval_fn_values = [eval_fn_inputs[k] for k in eval_fn_keys]
 
