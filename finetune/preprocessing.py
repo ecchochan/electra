@@ -93,7 +93,7 @@ class Preprocessor(object):
     return input_fn, steps
 
 
-  def serialize_work(self, ex_index, example, is_training, log_examples):
+  def serialize_work(self, ex_index, example, is_training):
     bucket = []
     for tf_example in self._example_to_tf_example(
         example, is_training,
