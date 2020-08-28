@@ -104,7 +104,7 @@ def get_bert_config(config):
   elif config.model_size == "small24":
     args = {"hidden_size": 256, "num_hidden_layers": 24, "embedding_size": 256}
   elif config.model_size == "small24x":
-    args = {"hidden_size": 256, "num_hidden_layers": 24, "embedding_size": 256, "num_attention_heads": 12}
+    args = {"hidden_size": 256, "num_hidden_layers": 24, "embedding_size": 256, "num_attention_heads": 8}
   else:
     raise ValueError("Unknown model size", config.model_size)
   args["vocab_size"] = config.vocab_size
