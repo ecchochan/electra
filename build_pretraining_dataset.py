@@ -245,7 +245,6 @@ class ExampleWriter(object):
 def write_examples(job_id, args):
   global log
   """A single process creating and writing out pre-processed examples."""
-
   def log(*args):
     msg = " ".join(map(str, args))
     print("Job {}:".format(job_id), msg)
