@@ -99,7 +99,7 @@ def evaluate(dataset, predictions):
   return {'exact_match': exact_match, 'f1': f1}
 
 
-def main(config: configure_finetuning.FinetuningConfig, split):
+def main(config: configure_finetuning.FinetuningConfig, split, data_dir):
   expected_version = '1.1'
   # parser = argparse.ArgumentParser(
   #     description='Evaluation for SQuAD ' + expected_version)
@@ -110,9 +110,9 @@ def main(config: configure_finetuning.FinetuningConfig, split):
       "dataset_file", "prediction_file"
   ])
   args = Args(dataset_file=os.path.join(
-      config.raw_data_dir("squadv1"),
+      config.raw_data_dir(data_dir),
       split + ("-debug" if config.debug else "") + ".json"),
-              prediction_file=config.qa_preds_file("squadv1"))
+              prediction_file=config.qa_preds_file(data_dir))
   with tf.io.gfile.GFile(args.dataset_file) as dataset_file:
     dataset_json = json.load(dataset_file)
     if dataset_json['version'] != expected_version:

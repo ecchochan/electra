@@ -41,7 +41,8 @@ def write_examples(job_id, args):
       max_seq_length=args.max_seq_length,
       num_jobs=args.num_processes,
       blanks_separate_docs=False,
-      do_lower_case=args.do_lower_case
+      do_lower_case=args.do_lower_case,
+      do_sop=args.do_sop
   )
   log("Writing tf examples")
   fnames = sorted(tf.io.gfile.listdir(args.data_dir))
@@ -50,7 +51,7 @@ def write_examples(job_id, args):
   random.shuffle(fnames)
   start_time = time.time()
   for file_no, fname in enumerate(fnames):
-    if file_no > 0 and file_no % 10 == 0:
+    if file_no > 0 and file_no % 3 == 0:
       elapsed = time.time() - start_time
       log("processed {:}/{:} files ({:.1f}%), ELAPSED: {:}s, ETA: {:}s, "
           "{:} examples written".format(
@@ -75,6 +76,8 @@ def main():
                       help="Number of tokens per example.")
   parser.add_argument("--num-processes", default=1, type=int,
                       help="Parallelize across multiple processes.")
+  parser.add_argument("--do-sop", dest='do_sop',
+                      action='store_false', help="Add SOP features.")
   parser.add_argument("--do-lower-case", dest='do_lower_case',
                       action='store_true', help="Lower case input text.")
   parser.add_argument("--no-lower-case", dest='do_lower_case',

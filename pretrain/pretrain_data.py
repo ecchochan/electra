@@ -97,7 +97,7 @@ def _decode_record(record, name_to_features):
 # features as a dict
 Inputs = collections.namedtuple(
     "Inputs", ["input_ids", "input_mask", "segment_ids", "masked_lm_positions",
-               "masked_lm_ids", "masked_lm_weights"])
+               "masked_lm_ids", "masked_lm_weights", "sop_label"])
 
 
 def features_to_inputs(features):
@@ -111,6 +111,8 @@ def features_to_inputs(features):
                      if "masked_lm_ids" in features else None),
       masked_lm_weights=(features["masked_lm_weights"]
                          if "masked_lm_weights" in features else None),
+      sop_label=(features["sop_label"]
+                 if "sop_label" in features else None),
   )
 
 
@@ -147,7 +149,7 @@ def print_tokens(inputs: Inputs, inv_vocab, updates_mask=None):
   for pos, (tokid, um) in enumerate(
       zip(inputs.input_ids[0], updates_mask[0])):
     token = inv_vocab[tokid]
-    if token == "[PAD]":
+    if token == "<pad>":
       break
     if pos in pos_to_tokid:
       token = RED + token + " (" + inv_vocab[pos_to_tokid[pos]] + ")" + ENDC

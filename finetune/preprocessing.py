@@ -29,6 +29,7 @@ import configure_finetuning
 from finetune import feature_spec
 from util import utils
 
+from tqdm import tqdm
 
 class Preprocessor(object):
   """Class for loading, preprocessing, and serializing fine-tuning datasets."""
@@ -95,10 +96,10 @@ class Preprocessor(object):
     """Convert a set of `InputExample`s to a TFRecord file."""
     n_examples = 0
     with tf.io.TFRecordWriter(output_file) as writer:
-      for (ex_index, example) in enumerate(examples):
-        if ex_index % 2000 == 0:
-          utils.log("Writing example {:} of {:}".format(
-              ex_index, len(examples)))
+      for (ex_index, example) in tqdm(list(enumerate(examples))):
+        #if ex_index % 2000 == 0:
+        #  utils.log("Writing example {:} of {:}".format(
+        #      ex_index, len(examples)))
         for tf_example in self._example_to_tf_example(
             example, is_training,
             log=self._config.log_examples and ex_index < 1):
