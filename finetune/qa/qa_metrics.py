@@ -194,7 +194,7 @@ class SpanBasedQAScorer(scorer.Scorer):
           break
         feature = features[pred.feature_index]
         offset = feature[self._name + "_doc_span_offset"]
-        N = segment_ids.index(1)
+        N = feature['segment_ids'].index(1)
         char_start = offsets[offset+pred.start_index - N][0]  # -N for [CLS]
         char_end = offsets[offset+pred.end_index - N][1]
         final_text = paragraph_text[char_start:char_end]
