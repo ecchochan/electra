@@ -75,6 +75,8 @@ def main():
                       help="Number of tokens per example.")
   parser.add_argument("--num-processes", default=1, type=int,
                       help="Parallelize across multiple processes.")
+  parser.add_argument("--do-sop", dest='do_sop',
+                      action='store_false', help="Add SOP features.")
   parser.add_argument("--do-lower-case", dest='do_lower_case',
                       action='store_true', help="Lower case input text.")
   parser.add_argument("--no-lower-case", dest='do_lower_case',
