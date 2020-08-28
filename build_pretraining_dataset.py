@@ -41,8 +41,6 @@ class ExampleBuilder(object):
     self._current_length = 0
     self._max_length = max_length
     self._target_length = max_length
-    if do_sop:
-      self._target_length = max_length * 2
     self.do_sop = do_sop
 
   def add_line(self, line):
