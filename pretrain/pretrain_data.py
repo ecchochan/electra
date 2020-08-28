@@ -147,7 +147,7 @@ def print_tokens(inputs: Inputs, inv_vocab, updates_mask=None):
   for pos, (tokid, um) in enumerate(
       zip(inputs.input_ids[0], updates_mask[0])):
     token = inv_vocab[tokid]
-    if token == "[PAD]":
+    if token == "<pad>":
       break
     if pos in pos_to_tokid:
       token = RED + token + " (" + inv_vocab[pos_to_tokid[pos]] + ")" + ENDC
