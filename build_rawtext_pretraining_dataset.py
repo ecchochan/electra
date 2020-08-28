@@ -42,6 +42,7 @@ def write_examples(job_id, args):
       num_jobs=args.num_processes,
       blanks_separate_docs=False,
       do_lower_case=args.do_lower_case
+      do_sop=args.do_sop
   )
   log("Writing tf examples")
   fnames = sorted(tf.io.gfile.listdir(args.data_dir))
