@@ -27,6 +27,10 @@ from util import utils
 
 from cantokenizer import CanTokenizer
 
+chinese_re = re.compile(u' *([⺀-⺙⺛-⻳⼀-⿕々〇〡-〩〸-〺〻㐀-䶵一-鿃豈-鶴侮-頻並-龎]) *', re.UNICODE)
+
+seen = set()
+
 def create_int_feature(values):
   feature = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
   return feature
@@ -52,7 +56,18 @@ class ExampleBuilder(object):
     encoded = self._tokenizer.encode(line)
     # bert_tokens = encoded.tokens
     bert_tokids = encoded.ids 
-    if bert_tokids.count(4) > 5:
+    unk_count = bert_tokids.count(4)
+    if unk_count > 0:
+      p = bert_tokids.index(4)
+      offsets = encoded.offsets
+      tokenized_text = ' '.join(encoded.tokens[p-10:p+10])
+      unk_token_should_be = line[offsets[p][0]:offsets[p][1]]
+      if unk_token_should_be not in seen:
+        seen.add(unk_token_should_be)
+        orig_text = line[offsets[p][0]-10:offsets[p][1]+10]
+        tokenized_text = chinese_re.sub(r'\1',tokenized_text)
+        print(tokenized_text+'\n'+ orig_text)
+    if unk_count > 5:
       return None
     self._current_sentences.append(bert_tokids)
     self._current_length += len(bert_tokids)
