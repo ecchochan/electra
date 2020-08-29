@@ -61,12 +61,13 @@ class ExampleBuilder(object):
       p = bert_tokids.index(4)
       offsets = encoded.offsets
       tokenized_text = ' '.join(encoded.tokens[p-10:p+10])
-      unk_token_should_be = line[offsets[p][0]:offsets[p][1]]
-      if unk_token_should_be not in seen:
-        seen.add(unk_token_should_be)
-        orig_text = line[offsets[p][0]-10:offsets[p][1]+10]
-        tokenized_text = chinese_re.sub(r'\1',tokenized_text)
-        print(tokenized_text+'\n'+ orig_text)
+      if offsets[p][1] - offsets[p][0] == 1:
+        unk_token_should_be = line[offsets[p][0]:offsets[p][1]]
+        if unk_token_should_be not in seen:
+          seen.add(unk_token_should_be)
+          orig_text = line[offsets[p][0]-10:offsets[p][1]+10]
+          tokenized_text = chinese_re.sub(r'\1',tokenized_text)
+          print(tokenized_text+'\n'+ orig_text)
     if unk_count > 5:
       return None
     self._current_sentences.append(bert_tokids)
