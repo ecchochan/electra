@@ -220,6 +220,7 @@ class ExampleWriter(object):
         if line:
           bucket.append(line)
         else:
+          bucket.append("")
           sub_doc = '\n'.join(bucket)
           sub_doc = remove_url(sub_doc)
           bad = False
@@ -239,6 +240,26 @@ class ExampleWriter(object):
           if not bad:
             cached.append(bucket)
           bucket = []
+      if bucket:
+        bucket.append("")
+        sub_doc = '\n'.join(bucket)
+        sub_doc = remove_url(sub_doc)
+        bad = False
+        if not sub_doc.strip() or too_many_repeat(sub_doc):
+          bad = True
+        if not bad:
+          for e in re.finditer(r'[\da-zA-Z_]{10,}', sub_doc):
+            g = e.group()
+            if re.search(r'\d', g) and re.search(r'[A-Z]{3,}', g):
+                pass
+            elif re.search(r'[a-z]+[A-Z]{2,}[a-z]+[A-Z]+', g):
+                pass
+            else:
+                continue
+            bad = True
+            break
+        if not bad:
+          cached.append(bucket)
 
       for bucket in cached:
         for line in bucket:
