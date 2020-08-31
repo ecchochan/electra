@@ -181,7 +181,8 @@ class CanTokenizer(BaseTokenizer):
             strip_accents=strip_accents,
             lowercase=lowercase,
             special_chars=special_chars,
-            zh_norm=zh_norm
+            zh_norm=zh_norm,
+            handle_simpl=handle_simpl
         )])
         tokenizer.pre_tokenizer = BertPreTokenizer()
 
@@ -267,6 +268,7 @@ class CanTokenizerSP(BaseTokenizer):
         wordpieces_prefix: str = "##",
         special_chars: str = SPECIAL_CHARS,
         zh_norm: bool = True,
+        handle_simpl: bool = True
     ):
         if vocab_file is not None and merges_file is not None:
             tokenizer = Tokenizer(
@@ -285,7 +287,8 @@ class CanTokenizerSP(BaseTokenizer):
             strip_accents=strip_accents,
             lowercase=lowercase,
             special_chars=special_chars,
-            zh_norm=zh_norm
+            zh_norm=zh_norm,
+            handle_simpl=handle_simpl
         )])
         tokenizer.pre_tokenizer = pre_tokenizers.Metaspace(
             replacement=replacement, add_prefix_space=add_prefix_space, no_consecutive_space=no_consecutive_space
