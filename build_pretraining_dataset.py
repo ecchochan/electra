@@ -188,6 +188,8 @@ from data_utils import too_many_repeat
 remove_url_re = re.compile(r' ?(?:https?:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z_0-9\-]+)+|[a-zA-Z_0-9\-]+(?:\.[a-zA-Z_0-9\-]+)+)(?:\/(?:\?(?:<nl>)?\n *[a-zA-Z0-9\-\._… &%\+]+|[a-zA-Z0-9\.\?\:@\-_=#…&%!\+])+)+ *(?:<nl>\n * ?(?:https?:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)+|[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)+)(?:\/(?:\?(?:<nl>)?\n *[a-zA-Z0-9\-\._… &%\+]+|[a-zA-Z0-9\.\?\:@\-_=#…&%!\+])+)+ *)*')
 remove_speakers = re.compile(r'^#\d+ ([A-Z]+: )?(#\d+ )?', re.MULTILINE)
 
+bad_unicode = re.compile(r'[\u2060-\u20ff\uAA80-\uFB45\u00AD\u008D\u008F\u009F\u0095\u0094\u0097\u0082\u0083\u0087\u0099囀ਾ]+', 
+                      re.UNICODE)
 remove_borders = re.compile(r'[┄┅┆┇┈┉┊┋┌┍┎┏┐┑┒┓└┕┖┗┘┙┚┛├┝┞┟┠┡┢┣┤┥┦┧┨┩┪┫┬┭┮┯┰┱┲┳┴┵┶┷┸┹┺┻┼┽┾┿╀╁╂╃╄╅╆╇╈╉╊╋╌╍╎╏║╒╓╔╕╖╗╘╙╚╛╜╝╞╟╠╡╢╣╤╥╦╧╨╩╪╫╬╭╮╯╰╱╲╳╵╷╹╻╼╽╾╿▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟]')
     
 
@@ -273,6 +275,9 @@ class ExampleWriter(object):
           bad = False
           if not sub_doc.strip() or too_many_repeat(sub_doc):
             bad = True
+          if not bad:
+            bad = any(1 for e in bad_unicode.finditer(sub_doc))
+            
           if not bad:
             for e in re.finditer(r'[\da-zA-Z_]{10,}', sub_doc):
               g = e.group()
