@@ -216,7 +216,9 @@ class ExampleWriter(object):
 傴瘻,駝背
 痀僂,駝背
 佝僂,駝背
-傴僂,駝背'''
+傴僂,駝背
+瘳瘳,寥寥
+'''
 
     for line in simple_replacements.split('\n'):
         if not line:
