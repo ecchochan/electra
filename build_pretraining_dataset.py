@@ -187,10 +187,7 @@ from data_utils import too_many_repeat
 remove_url_re = re.compile(r' ?(?:https?:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z_0-9\-]+)+|[a-zA-Z_0-9\-]+(?:\.[a-zA-Z_0-9\-]+)+)(?:\/(?:\?(?:<nl>)?\n *[a-zA-Z0-9\-\._… &%\+]+|[a-zA-Z0-9\.\?\:@\-_=#…&%!\+])+)+ *(?:<nl>\n * ?(?:https?:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)+|[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)+)(?:\/(?:\?(?:<nl>)?\n *[a-zA-Z0-9\-\._… &%\+]+|[a-zA-Z0-9\.\?\:@\-_=#…&%!\+])+)+ *)*')
 remove_speakers = re.compile(r'^#\d+ ([A-Z]+: )?(#\d+ )?', re.MULTILINE)
 
-def remove_url(x):
-    x = remove_url_re.sub(' [url] ',x)
-    x = remove_speakers.sub('',x)
-    return x
+remove_borders = re.compile(r'[┄┅┆┇┈┉┊┋┌┍┎┏┐┑┒┓└┕┖┗┘┙┚┛├┝┞┟┠┡┢┣┤┥┦┧┨┩┪┫┬┭┮┯┰┱┲┳┴┵┶┷┸┹┺┻┼┽┾┿╀╁╂╃╄╅╆╇╈╉╊╋╌╍╎╏║╒╓╔╕╖╗╘╙╚╛╜╝╞╟╠╡╢╣╤╥╦╧╨╩╪╫╬╭╮╯╰╱╲╳╵╷╹╻╼╽╾╿▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟]')
     
 
 class ExampleWriter(object):
@@ -201,6 +198,47 @@ class ExampleWriter(object):
                num_out_files=1000):
     self._blanks_separate_docs = blanks_separate_docs
     tokenizer = CanTokenizer(vocab_file)
+    replacements = {}
+    
+
+    simple_replacements = '''
+嘲文,潮文
+只系,只係
+扭釱,扭軚
+不慬,不懂
+蘔果,蘋果
+唔洎,唔洗
+痀瘻,駝背
+佝瘻,駝背
+傴瘻,駝背
+痀僂,駝背
+佝僂,駝背
+傴僂,駝背'''
+
+    for line in simple_replacements.split('\n'):
+        if not line:
+            continue
+        a, b = line.split(',')
+        replacements[a] = (b,'','')
+    with open('combine_zh.txt') as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            k, v = line.split(',')
+            replacements[k] = (v,'','')
+            
+    with open('emoji_to_name.txt') as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            splitted = line.split(',')
+            k, v = splitted[0][0], splitted[1]
+            vocab_id = tokenizer.token_to_id(k)
+            if not vocab_id:
+                replacements[k] = (':%s:'%v,'','')
+    self.replacer = Replacer(replacements)
     self._example_builder = ExampleBuilder(tokenizer, max_seq_length, do_sop=do_sop)
     self._writers = []
     for i in range(num_out_files):
@@ -211,6 +249,13 @@ class ExampleWriter(object):
         self._writers.append(tf.io.TFRecordWriter(output_fname))
     self.n_written = 0
 
+  def remove_url(self, x):
+      x = remove_url_re.sub(' [url] ',x)
+      x = remove_speakers.sub('',x)
+      x = remove_borders.sub('',x)
+      x = self.replacer.translate(x)
+
+      return x
   def write_examples(self, input_file):
     """Writes out examples from the provided input file."""
     with tf.io.gfile.GFile(input_file) as f:
@@ -223,7 +268,7 @@ class ExampleWriter(object):
         else:
           bucket.append("")
           sub_doc = '\n'.join(bucket)
-          sub_doc = remove_url(sub_doc)
+          sub_doc = self.remove_url(sub_doc)
           bad = False
           if not sub_doc.strip() or too_many_repeat(sub_doc):
             bad = True
@@ -239,7 +284,7 @@ class ExampleWriter(object):
               bad = True
               break
           if not bad:
-            cached.append(bucket)
+            cached.append(sub_doc.split('\n'))
           bucket = []
       if bucket:
         bucket.append("")

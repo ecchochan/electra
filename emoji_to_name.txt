@@ -1,0 +1,1636 @@
+😀,Grinning Face
+😃,Grinning Face With Big Eyes
+😄,Grinning Face With Smiling Eyes
+😁,Beaming Face With Smiling Eyes
+😆,Grinning Squinting Face
+😂,Face With Tears of Joy
+😉,Winking Face
+😊,Smiling Face With Smiling Eyes
+😍,Smiling Face With Heart-Eyes
+😗,Kissing Face
+😚,Kissing Face With Closed Eyes
+😙,Kissing Face With Smiling Eyes
+😛,Face With Tongue
+😜,Winking Face With Tongue
+😝,Squinting Face With Tongue
+😐,Neutral Face
+😑,Expressionless Face
+😶,Face Without Mouth
+😏,Smirking Face
+😒,Unamused Face
+😬,Grimacing Face
+😌,Relieved Face
+😪,Sleepy Face
+😷,Face With Medical Mask
+😵,Dizzy Face
+🤣,Rolling on the Floor Laughing
+🙃,Upside-Down Face
+🥰,Smiling Face With Hearts
+🤑,Money-Mouth Face
+🤫,Shushing Face
+🤐,Zipper-Mouth Face
+🤥,Disbelieving Face
+🤨,Face With Raised Eyebrow
+🤤,Drooling Face
+🤮,Face Vomiting
+🤒,Face With Thermometer
+🤧,Sneezing Face
+🥶,Cold Face
+🤯,Exploding Head
+🥳,Partying Face
+🤓,Nerd Face
+🧐,Face With Monocle
+😕,Confused Face
+😟,Worried Face
+😮,Face With Open Mouth
+😯,Hushed Face
+😳,Flushed Face
+🥺,Pleading Face
+😦,Frowning Face With Open Mouth
+😨,Fearful Face
+😰,Anxious Face With Sweat
+😭,Loudly Crying Face
+😞,Disappointed Face
+😩,Weary Face
+😫,Tired Face
+😤,Face With Steam From Nose
+😅,Grinning Face With Sweat
+🙂,Slightly Smiling Face
+😇,Smiling Face With Halo
+🤩,Star-Struck
+😘,Face Blowing a Kiss
+☺️,Smiling Face
+😋,Face Savoring Food
+🤪,Zany Face
+🤗,Hugging Face
+🤭,Face With Hand Over Mouth
+🤔,Thinking Face
+🙄,Face With Rolling Eyes
+😔,Pensive Face
+😴,Sleeping Face
+🤕,Face With Head-Bandage
+🤢,Nauseated Face
+🥵,Hot Face
+🥴,Woozy Face
+🤠,Cowboy Hat Face
+😎,Smiling Face With Sunglasses
+🙁,Slightly Frowning Face
+☹️,Frowning Face
+😲,Astonished Face
+😧,Anguished Face
+😥,Sad but Relieved Face
+😢,Crying Face
+😱,Face Screaming in Fear
+😖,Confounded Face
+😣,Persevering Face
+😓,Downcast Face With Sweat
+😡,Pouting Face
+😠,Angry Face
+🤬,Face With Symbols on Mouth
+😈,Smiling Face With Horns
+👿,Angry Face With Horns
+💀,Skull
+☠️,Skull and Crossbones
+💩,Pile of Poo
+🤡,Clown Face
+👹,Ogre
+👻,Ghost
+👺,Goblin
+👾,Alien Monster
+👽,Alien
+🤖,Robot Face
+😺,Grinning Cat Face
+😸,Grinning Cat Face With Smiling Eyes
+😹,Cat Face With Tears of Joy
+😻,Smiling Cat Face With Heart-Eyes
+😼,Cat Face With Wry Smile
+😽,Kissing Cat Face
+🙀,Weary Cat Face
+😿,Crying Cat Face
+😾,Pouting Cat Face
+💋,Kiss Mark
+👋,Waving Hand
+🤚,Raised Back of Hand
+🖐️,Hand With Fingers Splayed
+✋,Raised Hand
+🖖,Vulcan Salute
+👌,OK Hand
+✌️,Victory Hand
+🤞,Crossed Fingers
+🤟,Love-You Gesture
+🤘,Sign of the Horns
+🤙,Call Me Hand
+👈,Backhand Index Pointing Left
+👉,Backhand Index Pointing Right
+👆,Backhand Index Pointing Up
+🖕,Middle Finger
+👇,Backhand Index Pointing Down
+☝️,Index Pointing Up
+👍,Thumbs Up
+👎,Thumbs Down
+✊,Raised Fist
+👊,Oncoming Fist
+🤛,Left-Facing Fist
+🤜,Right-Facing Fist
+👏,Clapping Hands
+🙌,Raising Hands
+👐,Open Hands
+🤲,Palms Up Together
+🤝,Handshake
+🙏,Folded Hands
+✍️,Writing Hand
+💅,Nail Polish
+🤳,Selfie
+💪,Flexed Biceps
+🦵,Leg
+🦶,Foot
+👂,Ear
+👃,Nose
+🧠,Brain
+🦷,Tooth
+🦴,Bone
+👀,Eyes
+👁️,Eye
+👅,Tongue
+👄,Mouth
+👶,Baby
+🧒,Child
+👦,Boy
+👧,Girl
+🧑,Person
+👱,Person
+👨,Man
+🧔,Man
+👱‍♂️,Man
+👨‍🦰,Man
+👨‍🦱,Man
+👨‍🦳,Man
+👨‍🦲,Man
+👩,Woman
+👱‍♀️,Woman
+👩‍🦰,Woman
+👩‍🦱,Woman
+👩‍🦳,Woman
+👩‍🦲,Woman
+🧓,Older Person
+👴,Old Man
+👵,Old Woman
+🙍‍♂️,Man Frowning
+🙍,Person Frowning
+🙍‍♀️,Woman Frowning
+🙎,Person Pouting
+🙎‍♂️,Man Pouting
+🙎‍♀️,Woman Pouting
+🙅,Person Gesturing No
+🙅‍♂️,Man Gesturing No
+🙅‍♀️,Woman Gesturing No
+🙆,Person Gesturing OK
+🙆‍♂️,Man Gesturing OK
+🙆‍♀️,Woman Gesturing OK
+💁,Person Tipping Hand
+💁‍♂️,Man Tipping Hand
+💁‍♀️,Woman Tipping Hand
+🙋,Person Raising Hand
+🙋‍♂️,Man Raising Hand
+🙇,Person Bowing
+🙋‍♀️,Woman Raising Hand
+🙇‍♂️,Man Bowing
+🙇‍♀️,Woman Bowing
+🤦,Person Facepalming
+🤦‍♂️,Man Facepalming
+🤦‍♀️,Woman Facepalming
+🤷,Person Shrugging
+🤷‍♂️,Man Shrugging
+🤷‍♀️,Woman Shrugging
+👩‍⚕️,Woman Health Worker
+👨‍⚕️,Man Health Worker
+👨‍🎓,Man Student
+👩‍🎓,Woman Student
+👨‍🏫,Man Teacher
+👩‍🏫,Woman Teacher
+👨‍⚖️,Man Judge
+👩‍⚖️,Woman Judge
+👨‍🌾,Man Farmer
+👩‍🌾,Woman Farmer
+👨‍🍳,Man Cook
+👩‍🍳,Woman Cook
+👩‍🔧,Woman Mechanic
+👨‍🔧,Man Mechanic
+👨‍🏭,Man Factory Worker
+👩‍🏭,Woman Factory Worker
+👨‍💼,Man Office Worker
+👩‍💼,Woman Office Worker
+👨‍🔬,Man Scientist
+👩‍🔬,Woman Scientist
+👨‍💻,Man Technologist
+👩‍💻,Woman Technologist
+👨‍🎤,Man Singer
+👩‍🎤,Woman Singer
+👨‍🎨,Man Artist
+👩‍🎨,Woman Artist
+👨‍✈️,Man Pilot
+👩‍✈️,Woman Pilot
+👨‍🚀,Man Astronaut
+👩‍🚀,Woman Astronaut
+👨‍🚒,Man Firefighter
+👩‍🚒,Woman Firefighter
+👮,Police Officer
+👮‍♂️,Man Police Officer
+👮‍♀️,Woman Police Officer
+🕵️,Detective
+🕵️‍♂️,Man Detective
+🕵️‍♀️,Woman Detective
+💂,Guard
+💂‍♂️,Man Guard
+💂‍♀️,Woman Guard
+👷,Construction Worker
+👷‍♂️,Man Construction Worker
+👷‍♀️,Woman Construction Worker
+🤴,Prince
+👸,Princess
+👳,Person Wearing Turban
+👳‍♂️,Man Wearing Turban
+👳‍♀️,Woman Wearing Turban
+👲,Man With Chinese Cap
+🤵,Man in Tuxedo
+🧕,Woman With Headscarf
+🤰,Pregnant Woman
+👰,Bride With Veil
+🤱,Breast-Feeding
+👼,Baby Angel
+🎅,Santa Claus
+🤶,Mrs. Claus
+🦸,Superhero
+🦸‍♂️,Man Superhero
+🦸‍♀️,Woman Superhero
+🦹,Supervillain
+🦹‍♂️,Man Supervillain
+🦹‍♀️,Woman Supervillain
+🧙,Mage
+🧙‍♂️,Man Mage
+🧙‍♀️,Woman Mage
+🧚,Fairy
+🧚‍♂️,Man Fairy
+🧚‍♀️,Woman Fairy
+🧛,Vampire
+🧛‍♂️,Man Vampire
+🧛‍♀️,Woman Vampire
+🧜,Merperson
+🧜‍♂️,Merman
+🧜‍♀️,Mermaid
+🧝,Elf
+🧝‍♂️,Man Elf
+🧝‍♀️,Woman Elf
+🧞,Genie
+🧞‍♂️,Man Genie
+🧞‍♀️,Woman Genie
+🧟,Zombie
+🧟‍♂️,Man Zombie
+🧟‍♀️,Woman Zombie
+💆,Person Getting Massage
+💆‍♂️,Man Getting Massage
+💆‍♀️,Woman Getting Massage
+💇,Person Getting Haircut
+💇‍♂️,Man Getting Haircut
+💇‍♀️,Woman Getting Haircut
+🚶,Person Walking
+🚶‍♂️,Man Walking
+🚶‍♀️,Woman Walking
+🏃,Person Running
+🏃‍♂️,Man Running
+🏃‍♀️,Woman Running
+💃,Woman Dancing
+🕺,Man Dancing
+🕴️,Man in Suit Levitating
+👯,People With Bunny Ears
+👯‍♂️,Men With Bunny Ears
+👯‍♀️,Women With Bunny Ears
+🧖,Person in Steamy Room
+🧖‍♂️,Man in Steamy Room
+🧖‍♀️,Woman in Steamy Room
+🧘,Person in Lotus Position
+👭,Women Holding Hands
+👫,Woman and Man Holding Hands
+👬,Men Holding Hands
+💏,Kiss
+👨‍❤️‍💋‍👨,Kiss
+👩‍❤️‍💋‍👩,Kiss
+💑,Couple With Heart
+👨‍❤️‍👨,Couple With Heart
+👩‍❤️‍👩,Couple With Heart
+👪,Family
+👨‍👩‍👦,Family
+👨‍👩‍👧,Family
+👨‍👩‍👧‍👦,Family
+👨‍👩‍👦‍👦,Family
+👨‍👩‍👧‍👧,Family
+👨‍👨‍👦,Family
+👨‍👨‍👧,Family
+👨‍👨‍👧‍👦,Family
+👨‍👨‍👦‍👦,Family
+👩‍👩‍👧‍👧,Family
+👩‍👩‍👧,Family
+👩‍👩‍👦‍👦,Family
+👩‍👩‍👧‍👦,Family
+👨‍👦,Family
+👨‍👨‍👧‍👧,Family
+👩‍👩‍👦,Family
+👨‍👧,Family
+👨‍👦‍👦,Family
+👨‍👧‍👦,Family
+👨‍👧‍👧,Family
+👩‍👦,Family
+👩‍👦‍👦,Family
+👩‍👧,Family
+👩‍👧‍👦,Family
+👩‍👧‍👧,Family
+🗣️,Speaking Head
+👥,Busts in Silhouette
+👤,Bust in Silhouette
+👣,Footprints
+🧳,Luggage
+🌂,Closed Umbrella
+☂️,Umbrella
+🧵,Thread
+🧶,Yarn
+👓,Glasses
+🕶️,Sunglasses
+🥽,Goggles
+🥼,Lab Coat
+👔,Necktie
+👕,T-Shirt
+👖,Jeans
+🧣,Scarf
+🧤,Gloves
+🧥,Coat
+🧦,Socks
+👗,Dress
+👘,Kimono
+👙,Bikini
+👚,Woman’s Clothes
+👛,Purse
+👜,Handbag
+👝,Clutch Bag
+🎒,Backpack
+👞,Man’s Shoe
+👟,Running Shoe
+🥾,Hiking Boot
+🥿,Flat Shoe
+👠,High-Heeled Shoe
+👡,Woman’s Sandal
+👢,Woman’s Boot
+👑,Crown
+👒,Woman’s Hat
+🎩,Top Hat
+🎓,Graduation Cap
+🧢,Billed Cap
+⛑️,Rescue Worker’s Helmet
+💄,Lipstick
+💍,Ring
+💼,Briefcase
+🙈,See-No-Evil Monkey
+🙉,Hear-No-Evil Monkey
+🙊,Speak-No-Evil Monkey
+💥,Collision
+💫,Dizzy
+💦,Sweat Droplets
+💨,Dashing Away
+🐵,Monkey Face
+🦍,Gorilla
+🐒,Monkey
+🐶,Dog Face
+🐕,Dog
+🐩,Poodle
+🦊,Fox Face
+🐺,Wolf Face
+🦝,Raccoon
+🐱,Cat Face
+🐈,Cat
+🦁,Lion Face
+🐯,Tiger Face
+🐅,Tiger
+🐆,Leopard
+🐴,Horse Face
+🐎,Horse
+🦄,Unicorn Face
+🦓,Zebra
+🐮,Cow Face
+🐃,Water Buffalo
+🐂,Ox
+🐄,Cow
+🐷,Pig Face
+🐖,Pig
+🐽,Pig Nose
+🐗,Boar
+🐏,Ram
+🐐,Goat
+🐑,Ewe
+🐪,Camel
+🐫,Two-Hump Camel
+🦒,Giraffe
+🦙,Llama
+🐘,Elephant
+🦏,Rhinoceros
+🦛,Hippopotamus
+🐭,Mouse Face
+🐁,Mouse
+🐀,Rat
+🐹,Hamster Face
+🐰,Rabbit Face
+🐇,Rabbit
+🐿️,Chipmunk
+🦔,Hedgehog
+🦇,Bat
+🐻,Bear Face
+🐨,Koala
+🐼,Panda Face
+🦘,Kangaroo
+🦡,Badger
+🐾,Paw Prints
+🦃,Turkey
+🐔,Chicken
+🐓,Rooster
+🐣,Hatching Chick
+🐤,Baby Chick
+🐥,Front-Facing Baby Chick
+🐦,Bird
+🐧,Penguin
+🕊️,Dove
+🦅,Eagle
+🦆,Duck
+🦢,Swan
+🦉,Owl
+🦚,Peacock
+🦜,Parrot
+🐸,Frog Face
+🐊,Crocodile
+🐢,Turtle
+🦎,Lizard
+🐲,Dragon Face
+🐍,Snake
+🐉,Dragon
+🦕,Sauropod
+🦖,T-Rex
+🐳,Spouting Whale
+🐋,Whale
+🐬,Dolphin
+🐟,Fish
+🐠,Tropical Fish
+🐡,Blowfish
+🦈,Shark
+🐙,Octopus
+🐚,Spiral Shell
+🐌,Snail
+🦋,Butterfly
+🐛,Bug
+🐜,Ant
+🐝,Honeybee
+🐞,Lady Beetle
+🦗,Cricket
+🕷️,Spider
+🕸️,Spider Web
+🦂,Scorpion
+🦟,Mosquito
+🦠,Microbe
+💐,Bouquet
+🌸,Cherry Blossom
+💮,White Flower
+🏵️,Rosette
+🥀,Wilted Flower
+🌹,Rose
+🌺,Hibiscus
+🌻,Sunflower
+🌼,Blossom
+🌷,Tulip
+🌱,Seedling
+🌳,Deciduous Tree
+🌲,Evergreen Tree
+🌴,Palm Tree
+🌵,Cactus
+🌾,Sheaf of Rice
+🌿,Herb
+☘️,Shamrock
+🍀,Four Leaf Clover
+🍁,Maple Leaf
+🍂,Fallen Leaf
+🍃,Leaf Fluttering in Wind
+🌰,Chestnut
+🍄,Mushroom
+🦀,Crab
+🦞,Lobster
+🦐,Shrimp
+🦑,Squid
+🌍,Globe Showing Europe-Africa
+🌎,Globe Showing Americas
+🌏,Globe Showing Asia-Australia
+🌑,New Moon
+🌐,Globe With Meridians
+🌒,Waxing Crescent Moon
+🌓,First Quarter Moon
+🌔,Waxing Gibbous Moon
+🌕,Full Moon
+🌖,Waning Gibbous Moon
+🌗,Last Quarter Moon
+🌘,Waning Crescent Moon
+🌙,Crescent Moon
+🌚,New Moon Face
+🌛,First Quarter Moon Face
+🌜,Last Quarter Moon Face
+☀️,Sun
+🌝,Full Moon Face
+🌞,Sun With Face
+⭐,Star
+🌟,Glowing Star
+🌠,Shooting Star
+⛅,Sun Behind Cloud
+☁️,Cloud
+⛈️,Cloud With Lightning and Rain
+🌤️,Sun Behind Small Cloud
+🌦️,Sun Behind Rain Cloud
+🌥️,Sun Behind Large Cloud
+🌧️,Cloud With Rain
+🌨️,Cloud With Snow
+🌩️,Cloud With Lightning
+🌪️,Tornado
+🌫️,Fog
+🌬️,Wind Face
+🌈,Rainbow
+☔,Umbrella With Rain Drops
+⚡,High Voltage
+❄️,Snowflake
+☃️,Snowman
+⛄,Snowman Without Snow
+☄️,Comet
+🔥,Fire
+💧,Droplet
+🌊,Water Wave
+🎄,Christmas Tree
+✨,Sparkles
+🎋,Tanabata Tree
+🎍,Pine Decoration
+🍇,Grapes
+🍈,Melon
+🍉,Watermelon
+🍌,Banana
+🍋,Lemon
+🍊,Tangerine
+🍍,Pineapple
+🍎,Red Apple
+🥭,Mango
+🍏,Green Apple
+🍐,Pear
+🍑,Peach
+🍒,Cherries
+🍓,Strawberry
+🥝,Kiwi Fruit
+🍅,Tomato
+🥥,Coconut
+🥑,Avocado
+🍆,Eggplant
+🥔,Potato
+🥕,Carrot
+🌽,Ear of Corn
+🌶️,Hot Pepper
+🥒,Cucumber
+🥬,Leafy Green
+🥦,Broccoli
+🥜,Peanuts
+🍞,Bread
+🥖,Baguette Bread
+🥐,Croissant
+🥨,Pretzel
+🥞,Pancakes
+🥯,Bagel
+🧀,Cheese Wedge
+🍖,Meat on Bone
+🍗,Poultry Leg
+🥩,Cut of Meat
+🍔,Hamburger
+🥓,Bacon
+🍟,French Fries
+🍕,Pizza
+🌭,Hot Dog
+🥪,Sandwich
+🌮,Taco
+🌯,Burrito
+🥙,Stuffed Flatbread
+🍳,Cooking
+🥘,Shallow Pan of Food
+🍲,Pot of Food
+🥣,Bowl With Spoon
+🍿,Popcorn
+🥗,Green Salad
+🧂,Salt
+🥫,Canned Food
+🍱,Bento Box
+🍘,Rice Cracker
+🍙,Rice Ball
+🍚,Cooked Rice
+🍛,Curry Rice
+🍜,Steaming Bowl
+🍝,Spaghetti
+🍠,Roasted Sweet Potato
+🍢,Oden
+🍣,Sushi
+🍤,Fried Shrimp
+🍥,Fish Cake With Swirl
+🥮,Moon Cake
+🍡,Dango
+🥟,Dumpling
+🥠,Fortune Cookie
+🥡,Takeout Box
+🍦,Soft Ice Cream
+🍧,Shaved Ice
+🍨,Ice Cream
+🍩,Doughnut
+🍪,Cookie
+🎂,Birthday Cake
+🍰,Shortcake
+🧁,Cupcake
+🥧,Pie
+🍫,Chocolate Bar
+🍬,Candy
+🍭,Lollipop
+🍮,Custard
+🍯,Honey Pot
+🍼,Baby Bottle
+🥛,Glass of Milk
+☕,Hot Beverage
+🍵,Teacup Without Handle
+🍶,Sake
+🍾,Bottle With Popping Cork
+🍷,Wine Glass
+🍸,Cocktail Glass
+🍹,Tropical Drink
+🍻,Clinking Beer Mugs
+🍺,Beer Mug
+🥂,Clinking Glasses
+🥃,Tumbler Glass
+🥤,Cup With Straw
+🥢,Chopsticks
+🍽️,Fork and Knife With Plate
+🍴,Fork and Knife
+🥄,Spoon
+🧗,Person Climbing
+🧗‍♂️,Man Climbing
+🧗‍♀️,Woman Climbing
+⛷️,Skier
+🏇,Horse Racing
+🏂,Snowboarder
+🏌️,Person Golfing
+🏌️‍♂️,Man Golfing
+🏌️‍♀️,Woman Golfing
+🏄,Person Surfing
+🏄‍♂️,Man Surfing
+🏄‍♀️,Woman Surfing
+🚣,Person Rowing Boat
+🚣‍♂️,Man Rowing Boat
+🚣‍♀️,Woman Rowing Boat
+🏊,Person Swimming
+🏊‍♂️,Man Swimming
+🏊‍♀️,Woman Swimming
+⛹️,Person Bouncing Ball
+⛹️‍♂️,Man Bouncing Ball
+⛹️‍♀️,Woman Bouncing Ball
+🏋️,Person Lifting Weights
+🏋️‍♂️,Man Lifting Weights
+🏋️‍♀️,Woman Lifting Weights
+🚴,Person Biking
+🚴‍♂️,Man Biking
+🚴‍♀️,Woman Biking
+🚵,Person Mountain Biking
+🚵‍♂️,Man Mountain Biking
+🚵‍♀️,Woman Mountain Biking
+🤸,Person Cartwheeling
+🤸‍♂️,Man Cartwheeling
+🤸‍♀️,Woman Cartwheeling
+🤼,People Wrestling
+🤼‍♂️,Men Wrestling
+🤼‍♀️,Women Wrestling
+🤽,Person Playing Water Polo
+🤽‍♂️,Man Playing Water Polo
+🤽‍♀️,Woman Playing Water Polo
+🤾,Person Playing Handball
+🤾‍♀️,Woman Playing Handball
+🤾‍♂️,Man Playing Handball
+🤹,Person Juggling
+🤹‍♂️,Man Juggling
+🤹‍♀️,Woman Juggling
+🧘‍♂️,Man in Lotus Position
+🧘‍♀️,Woman in Lotus Position
+🎪,Circus Tent
+🛹,Skateboard
+🎗️,Reminder Ribbon
+🎟️,Admission Tickets
+🎫,Ticket
+🎖️,Military Medal
+🏆,Trophy
+🥇,1st Place Medal
+🏅,Sports Medal
+🥈,2nd Place Medal
+🥉,3rd Place Medal
+⚽,Soccer Ball
+⚾,Baseball
+🥎,Softball
+🏀,Basketball
+🏈,American Football
+🏐,Volleyball
+🏉,Rugby Football
+🎾,Tennis
+🥏,Flying Disc
+🎳,Bowling
+🏑,Field Hockey
+🏏,Cricket Game
+🏒,Ice Hockey
+🥍,Lacrosse
+🏓,Ping Pong
+🏸,Badminton
+🥊,Boxing Glove
+🥋,Martial Arts Uniform
+⛸️,Ice Skate
+🎣,Fishing Pole
+🎽,Running Shirt
+🎿,Skis
+🛷,Sled
+🥌,Curling Stone
+🎯,Direct Hit
+🎱,Pool 8 Ball
+🎮,Video Game
+🎰,Slot Machine
+🎲,Game Die
+🧩,Jigsaw
+♟️,Chess Pawn
+🎭,Performing Arts
+🎨,Artist Palette
+🎼,Musical Score
+🎤,Microphone
+🎧,Headphone
+🎷,Saxophone
+🎸,Guitar
+🎹,Musical Keyboard
+🎺,Trumpet
+🎻,Violin
+🥁,Drum
+🎬,Clapper Board
+🏹,Bow and Arrow
+🗾,Map of Japan
+🏔️,Snow-Capped Mountain
+🌋,Volcano
+⛰️,Mountain
+🗻,Mount Fuji
+🏖️,Beach With Umbrella
+🏕️,Camping
+🏜️,Desert
+🏝️,Desert Island
+🏞️,National Park
+🏟️,Stadium
+🏛️,Classical Building
+🏗️,Building Construction
+🏘️,Houses
+🏚️,Derelict House
+🏠,House
+🏡,House With Garden
+🏣,Japanese Post Office
+🏢,Office Building
+🏤,Post Office
+🏥,Hospital
+🏦,Bank
+🏨,Hotel
+🏩,Love Hotel
+🏪,Convenience Store
+🏬,Department Store
+🏫,School
+🏭,Factory
+🏯,Japanese Castle
+🏰,Castle
+💒,Wedding
+🗼,Tokyo Tower
+🗽,Statue of Liberty
+⛪,Church
+🕌,Mosque
+🕍,Synagogue
+⛩️,Shinto Shrine
+🕋,Kaaba
+⛲,Fountain
+⛺,Tent
+🌁,Foggy
+🌃,Night With Stars
+🏙️,Cityscape
+🌅,Sunrise
+🌄,Sunrise Over Mountains
+🌆,Cityscape at Dusk
+🌇,Sunset
+🌉,Bridge at Night
+🎡,Ferris Wheel
+🎠,Carousel Horse
+🎢,Roller Coaster
+🚂,Locomotive
+🚃,Railway Car
+🚅,Bullet Train
+🚄,High-Speed Train
+🚆,Train
+🚇,Metro
+🚈,Light Rail
+🚉,Station
+🚊,Tram
+🚝,Monorail
+🚞,Mountain Railway
+🚋,Tram Car
+🚌,Bus
+🚍,Oncoming Bus
+🚎,Trolleybus
+🚐,Minibus
+🚑,Ambulance
+🚒,Fire Engine
+🚔,Oncoming Police Car
+🚓,Police Car
+🚕,Taxi
+🚖,Oncoming Taxi
+🚗,Automobile
+🚘,Oncoming Automobile
+🚚,Delivery Truck
+🚛,Articulated Lorry
+🚜,Tractor
+🏎️,Racing Car
+🏍️,Motorcycle
+🛵,Motor Scooter
+🚲,Bicycle
+🛴,Kick Scooter
+🚏,Bus Stop
+🛤️,Railway Track
+⛽,Fuel Pump
+🚨,Police Car Light
+🚥,Horizontal Traffic Light
+🚦,Vertical Traffic Light
+🚧,Construction
+⚓,Anchor
+⛵,Sailboat
+🚤,Speedboat
+🛳️,Passenger Ship
+⛴️,Ferry
+🛥️,Motor Boat
+🚢,Ship
+🛩️,Small Airplane
+✈️,Airplane
+🛫,Airplane Departure
+🛬,Airplane Arrival
+💺,Seat
+🚁,Helicopter
+🚟,Suspension Railway
+🚠,Mountain Cableway
+🚡,Aerial Tramway
+🛰️,Satellite
+🚀,Rocket
+🛸,Flying Saucer
+🌌,Milky Way
+⛱️,Umbrella on Ground
+🎆,Fireworks
+🎑,Moon Viewing Ceremony
+🎇,Sparkler
+💴,Yen Banknote
+💵,Dollar Banknote
+💶,Euro Banknote
+💷,Pound Banknote
+🛂,Passport Control
+🗿,Moai
+🛃,Customs
+🛄,Baggage Claim
+🛅,Left Luggage
+💌,Love Letter
+💣,Bomb
+🕳️,Hole
+🛀,Person Taking Bath
+🛌,Person in Bed
+🏺,Amphora
+🔪,Kitchen Knife
+🗺️,World Map
+🧭,Compass
+🧱,Brick
+🛢️,Oil Drum
+💈,Barber Pole
+🛎️,Bellhop Bell
+⌛,Hourglass Done
+⏳,Hourglass Not Done
+⌚,Watch
+⏰,Alarm Clock
+⏱️,Stopwatch
+⏲️,Timer Clock
+🌡️,Thermometer
+🕰️,Mantelpiece Clock
+🧨,Firecracker
+🎈,Balloon
+🎉,Party Popper
+🎊,Confetti Ball
+🎎,Japanese Dolls
+🎏,Carp Streamer
+🎐,Wind Chime
+🧧,Red Envelope
+🎀,Ribbon
+🔮,Crystal Ball
+🎁,Wrapped Gift
+🧿,Nazar Amulet
+🧸,Teddy Bear
+🕹️,Joystick
+🖼️,Framed Picture
+🛍️,Shopping Bags
+📿,Prayer Beads
+💎,Gem Stone
+📯,Postal Horn
+🎙️,Studio Microphone
+🎚️,Level Slider
+🎛️,Control Knobs
+📻,Radio
+📱,Mobile Phone
+📲,Mobile Phone With Arrow
+☎️,Telephone
+📞,Telephone Receiver
+📟,Pager
+📠,Fax Machine
+🔋,Battery
+🔌,Electric Plug
+🖥️,Desktop Computer
+💻,Laptop Computer
+🖨️,Printer
+⌨️,Keyboard
+🖱️,Computer Mouse
+🖲️,Trackball
+💽,Computer Disk
+💾,Floppy Disk
+💿,Optical Disk
+📀,DVD
+🧮,Abacus
+🎥,Movie Camera
+🎞️,Film Frames
+📽️,Film Projector
+📺,Television
+📷,Camera
+📸,Camera With Flash
+📹,Video Camera
+📼,Videocassette
+🔍,Magnifying Glass Tilted Left
+🔎,Magnifying Glass Tilted Right
+🕯️,Candle
+💡,Light Bulb
+🔦,Flashlight
+🏮,Red Paper Lantern
+📔,Notebook With Decorative Cover
+📕,Closed Book
+📖,Open Book
+📗,Green Book
+📘,Blue Book
+📙,Orange Book
+📚,Books
+📓,Notebook
+📃,Page With Curl
+📜,Scroll
+📄,Page Facing Up
+📰,Newspaper
+📑,Bookmark Tabs
+🗞️,Rolled-Up Newspaper
+🔖,Bookmark
+🏷️,Label
+💰,Money Bag
+💸,Money With Wings
+💳,Credit Card
+🧾,Receipt
+✉️,Envelope
+📧,E-Mail
+📨,Incoming Envelope
+📩,Envelope With Arrow
+📤,Outbox Tray
+📥,Inbox Tray
+📦,Package
+📮,Postbox
+🗳️,Ballot Box With Ballot
+✏️,Pencil
+✒️,Black Nib
+🖋️,Fountain Pen
+🖊️,Pen
+🖌️,Paintbrush
+🖍️,Crayon
+📝,Memo
+📁,File Folder
+📂,Open File Folder
+🗂️,Card Index Dividers
+📅,Calendar
+📆,Tear-Off Calendar
+🗒️,Spiral Notepad
+🗓️,Spiral Calendar
+📇,Card Index
+📈,Chart Increasing
+📉,Chart Decreasing
+📊,Bar Chart
+📋,Clipboard
+📌,Pushpin
+📍,Round Pushpin
+📎,Paperclip
+📏,Straight Ruler
+🖇️,Linked Paperclips
+📐,Triangular Ruler
+✂️,Scissors
+🗃️,Card File Box
+🗄️,File Cabinet
+🗑️,Wastebasket
+🔒,Locked
+🔓,Unlocked
+🔏,Locked With Pen
+🔐,Locked With Key
+🔑,Key
+🗝️,Old Key
+🔨,Hammer
+⛏️,Pick
+⚒️,Hammer and Pick
+🛠️,Hammer and Wrench
+🗡️,Dagger
+⚔️,Crossed Swords
+🔫,Pistol
+🛡️,Shield
+🔧,Wrench
+🔩,Nut and Bolt
+⚙️,Gear
+🗜️,Clamp
+⚖️,Balance Scale
+🔗,Link
+⛓️,Chains
+🧰,Toolbox
+🧲,Magnet
+⚗️,Alembic
+🧪,Test Tube
+🧫,Petri Dish
+🧬,DNA
+🔬,Microscope
+🔭,Telescope
+📡,Satellite Antenna
+💉,Syringe
+🚪,Door
+💊,Pill
+🛏️,Bed
+🛋️,Couch and Lamp
+🚿,Shower
+🚽,Toilet
+🛁,Bathtub
+🧴,Lotion Bottle
+🧷,Safety Pin
+🧹,Broom
+🧺,Basket
+🧻,Roll of Paper
+🧼,Soap
+🧽,Sponge
+🧯,Fire Extinguisher
+🚬,Cigarette
+⚰️,Coffin
+⚱️,Funeral Urn
+🚰,Potable Water
+💘,Heart with Arrow
+💝,Heart With Ribbon
+💖,Sparkling Heart
+💗,Growing Heart
+💓,Beating Heart
+💞,Revolving Hearts
+💕,Two Hearts
+💟,Heart Decoration
+❣️,Heavy Heart Exclamation
+💔,Broken Heart
+💛,Yellow Heart
+❤️,Red Heart
+🧡,Orange Heart
+💚,Green Heart
+💙,Blue Heart
+💜,Purple Heart
+🖤,Black Heart
+💯,Hundred Points
+💬,Speech Balloon
+💢,Anger Symbol
+🗯️,Right Anger Bubble
+👁️‍🗨️,Eye in Speech Bubble
+💭,Thought Balloon
+💤,Zzz
+♨️,Hot Springs
+🛑,Stop Sign
+🕛,Twelve O’Clock
+🕧,Twelve-Thirty
+🕐,One O’Clock
+🕜,One-Thirty
+🕑,Two O’Clock
+🕝,Two-Thirty
+🕒,Three O’Clock
+🕓,Four O’Clock
+🕞,Three-Thirty
+🕟,Four-Thirty
+🕔,Five O’Clock
+🕕,Six O’Clock
+🕠,Five-Thirty
+🕡,Six-Thirty
+🕖,Seven O’Clock
+🕢,Seven-Thirty
+🕣,Eight-Thirty
+🕗,Eight O’Clock
+🕤,Nine-Thirty
+🕘,Nine O’Clock
+🕙,Ten O’Clock
+🕥,Ten-Thirty
+🕚,Eleven O’Clock
+🕦,Eleven-Thirty
+🌀,Cyclone
+♠️,Spade Suit
+♥️,Heart Suit
+♦️,Diamond Suit
+♣️,Club Suit
+🀄,Mahjong Red Dragon
+🎴,Flower Playing Cards
+🔇,Muted Speaker
+🔈,Speaker Low Volume
+📣,Megaphone
+🔉,Speaker Medium Volume
+📢,Loudspeaker
+🔊,Speaker High Volume
+🔔,Bell
+🔕,Bell With Slash
+🎵,Musical Note
+🏧,ATM Sign
+🎶,Musical Notes
+🚮,Litter in Bin Sign
+🚹,Men’s Room
+♿,Wheelchair Symbol
+🚺,Women’s Room
+🚻,Restroom
+🚼,Baby Symbol
+⚠️,Warning
+🚾,Water Closet
+🚸,Children Crossing
+🚫,Prohibited
+⛔,No Entry
+🚯,No Littering
+🚳,No Bicycles
+🚭,No Smoking
+🚱,Non-Potable Water
+🚷,No Pedestrians
+☢️,Radioactive
+🔞,No One Under Eighteen
+☣️,Biohazard
+⬆️,Up Arrow
+➡️,Right Arrow
+↗️,Up-Right Arrow
+↘️,Down-Right Arrow
+⬇️,Down Arrow
+↙️,Down-Left Arrow
+⬅️,Left Arrow
+↖️,Up-Left Arrow
+↕️,Up-Down Arrow
+↔️,Left-Right Arrow
+↩️,Right Arrow Curving Left
+⤴️,Right Arrow Curving Up
+↪️,Left Arrow Curving Right
+🔄,Counterclockwise Arrows Button
+⤵️,Right Arrow Curving Down
+🔃,Clockwise Vertical Arrows
+🔚,End Arrow
+🔙,Back Arrow
+🔜,Soon Arrow
+🔛,On! Arrow
+🛐,Place of Worship
+🔝,Top Arrow
+⚛️,Atom Symbol
+🕉️,Om
+✡️,Star of David
+☯️,Yin Yang
+☸️,Wheel of Dharma
+✝️,Latin Cross
+☦️,Orthodox Cross
+☮️,Peace Symbol
+☪️,Star and Crescent
+🕎,Menorah
+🔯,Dotted Six-Pointed Star
+♈,Aries
+♉,Taurus
+♊,Gemini
+♋,Cancer
+♍,Virgo
+♌,Leo
+♏,Scorpio
+♎,Libra
+♐,Sagittarius
+♑,Capricorn
+♒,Aquarius
+♓,Pisces
+⛎,Ophiuchus
+🔁,Repeat Button
+🔀,Shuffle Tracks Button
+▶️,Play Button
+🔂,Repeat Single Button
+◀️,Reverse Button
+⏩,Fast-Forward Button
+🔼,Upwards Button
+⏪,Fast Reverse Button
+⏫,Fast Up Button
+🔽,Downwards Button
+⏬,Fast Down Button
+⏏️,Eject Button
+⏹️,Stop Button
+🎦,Cinema
+🔅,Dim Button
+🔆,Bright Button
+📶,Antenna Bars
+📴,Mobile Phone Off
+📳,Vibration Mode
+♾️,Infinity
+♻️,Recycling Symbol
+🔱,Trident Emblem
+🔰,Japanese Symbol for Beginner
+📛,Name Badge
+✅,White Heavy Check Mark
+⭕,Heavy Large Circle
+✔️,Heavy Check Mark
+☑️,Ballot Box With Check
+✖️,Heavy Multiplication X
+❌,Cross Mark
+❎,Cross Mark Button
+➖,Heavy Minus Sign
+➕,Heavy Plus Sign
+➰,Curly Loop
+➗,Heavy Division Sign
+➿,Double Curly Loop
+〽️,Part Alternation Mark
+✳️,Eight-Spoked Asterisk
+✴️,Eight-Pointed Star
+❇️,Sparkle
+‼️,Double Exclamation Mark
+❓,Question Mark
+⁉️,Exclamation Question Mark
+❔,White Question Mark
+❕,White Exclamation Mark
+❗,Exclamation Mark
+©️,Copyright
+®️,Registered
+#️⃣,Keycap Number Sign
+™️,Trade Mark
+0️⃣,Keycap Digit Zero
+1️⃣,Keycap Digit One
+4️⃣,Keycap Digit Four
+2️⃣,Keycap Digit Two
+3️⃣,Keycap Digit Three
+5️⃣,Keycap Digit Five
+7️⃣,Keycap Digit Seven
+6️⃣,Keycap Digit Six
+8️⃣,Keycap Digit Eight
+9️⃣,Keycap Digit Nine
+🔠,Input Latin Uppercase
+🔟,Keycap
+🔢,Input Numbers
+🔡,Input Latin Lowercase
+🔣,Input Symbols
+🅰️,A Button (Blood Type)
+🔤,Input Latin Letters
+🅱️,B Button (Blood Type)
+🆎,AB Button (Blood Type)
+🆑,CL Button
+🆒,Cool Button
+🆓,Free Button
+ℹ️,Information
+🆔,ID Button
+Ⓜ️,Circled M
+🆕,New Button
+🆖,NG Button
+🅾️,O Button (Blood Type)
+🅿️,P Button
+🆗,OK Button
+🆘,SOS Button
+🆙,Up! Button
+🆚,Vs Button
+🈁,Japanese “Here” Button
+🈂️,Japanese “Service Charge” Button
+🈶,Japanese “Not Free of Charge” Button
+🈷️,Japanese “Monthly Amount” Button
+🈯,Japanese “Reserved” Button
+🈹,Japanese “Discount” Button
+🉐,Japanese “Bargain” Button
+🈚,Japanese “Free of Charge” Button
+🈲,Japanese “Prohibited” Button
+🉑,Japanese “Acceptable” Button
+🈸,Japanese “Application” Button
+🈳,Japanese “Vacancy” Button
+㊙️,Japanese “Secret” Button
+🈴,Japanese “Passing Grade” Button
+㊗️,Japanese “Congratulations” Button
+🈺,Japanese “Open for Business” Button
+🔵,Blue Circle
+🈵,Japanese “No Vacancy” Button
+🔴,Red Circle
+⚫,Black Circle
+⚪,White Circle
+⬛,Black Large Square
+⬜,White Large Square
+◼️,Black Medium Square
+◻️,White Medium Square
+◾,Black Medium-Small Square
+◽,White Medium-Small Square
+▪️,Black Small Square
+▫️,White Small Square
+🔶,Large Orange Diamond
+🔷,Large Blue Diamond
+🔸,Small Orange Diamond
+🔹,Small Blue Diamond
+🔺,Red Triangle Pointed Up
+🔻,Red Triangle Pointed Down
+💠,Diamond With a Dot
+🔲,Black Square Button
+🔳,White Square Button
+🃏,Joker
+🏼,Medium-Light Skin Tone
+⛑🏼,Helmet With White Cross, Type-3
+⛷🏼,Skier, Type-3
+👋🏼,Waving Hand
+🤚🏼,Raised Back of Hand
+🖐🏼,Hand With Fingers Splayed
+✋🏼,Raised Hand
+🖖🏼,Vulcan Salute
+👌🏼,OK Hand
+🤏🏼,Pinching Hand
+✌🏼,Victory Hand
+🤞🏼,Crossed Fingers
+🤟🏼,Love-You Gesture
+🤙🏼,Call Me Hand
+🤘🏼,Sign of the Horns
+👈🏼,Backhand Index Pointing Left
+🖕🏼,Middle Finger
+👉🏼,Backhand Index Pointing Right
+👆🏼,Backhand Index Pointing Up
+👇🏼,Backhand Index Pointing Down
+☝🏼,Index Pointing Up
+👍🏼,Thumbs Up
+👎🏼,Thumbs Down
+✊🏼,Raised Fist
+👊🏼,Oncoming Fist
+🤛🏼,Left-Facing Fist
+🤜🏼,Right-Facing Fist
+👏🏼,Clapping Hands
+🙌🏼,Raising Hands
+👐🏼,Open Hands
+🤲🏼,Palms Up Together
+🤝🏼,Handshake, Type-3
+💅🏼,Nail Polish
+🦶🏼,Foot
+🙏🏼,Folded Hands
+👂🏼,Ear
+💪🏼,Flexed Biceps
+👶🏼,Baby
+👧🏼,Girl
+🦻🏼,Ear With Hearing Aid
+✍🏼,Writing Hand
+🤳🏼,Selfie
+👨🏼,Man
+🦵🏼,Leg
+🙇🏼,Person Bowing
+👴🏼,Old Man
+👵🏼,Old Woman
+🙍🏼,Person Frowning
+🧒🏼,Child
+👃🏼,Nose
+👦🏼,Boy
+🧑🏼,Person
+🧏🏼,Deaf Person
+💁🏼,Person Tipping Hand
+🧔🏼,Man
+🧓🏼,Older Person
+👱🏼,Person
+👩🏼,Woman
+🤦🏼,Person Facepalming
+🙅🏼,Person Gesturing No
+🙆🏼,Person Gesturing OK
+🕵🏼,Detective
+🧟🏼,Zombie
+👷🏼,Construction Worker
+🙋🏼,Person Raising Hand
+🤴🏼,Prince
+🤷🏼,Person Shrugging
+👮🏼,Police Officer
+💂🏼,Guard
+🧕🏼,Woman With Headscarf
+👲🏼,Man With Chinese Cap
+🤵🏼,Man in Tuxedo
+🤰🏼,Pregnant Woman
+👸🏼,Princess
+🎅🏼,Santa Claus
+👳🏼,Person Wearing Turban
+👼🏼,Baby Angel
+🤶🏼,Mrs. Claus
+🦸🏼,Superhero
+👰🏼,Bride With Veil
+🤱🏼,Breast-Feeding
+🧙🏼,Mage
+🦹🏼,Supervillain
+🧚🏼,Fairy
+🧛🏼,Vampire
+💇🏼,Person Getting Haircut
+🧜🏼,Merperson
+🧝🏼,Elf
+💆🏼,Person Getting Massage
+🚶🏼,Person Walking
+🧍🏼,Person Standing
+🧎🏼,Person Kneeling
+🏃🏼,Person Running
+💃🏼,Woman Dancing
+👯🏼,Woman With Bunny Ears, Type-3
+🕺🏼,Man Dancing
+🕴🏼,Man in Suit Levitating
+🧖🏼,Person in Steamy Room
+🧗🏼,Person Climbing
+🏂🏼,Snowboarder
+🏇🏼,Horse Racing
+🏌🏼,Person Golfing
+🏄🏼,Person Surfing
+🚣🏼,Person Rowing Boat
+🏊🏼,Person Swimming
+⛹🏼,Person Bouncing Ball
+🏋🏼,Person Lifting Weights
+🚴🏼,Person Biking
+🚵🏼,Person Mountain Biking
+🤼🏼,Wrestlers, Type-3
+🤸🏼,Person Cartwheeling
+🤽🏼,Person Playing Water Polo
+🤾🏼,Person Playing Handball
+🤹🏼,Person Juggling
+🧘🏼,Person in Lotus Position
+🛀🏼,Person Taking Bath
+🙎🏼,Person Pouting
+🛌🏼,Person in Bed
+👭🏼,Women Holding Hands
+👬🏼,Men Holding Hands
+👫🏼,Woman and Man Holding Hands
+💏🏼,Kiss, Type-3
+💑🏼,Couple With Heart, Type-3
+👪🏼,Family, Type-3
+🖎🏼,Left Writing Hand + Emoji Modifier Fitzpatrick Type-3
+🖒🏼,Reversed Thumbs Up Sign + Emoji Modifier Fitzpatrick Type-3
+☛🏼,Black Right Pointing Index + Emoji Modifier Fitzpatrick Type-3
+☞🏼,White Right Pointing Index + Emoji Modifier Fitzpatrick Type-3
+🖓🏼,Reversed Thumbs Down Sign + Emoji Modifier Fitzpatrick Type-3
+🖑🏼,Reversed Raised Hand with Fingers Splayed + Emoji Modifier Fitzpatrick Type-3
+☟🏼,White Down Pointing Index + Emoji Modifier Fitzpatrick Type-3
+☜🏼,White Left Pointing Index + Emoji Modifier Fitzpatrick Type-3
+☚🏼,Black Left Pointing Index + Emoji Modifier Fitzpatrick Type-3
+🖔🏼,Reversed Victory Hand + Emoji Modifier Fitzpatrick Type-3
+🦲,Bald
+🦱,Curly Hair
+🦰,Red Hair
+🦳,White Hair
+🛍,Shopping Bags
+🎃,Jack-O-Lantern
+🕯,Candle
+🕉,Om
+♀️,Female Sign
+♂️,Male Sign
+‍,Zero Width Joiner
+🏻,Light Skin Tone
+🏿,Dark Skin Tone
+🏾,Medium-Dark Skin Tone
+🏽,Medium Skin Tone
+☪,Star and Crescent
+☘,Shamrock
+☀,Sun
+🧖🏽,Person in Steamy Room
+🧖🏻,Person in Steamy Room
+🧖🏿,Person in Steamy Room
+🧖🏾,Person in Steamy Room
+🧖🏻‍♂️,Man in Steamy Room
+🧖🏼‍♂️,Man in Steamy Room
+🧖🏽‍♂️,Man in Steamy Room
+🧖🏾‍♂️,Man in Steamy Room
+🧖🏿‍♂️,Man in Steamy Room
+🧖🏼‍♀️,Woman in Steamy Room
+🧖🏻‍♀️,Woman in Steamy Room
+🧖🏾‍♀️,Woman in Steamy Room
+🧖🏽‍♀️,Woman in Steamy Room
+🧖🏿‍♀️,Woman in Steamy Room
+🧎,Person Kneeling
+🗂,Card Index Dividers
+⛈,Cloud with Lightning and Rain
+🕴,Person in Suit Levitating
+🛤,Railway Track
+♂,Male Sign
+📒,Ledger
+🏌,Person Golfing
+🏟,Stadium
+🗯,Right Anger Bubble
+🗡,Dagger
+🗃,Card File Box
+🕊,Dove
+🏚,Derelict House
+🖱,Computer Mouse
+🏞,National Park
+⛴,Ferry
+🏙,Cityscape
+🛎,Bellhop Bell
+🗞,Rolled-Up Newspaper
+🗓,Spiral Calendar
+🌫,Fog
+🛡,Shield
+🛳,Passenger Ship
+🏋,Person Lifting Weights
+🏎,Racing Car
+🌥,Sun Behind Large Cloud
+🏕,Camping
+⏲,Timer Clock
+🌶,Hot Pepper
+🗒,Spiral Notepad
+⚖,Balance Scale
+🏛,Classical Building
+🌡,Thermometer
+🕵,Detective
+🗄,File Cabinet
+🗑,Wastebasket
+⛷,Skier
+🛩,Small Airplane
+⛹,Person Bouncing Ball
+🛥,Motor Boat
+🛣,Motorway
+🖥,Desktop Computer
+⏮,Last Track Button
+🏖,Beach with Umbrella
+🕸,Spider Web
+⏸,Pause Button
+⛓,Chains
+🗺,World Map
+🛋,Couch and Lamp
+⚕,Medical Symbol
+🍽,Fork and Knife with Plate
+🖍,Crayon
+🕹,Joystick
+💹,Chart Increasing with Yen
+🗨,Left Speech Bubble
+♀,Female Sign
+🛢,Oil Drum
+🌦,Sun Behind Rain Cloud
+💱,Currency Exchange
+🖌,Paintbrush
+🖊,Pen
+🕳,Hole
+⃣,Combining Enclosing Keycap
+☄,Comet
+🎟,Admission Tickets
+🖼,Framed Picture
+💲,Heavy Dollar Sign
+🗝,Old Key
+🗜,Clamp
+🗳,Ballot Box with Ballot
+🥅,Goal Net
+🛶,Canoe
+⏹,Stop Button
+🎞,Film Frames
+🖐,Hand with Fingers Splayed
+🤺,Person Fencing
+🗣,Speaking Head
+🌧,Cloud with Rain
+⏭,Next Track Button
+🛏,Bed
+🌨,Cloud with Snow
+🏵,Rosette
+🌪,Tornado
+🌩,Cloud with Lightning
+🥚,Egg
+📵,No Mobile Phones
+🌤,Sun Behind Small Cloud
+⛩,Shinto Shrine
+🛠,Hammer and Wrench
+🎙,Studio Microphone
+🏘,Houses
+👁,Eye
+🏜,Desert
+🌬,Wind Face
+🏍,Motorcycle
+⛰,Mountain
+⚜,Fleur-de-lis
+️,Variation Selector-16
+⛑,Rescue Worker’s Helmet
+🎖,Military Medal
+⚒,Hammer and Pick
+⛸,Ice Skate
+🐿,Chipmunk
+〰,Wavy Dash
+✈,Airplane
+🛒,Shopping Cart
+🕷,Spider
+📽,Film Projector
+🛰,Satellite
+🎛,Control Knobs
+🖨,Printer
+🎚,Level Slider
+🎗,Reminder Ribbon
+⏯,Play or Pause Button
+🏷,Label
+⛏,Pick
+*,Asterisk
+⛱,Umbrella on Ground
+🕰,Mantelpiece Clock
+🖇,Linked Paperclips
+🕶,Sunglasses
+🏝,Desert Island
+🦌,Deer
+⏱,Stopwatch
+🚙,Sport Utility Vehicle
+🖋,Fountain Pen
+🔘,Radio Button
+🏗,Building Construction
+🏔,Snow-Capped Mountain
+🖲,Trackball
+⏺,Record Button
