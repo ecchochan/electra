@@ -150,6 +150,7 @@ class CanTokenizer(BaseTokenizer):
         wordpieces_prefix: str = "##",
         special_chars: str = SPECIAL_CHARS,
         zh_norm: bool = True,
+        handle_simpl: bool = True,
     ):
 
         if vocab_file is not None:
@@ -202,6 +203,7 @@ class CanTokenizer(BaseTokenizer):
             "lowercase": lowercase,
             "special_chars": special_chars,
             "zh_norm": zh_norm,
+            "handle_simpl": handle_simpl,
             "wordpieces_prefix": wordpieces_prefix,
         }
 

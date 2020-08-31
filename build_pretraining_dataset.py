@@ -297,7 +297,7 @@ class ExampleWriter(object):
       if bucket:
         bucket.append("")
         sub_doc = '\n'.join(bucket)
-        sub_doc = remove_url(sub_doc)
+        sub_doc = self.remove_url(sub_doc)
         bad = False
         if not sub_doc.strip() or too_many_repeat(sub_doc):
           bad = True
