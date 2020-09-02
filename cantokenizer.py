@@ -134,6 +134,8 @@ SPECIAL_CHARS = (
 
     'ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦㄧㄨㄩㄱ'
 
+    '\u200d'
+
 )
 
 SPECIAL_CHARS = ''.join(sorted(set(SPECIAL_CHARS)))

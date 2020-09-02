@@ -1460,22 +1460,22 @@
 💏🏼,Kiss, Type-3
 💑🏼,Couple With Heart, Type-3
 👪🏼,Family, Type-3
-🖎🏼,Left Writing Hand + Emoji Modifier Fitzpatrick Type-3
-🖒🏼,Reversed Thumbs Up Sign + Emoji Modifier Fitzpatrick Type-3
-☛🏼,Black Right Pointing Index + Emoji Modifier Fitzpatrick Type-3
-☞🏼,White Right Pointing Index + Emoji Modifier Fitzpatrick Type-3
-🖓🏼,Reversed Thumbs Down Sign + Emoji Modifier Fitzpatrick Type-3
-🖑🏼,Reversed Raised Hand with Fingers Splayed + Emoji Modifier Fitzpatrick Type-3
-☟🏼,White Down Pointing Index + Emoji Modifier Fitzpatrick Type-3
-☜🏼,White Left Pointing Index + Emoji Modifier Fitzpatrick Type-3
-☚🏼,Black Left Pointing Index + Emoji Modifier Fitzpatrick Type-3
-🖔🏼,Reversed Victory Hand + Emoji Modifier Fitzpatrick Type-3
+🖎🏼,Left Writing Hand
+🖒🏼,Reversed Thumbs Up Sign
+☛🏼,Black Right Pointing Index
+☞🏼,White Right Pointing Index
+🖓🏼,Reversed Thumbs Down Sign
+🖑🏼,Reversed Raised Hand with Fingers Splayed
+☟🏼,White Down Pointing Index
+☜🏼,White Left Pointing Index
+☚🏼,Black Left Pointing Index
+🖔🏼,Reversed Victory Hand
 🦲,Bald
 🦱,Curly Hair
 🦰,Red Hair
 🦳,White Hair
 🛍,Shopping Bags
-🎃,Jack-O-Lantern
+🎃,Halloween
 🕯,Candle
 🕉,Om
 ♀️,Female Sign
@@ -1634,3 +1634,29 @@
 🏔,Snow-Capped Mountain
 🖲,Trackball
 ⏺,Record Button
+🏁,Chequered Flag
+🚩,Triangular Flag
+🎌,Crossed Flags
+🏴,Black Flag
+🏳,White Flag
+🏳️‍🌈,Rainbow Flag
+🏳️‍,Transgender Flag
+🦪,Oyster
+🩹,Adhesive Bandage
+🩺,Stethoscope
+🩳,Shorts
+🪒,Razor
+🪃,Boomerang
+🩸,Drop of Blood
+🪁,Kite
+🪜,Ladder
+🪟,Window
+🧊,Ice
+🛊,Girls
+🛉,Boys Symbol
+🦩,Flamingo
+🦥,Sloth
+🪂,Parachute
+⏎,Insert
+⎇,Alternate
+☿,Mercury
