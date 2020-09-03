@@ -61,7 +61,6 @@ class ExampleBuilder(object):
 
     unk_count = bert_tokids.count(4)
     '''
-'''
     if unk_count > 0:
       p = bert_tokids.index(4)
       offsets = encoded.offsets
@@ -74,6 +73,7 @@ class ExampleBuilder(object):
           tokenized_text = chinese_re.sub(r'\1',tokenized_text)
           print(tokenized_text+'\n'+ orig_text)
 
+'''
     if unk_count > 5:
       return None
     self._current_sentences.append(bert_tokids)
