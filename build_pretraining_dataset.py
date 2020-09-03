@@ -57,7 +57,10 @@ class ExampleBuilder(object):
     encoded = self._tokenizer.encode(line)
     # bert_tokens = encoded.tokens
     bert_tokids = encoded.ids 
+
+
     unk_count = bert_tokids.count(4)
+    '''
     if unk_count > 0:
       p = bert_tokids.index(4)
       offsets = encoded.offsets
@@ -69,6 +72,8 @@ class ExampleBuilder(object):
           orig_text = line[offsets[p][0]-10:offsets[p][1]+10]
           tokenized_text = chinese_re.sub(r'\1',tokenized_text)
           print(tokenized_text+'\n'+ orig_text)
+
+'''
     if unk_count > 5:
       return None
     self._current_sentences.append(bert_tokids)
@@ -188,7 +193,7 @@ from data_utils import too_many_repeat
 remove_url_re = re.compile(r' ?(?:https?:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z_0-9\-]+)+|[a-zA-Z_0-9\-]+(?:\.[a-zA-Z_0-9\-]+)+)(?:\/(?:\?(?:<nl>)?\n *[a-zA-Z0-9\-\._… &%\+]+|[a-zA-Z0-9\.\?\:@\-_=#…&%!\+])+)+ *(?:<nl>\n * ?(?:https?:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)+|[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)+)(?:\/(?:\?(?:<nl>)?\n *[a-zA-Z0-9\-\._… &%\+]+|[a-zA-Z0-9\.\?\:@\-_=#…&%!\+])+)+ *)*')
 remove_speakers = re.compile(r'^#\d+ ([A-Z]+: )?(#\d+ )?', re.MULTILINE)
 
-bad_unicode = re.compile(r'[\u2060-\u20ff\uAA80-\uFB45\u00AD\u008D\u008F\u009F\u0095\u0094\u0097\u0082\u0083\u0087\u0099囀ਾ]+|矛受畩究悍妤|脖宋鬱駜|ÐÒøÓÐÕ|ㄛ筍|ㄛ婌|ㄛ紨|ㄛ嘟|大虯李李朽|獝獞獟獠|拇謂饢|海瑉|隳哪|堶悸漲Л釔|野怛儞也|鈭鲭|韏啣|蟡㏘|乯儜|牁轎煤|蕻淕|蜁巌|潝砩|坉洩|竷h|匾哺|衷讜|愣勾|划曻|a﹐a¶#|p"0∨"q"|鼐盀|阠鼐|皇瞧|鍩挂槐|肭資指娓|蟛青|眩謖|笥|饇|櫱|肭|亂桓|嫠', 
+bad_unicode = re.compile(r'[\u2060-\u20ff\uAA80-\uFB45\u00AD\u008D\u008F\u009F\u0095\u0094\u0097\u0082\u0083\u0087\u0099囀ਾ]+|矛受畩究悍妤|脖宋鬱駜|ÐÒøÓÐÕ|ㄛ筍|ㄛ婌|ㄛ紨|ㄛ嘟|大虯李李朽|獝獞獟獠|拇謂饢|海瑉|隳哪|堶悸漲Л釔|野怛儞也|鈭鲭|韏啣|蟡㏘|乯儜|牁轎煤|蕻淕|蜁巌|潝砩|坉洩|竷h|匾哺|衷讜|愣勾|划曻|a﹐a¶#|p"0∨"q"|鼐盀|阠鼐|皇瞧|鍩挂槐|肭資指娓|蟛青|眩謖|笥|饇|櫱|肭|亂桓|嫠|芔苙苾苹|攆擺|似饲|恕刷', 
                       re.UNICODE)
 remove_borders = re.compile(r'[┄┅┆┇┈┉┊┋┌┍┎┏┐┑┒┓└┕┖┗┘┙┚┛├┝┞┟┠┡┢┣┤┥┦┧┨┩┪┫┬┭┮┯┰┱┲┳┴┵┶┷┸┹┺┻┼┽┾┿╀╁╂╃╄╅╆╇╈╉╊╋╌╍╎╏║╒╓╔╕╖╗╘╙╚╛╜╝╞╟╠╡╢╣╤╥╦╧╨╩╪╫╬╭╮╯╰╱╲╳╵╷╹╻╼╽╾╿▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟◣◥͜͡╮╯╰◜◝◞◟ᕕᕗ⌇⧸⎩⎠⎞͏⎛͏⎝⎭⧹༼ ༽♢◄ƪʅʋ)]')
     
@@ -211,13 +216,23 @@ class ExampleWriter(object):
 荓o天獨厚,得天獨厚
 訾議,指責
 佢迚,佢
+胗金,診金
+擻旦,撒旦
+擻亞,撒亞
+擻手,撒手
+擻下,撒下
+擻冷,撒冷
+看診,看診
 倒禢,倒塌
 然緮,然後
 溘然,忽然
+好胗,好彩
 溘逝,忽逝
 詆訿,詆毀
 感䁷,感覺
+胗落,胗睇
 㥥然,偶然
+門㰖,門檻
 無䫋,無類
 顪色,顏色
 討讑,討論
