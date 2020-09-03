@@ -26,6 +26,11 @@ from model import tokenization
 from util import utils
 
 from cantokenizer import CanTokenizer
+from replacer import Replacer
+import re
+chinese_re = re.compile(u' *([⺀-⺙⺛-⻳⼀-⿕々〇〡-〩〸-〺〻㐀-䶵一-鿃豈-鶴侮-頻並-龎]) *', re.UNICODE)
+
+seen = set()
 
 def create_int_feature(values):
   feature = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
@@ -42,6 +47,7 @@ class ExampleBuilder(object):
     self._max_length = max_length
     self._target_length = max_length
     self.do_sop = do_sop
+    self.warned = False
 
   def add_line(self, line):
     """Adds a line of text to the current example being built."""
@@ -51,7 +57,24 @@ class ExampleBuilder(object):
     encoded = self._tokenizer.encode(line)
     # bert_tokens = encoded.tokens
     bert_tokids = encoded.ids 
-    if bert_tokids.count(4) > 5:
+
+
+    unk_count = bert_tokids.count(4)
+    '''
+    if unk_count > 0:
+      p = bert_tokids.index(4)
+      offsets = encoded.offsets
+      tokenized_text = ' '.join(encoded.tokens[p-10:p+10])
+      if offsets[p][1] - offsets[p][0] == 1:
+        unk_token_should_be = line[offsets[p][0]:offsets[p][1]]
+        if unk_token_should_be not in seen:
+          seen.add(unk_token_should_be)
+          orig_text = line[offsets[p][0]-10:offsets[p][1]+10]
+          tokenized_text = chinese_re.sub(r'\1',tokenized_text)
+          print(tokenized_text+'\n'+ orig_text)
+
+'''
+    if unk_count > 5:
       return None
     self._current_sentences.append(bert_tokids)
     self._current_length += len(bert_tokids)
@@ -62,18 +85,23 @@ class ExampleBuilder(object):
   def _create_example(self):
     """Creates a pre-training example from the current list of sentences."""
     # small chance to only have one segment as in classification tasks
+    if not self.warned and self.do_sop:
+      print("Creating tfrecords with SOP objective.")
+      self.warned = True
+      
     if not self.do_sop and random.random() < 0.1:
       first_segment_target_length = 100000
     else:
       # -3 due to not yet having [CLS]/[SEP] tokens in the input text
-      first_segment_target_length = (self._target_length - 3) // 2 if not self.do_sop else \
-                                    (random.randint(8, (self._target_length - 3) // 2) if random.random() > 0.5 else (self._target_length - 3) // 2
+      ss = (self._target_length - 3) // 2
+      first_segment_target_length = ss if not self.do_sop else \
+                                    (random.randint(min(8,ss), ss) if random.random() > 0.5 else ss
                                     )
 
     first_segment = []
     second_segment = []
     if self.do_sop and len(self._current_sentences) == 1:
-      length = len(first_segment_target_length)
+      length = first_segment_target_length
       a = self._current_sentences[0][:length // 2]
       b = self._current_sentences[0][length // 2:]
       self._current_sentences = [a, b]
@@ -165,10 +193,9 @@ from data_utils import too_many_repeat
 remove_url_re = re.compile(r' ?(?:https?:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z_0-9\-]+)+|[a-zA-Z_0-9\-]+(?:\.[a-zA-Z_0-9\-]+)+)(?:\/(?:\?(?:<nl>)?\n *[a-zA-Z0-9\-\._… &%\+]+|[a-zA-Z0-9\.\?\:@\-_=#…&%!\+])+)+ *(?:<nl>\n * ?(?:https?:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)+|[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)+)(?:\/(?:\?(?:<nl>)?\n *[a-zA-Z0-9\-\._… &%\+]+|[a-zA-Z0-9\.\?\:@\-_=#…&%!\+])+)+ *)*')
 remove_speakers = re.compile(r'^#\d+ ([A-Z]+: )?(#\d+ )?', re.MULTILINE)
 
-def remove_url(x):
-    x = remove_url_re.sub(' [url] ',x)
-    x = remove_speakers.sub('',x)
-    return x
+bad_unicode = re.compile(r'[\u2060-\u20ff\uAA80-\uFB45\u00AD\u008D\u008F\u009F\u0095\u0094\u0097\u0082\u0083\u0087\u0099囀ਾ]+|矛受畩究悍妤|脖宋鬱駜|ÐÒøÓÐÕ|ㄛ筍|ㄛ婌|ㄛ紨|ㄛ嘟|大虯李李朽|獝獞獟獠|拇謂饢|海瑉|隳哪|堶悸漲Л釔|野怛儞也|鈭鲭|韏啣|蟡㏘|乯儜|牁轎煤|蕻淕|蜁巌|潝砩|坉洩|竷h|匾哺|衷讜|愣勾|划曻|a﹐a¶#|p"0∨"q"|鼐盀|阠鼐|皇瞧|鍩挂槐|肭資指娓|蟛青|眩謖|笥|饇|櫱|肭|亂桓|嫠|芔苙苾苹|攆擺|似饲|恕刷|膘', 
+                      re.UNICODE)
+remove_borders = re.compile(r'[┄┅┆┇┈┉┊┋┌┍┎┏┐┑┒┓└┕┖┗┘┙┚┛├┝┞┟┠┡┢┣┤┥┦┧┨┩┪┫┬┭┮┯┰┱┲┳┴┵┶┷┸┹┺┻┼┽┾┿╀╁╂╃╄╅╆╇╈╉╊╋╌╍╎╏║╒╓╔╕╖╗╘╙╚╛╜╝╞╟╠╡╢╣╤╥╦╧╨╩╪╫╬╭╮╯╰╱╲╳╵╷╹╻╼╽╾╿▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟◣◥͜͡╮╯╰◜◝◞◟ᕕᕗ⌇⧸⎩⎠⎞͏⎛͏⎝⎭⧹༼ ༽♢◄ƪʅʋ)]')
     
 
 class ExampleWriter(object):
@@ -179,6 +206,340 @@ class ExampleWriter(object):
                num_out_files=1000):
     self._blanks_separate_docs = blanks_separate_docs
     tokenizer = CanTokenizer(vocab_file)
+    replacements = {}
+    
+
+    simple_replacements = '''
+支支梧梧,支支吾吾
+愴悴,倉卒
+成訧,成就
+荓o天獨厚,得天獨厚
+毖後,慎後
+訾議,指責
+無毖,無操
+佢迚,佢
+胗金,診金
+擻旦,撒旦
+擻亞,撒亞
+擻手,撒手
+擻下,撒下
+擻冷,撒冷
+看診,看診
+倒禢,倒塌
+然緮,然後
+溘然,忽然
+好胗,好彩
+溘逝,忽逝
+詆訿,詆毀
+感䁷,感覺
+胗落,胗睇
+㥥然,偶然
+門㰖,門檻
+無䫋,無類
+顪色,顏色
+討讑,討論
+礀勢,姿勢
+暴畛,暴殄
+不恂情面,不徇情面
+𤓓紙,攞紙
+誄程,課程
+䟓爆,踢爆
+上誄,上課
+開誄,開課
+笄芯,開心
+嗫嗫嚅嚅,吞吞吐吐
+而冡,而家
+多蒯,多部
+靚唔挸,靚唔靚
+蹝左,徙左
+旵士,巴士
+哂萠,哂崩
+穿萠,穿崩
+裸 裎,赤裸
+裸裎,赤裸
+縻爛,糜爛
+禳灾,除灾
+足以⊥,足以令
+濕頄,濕九
+朊髒,骯髒
+放簜,放盪
+絾績,成績
+班乹,班戟
+可𠰴可以,可唔可以
+校䏜,校服
+凵家剷,冚家剷
+雕屋脊,雕屋脊
+傖促,倉促
+窩錀,窩輪
+資枓,資料
+譊唔譊,曉唔曉
+直裰,直袍
+栱桿,槓桿
+難堐 ,難捱
+入饔,入甕
+萯碟,副碟
+鈠鍊,鍛鍊
+龜柃,龜柃
+朓望,眺望
+味䁷,味覺
+寒傖,寒酸
+巴玎,巴打
+臉脥,臉頰
+譂讓,禪讓
+扶筇,扶杖
+躐等,越等
+門襤,門檻
+顝顱,骷顱
+脥下,腋下
+解瓿圖,解剖圖
+藍笌,藍牙
+枌末,粉末
+止瘑,止屙
+肚瘑,肚屙
+治瘵,治療
+闥入,闖入
+鈙事,敘事
+陀怫,陀佛
+㩂個女人,揀個女人
+無儔,無比
+踽僂,傴僂
+咳欶,咳嗽
+䅻身,痴身
+惝恍,失意
+惝怳,失意
+賷發,打發
+睇踾到,睇唔到
+齎發,打發
+㧥親,跣親
+㧥到,跣到
+挍調,較調
+㧥倒,跣倒
+好㧥,好㧥
+候僎,候選
+影呴,影響
+杪近,抄近
+大棑,大排
+材枓,材料
+橡筯,橡筋
+左猺,左搖
+激璗,激盪
+籟欶,籟簌
+計筫,計算
+動璗,動盪
+熘彈,榴彈
+拉筯,拉筋
+推廌,推薦
+得闃,得閒
+𥅽好d,貪好d
+接蠋,接觸
+蠟蠋,蠟觸
+咪菚,咪盞
+旗壏,旗艦
+大陰蠋,大陰燭
+問顗,問題
+亂椗,亂掟
+懷愐,懷緬
+愐懷,緬懷
+十㰩,十蚊
+撙抵,蹲低
+咪菚,咪盞
+趷低,踎低
+挍一餐,拗一餐
+獎過狟0,獎過期幾
+陰𧖣,陰蠟
+嘲文,潮文
+蹝氣,嘥氣
+屣氣,嘥氣
+蝦誁,蝦餅
+栚票,機票
+齟齬,齒不齊
+齟晤,齒不齊
+龃龉,齒不齊
+二妁,二奶
+一鑤,一鑊
+贂,睇
+輞早,早
+囁嚅,吞吐
+囁嚅,吞吐
+黠樣,點樣
+𪘲,依
+反餔,反哺
+一擨,一蹶
+氀好,唔好
+影譠,影壇
+震囁,震攝
+風杋,風帆
+夜䦨,夜闌
+論譠,論壇
+㟨士,瑞士
+縯紛,繽紛
+點䓹,點養
+內哄,內訌
+共鈙 ,共聚
+唔度賩,唔到
+剸入法,輸入法
+Ⴡ,o靚
+樂譠,影壇
+海絴,海洋
+追誴,追蹤
+告謦,售罄
+洧息,消息
+三妁,三奶
+o徙氣,嘥氣
+沉斁,沉默
+越殂,越俎
+腌尖,奄尖
+腌臢,奄尖
+奄臢,奄尖
+乏善可鯔,乏善可陳
+沉𤢕,沉默
+多斁,多數
+多𤢕,多數
+著斁,著數
+著𤢕,著數
+徙氣,嘥氣
+落㮞,落格
+造廔,造口
+奔弛,奔馳
+做弭,做餌
+魚弭,魚餌
+又泅,又lup
+塵蹣,麈蟎
+泅泅,lup lup
+肉𤎖,肉糠
+只系,只係
+扭釱,扭軚
+不慬,不懂
+蘔果,蘋果
+唔洎,唔洗
+痀瘻,駝背
+佝瘻,駝背
+傴瘻,駝背
+痀僂,駝背
+佝僂,駝背
+傴僂,駝背
+瘳瘳,寥寥
+賌料,資料
+挍碎,攪碎
+挍盡,攪盡
+挍挍,搞搞
+學挍,學校
+挍晒,R曬
+挍左柴,拗左柴
+挍位,鉸位
+挍低,較低
+挍內,校內
+援挍,援交
+挍長,校長
+挍服,校服
+挍痕,R痕
+有得挍,有得校
+唔洗挍,唔洗拗
+有排挍,有排拗
+"挍"到隻,拗到隻
+挍部機,較部機
+挍番,較番
+挍左d老,R左d老
+挍西班牙呀,搞西班牙呀
+"挍"得贏,拗得贏
+魚挍,魚餃
+同我挍,同我拗
+同鼻挍,同鼻拗
+挍到個,較到個
+挍撚晒,R撚晒
+腰挍到,拗挍到
+挍柴,拗柴
+挍屎棍,攪屎棍
+上挍,上校
+詅住,諗住
+遲墿,遲擇
+挍返個,較返個
+就挍到,就搞到
+挍緊手瓜,拗緊手瓜
+唔好挍院,唔好搞院
+挍生挍死,拗生拗死
+挍殺王,搞殺王
+勿挍事,勿搞事
+挍手瓜,拗手瓜
+喺度挍,喺度拗
+挍痛,絞痛
+挍贏,拗贏
+都無數挍,都無數拗
+挍到獨立,搞到獨立
+挍左另外,搞左另外
+死忍唔挍得,死忍唔R得
+條命挍飛,條命教飛
+紅波挍黑,紅波搞黑
+挍極到最,較極到最
+做唔成你挍,做唔成你拗
+唔知你挍乜,唔知你拗乜
+名挍,名校
+挍剪,鉸剪
+挍到死腳,拗到死腳
+挍腰,拗腰
+互相挍殺,互相殘殺
+挍咩條仆街,搞咩條仆街
+挍腳走人,拗腳走人
+挍水吹,r水吹
+挍返正,較返正
+鄭挍唔掂,鄭搞唔掂
+比佢挍到分分鐘,比佢搞到分分鐘
+粗嘅就挍,粗嘅就抆
+挍變速鐵鎖,較變速鐵鎖
+挍斷,拗斷
+挍肉機,搞肉機
+挍爛,r爛
+挍緊啲咩,搞緊啲咩
+挍緊屎,屙緊屎
+挍到佢地正常,拗到佢地正常
+赢場挍,赢場交
+以為唔小心挍左,以為唔小心拗左
+手挍腳挍,手r腳r
+慇速,光速
+檢椌,檢控
+申諘,申請
+目摽,目標
+苓膏,柃膏
+猜𣐀,猜枚
+猌,就
+淘汱,淘汰
+汰弱留,汰弱留
+𨳒你焛,𨳒你𨳒
+雖焛,雖然
+俾人焛,俾人小
+焛你,小你
+焛到爆,小到爆
+焛下焛下,閃下閃下
+好焛,好閃
+焛你,小你
+邅自,擅自
+焛撚晒,閃撚晒
+'''
+
+    for line in simple_replacements.split('\n'):
+        if not line:
+            continue
+        a, b = line.split(',')
+        replacements[a] = (b,'','')
+    with open('combine_zh.txt') as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            k, v = line.split(',')
+            replacements[k] = (v,'','')
+            
+    with open('emoji_to_name.txt') as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            splitted = line.split(',')
+            k, v = splitted[0][0], splitted[1]
+            vocab_id = tokenizer.token_to_id(k)
+            if not vocab_id:
+                replacements[k] = (':%s:'%v,'','')
+    self.replacer = Replacer(replacements)
     self._example_builder = ExampleBuilder(tokenizer, max_seq_length, do_sop=do_sop)
     self._writers = []
     for i in range(num_out_files):
@@ -189,6 +550,13 @@ class ExampleWriter(object):
         self._writers.append(tf.io.TFRecordWriter(output_fname))
     self.n_written = 0
 
+  def remove_url(self, x):
+      x = remove_url_re.sub(' [url] ',x)
+      x = remove_speakers.sub('',x)
+      x = remove_borders.sub('',x)
+      x = self.replacer.translate(x)
+
+      return x
   def write_examples(self, input_file):
     """Writes out examples from the provided input file."""
     with tf.io.gfile.GFile(input_file) as f:
@@ -199,11 +567,15 @@ class ExampleWriter(object):
         if line:
           bucket.append(line)
         else:
+          bucket.append("")
           sub_doc = '\n'.join(bucket)
-          sub_doc = remove_url(sub_doc)
+          sub_doc = self.remove_url(sub_doc)
           bad = False
           if not sub_doc.strip() or too_many_repeat(sub_doc):
             bad = True
+          if not bad:
+            bad = any(1 for e in bad_unicode.finditer(sub_doc))
+            
           if not bad:
             for e in re.finditer(r'[\da-zA-Z_]{10,}', sub_doc):
               g = e.group()
@@ -216,8 +588,28 @@ class ExampleWriter(object):
               bad = True
               break
           if not bad:
-            cached.append(bucket)
+            cached.append(sub_doc.split('\n'))
           bucket = []
+      if bucket:
+        bucket.append("")
+        sub_doc = '\n'.join(bucket)
+        sub_doc = self.remove_url(sub_doc)
+        bad = False
+        if not sub_doc.strip() or too_many_repeat(sub_doc):
+          bad = True
+        if not bad:
+          for e in re.finditer(r'[\da-zA-Z_]{10,}', sub_doc):
+            g = e.group()
+            if re.search(r'\d', g) and re.search(r'[A-Z]{3,}', g):
+                pass
+            elif re.search(r'[a-z]+[A-Z]{2,}[a-z]+[A-Z]+', g):
+                pass
+            else:
+                continue
+            bad = True
+            break
+        if not bad:
+          cached.append(bucket)
 
       for bucket in cached:
         for line in bucket:
@@ -240,7 +632,6 @@ class ExampleWriter(object):
 
 def write_examples(job_id, args):
   """A single process creating and writing out pre-processed examples."""
-
   def log(*args):
     msg = " ".join(map(str, args))
     print("Job {}:".format(job_id), msg)
@@ -290,7 +681,7 @@ def main():
   parser.add_argument("--blanks-separate-docs", default=True, type=bool,
                       help="Whether blank lines indicate document boundaries.")
   parser.add_argument("--do-sop", dest='do_sop',
-                      action='store_false', help="Add SOP features.")
+                      action='store_true', help="Add SOP features.")
   parser.add_argument("--do-lower-case", dest='do_lower_case',
                       action='store_true', help="Lower case input text.")
   parser.add_argument("--no-lower-case", dest='do_lower_case',

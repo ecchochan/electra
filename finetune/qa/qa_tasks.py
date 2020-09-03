@@ -175,7 +175,7 @@ class QATask(task.Task):
     self.v2 = v2
 
   def _add_examples(self, examples, example_failures, paragraph, split):
-    tokenizer = self.tokenizer
+    tokenizer = self._tokenizer
     paragraph_text = paragraph["context"]
     encoded = tokenizer.encode(paragraph_text)
     offsets = encoded.offsets
@@ -220,7 +220,7 @@ class QATask(task.Task):
           start_position = encoded.char_to_token(answer_offset)
           end_position = encoded.char_to_token(answer_offset + answer_length - 1)
 
-          actual_text = paragraph_text[offsets[start_position[0]]: offsets[end_position[1]+1]]
+          actual_text = paragraph_text[offsets[start_position][0]: offsets[end_position][1]]
           cleaned_answer_text = orig_answer_text
 
           actual_text = actual_text.lower()
@@ -232,8 +232,8 @@ class QATask(task.Task):
                           tokenization.printable_text(cleaned_answer_text)))
             example_failures[0] += 1
             continue
-          continue
-
+            
+          """
           start_position = char_to_word_offset[answer_offset]
           if answer_offset + answer_length - 1 >= len(char_to_word_offset):
             utils.log("End position is out of document!")
@@ -264,7 +264,7 @@ class QATask(task.Task):
                           tokenization.printable_text(actual_text),
                           tokenization.printable_text(cleaned_answer_text)))
             example_failures[0] += 1
-            continue
+            continue"""
         else:
           start_position = -1
           end_position = -1
@@ -373,7 +373,7 @@ class QATask(task.Task):
         token_is_max_context[len(tokens)] = is_max_context
         tokens.append(all_doc_tokens[split_token_index])
         segment_ids.append(1)
-      tokens.append(1) # ("[SEP]")
+      tokens.append(2) # ("[SEP]")
       segment_ids.append(1)
 
       input_ids = tokens #input_ids = self._tokenizer.convert_tokens_to_ids(tokens)

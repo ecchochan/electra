@@ -102,7 +102,7 @@ class Preprocessor(object):
         #      ex_index, len(examples)))
         for tf_example in self._example_to_tf_example(
             example, is_training,
-            log=self._config.log_examples and ex_index < 1):
+            log=self._config.log_examples and ex_index < 3):
           writer.write(tf_example.SerializeToString())
           n_examples += 1
       # add padding so the dataset is a multiple of batch_size
