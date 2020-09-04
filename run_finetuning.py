@@ -324,7 +324,7 @@ def main():
     hparams = json.loads(args.hparams)
   tf.logging.set_verbosity(tf.logging.ERROR)
   run_finetuning(configure_finetuning.FinetuningConfig(
-      args.model_name, args.data_dir, **hparams))
+      args.model_name, args.data_dir, albert=True, **hparams))
 
 
 if __name__ == "__main__":
