@@ -175,6 +175,11 @@ class FinetuningConfig(object):
     # passed-in-arguments override (for example) debug-mode defaults
     self.update(kwargs)
 
+    if 'raw_data_dir' in kwargs:
+      self.update({
+        'raw_data_dir': os.path.join(kwargs['raw_data_dir'], "{:}").format
+      })
+
   def update(self, kwargs):
     for k, v in kwargs.items():
       if k not in self.__dict__:
