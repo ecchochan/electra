@@ -199,6 +199,7 @@ class SpanBasedQAScorer(scorer.Scorer):
           char_start = offsets[offset+pred.start_index - N][0]  # -N for [CLS]
           char_end = offsets[offset+pred.end_index - N][1]
         except Exception as e:
+          continue
           import traceback
           traceback.print_exc()
           print('char_start/char_end cannot be found')
@@ -208,7 +209,6 @@ class SpanBasedQAScorer(scorer.Scorer):
           print('pred.start_index =', pred.start_index)
           print('pred.end_index =', pred.end_index)
           print('len(offsets) =', len(offsets))
-          continue
         final_text = paragraph_text[char_start:char_end]
 
 

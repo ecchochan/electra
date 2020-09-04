@@ -316,8 +316,6 @@ def main():
   parser.add_argument("--albert", action='store_true', default=False,
                       help="Use albert")
   args = parser.parse_args()
-  if args.albert:
-    modeling = modeling_albert
   if args.hparams.endswith(".json"):
     hparams = utils.load_json(args.hparams)
   else:
