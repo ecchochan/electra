@@ -116,6 +116,12 @@ class SpanBasedQAScorer(scorer.Scorer):
       # keep track of the minimum score of null start+end of position 0
       score_null = 1000000  # large and positive
       for (feature_index, feature) in enumerate(features):
+        if (self._name + "_eid") not in feature:
+          print('ERROR: feature not found feature[%r]'%(self._name + "_eid"))
+          continue
+        if feature[self._name + "_eid"] not in unique_id_to_result:
+          print('ERROR: feature not found unique_id_to_result[%r]'%(feature[self._name + "_eid"]))
+          continue
         result = unique_id_to_result[feature[self._name + "_eid"]]
         if self._config.joint_prediction:
           start_indexes = result.start_top_index
