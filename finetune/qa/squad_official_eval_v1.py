@@ -99,11 +99,13 @@ def find_lcs(s1, s2):
 	return s1[p-mmax:p], mmax
   
 def f1_score(prediction, ground_truth):
-  lcs, lcs_len = find_lcs(normalize_answer(ground_truth), normalize_answer(prediction))
+  A = normalize_answer(ground_truth)
+  B = normalize_answer(prediction)
+  lcs, lcs_len = find_lcs(A, B)
   if lcs_len == 0:
     return 0
-  precision 	= 1.0*lcs_len/len(prediction_segs)
-  recall 		= 1.0*lcs_len/len(ans_segs)
+  precision 	= 1.0*lcs_len/len(B)
+  recall 		= 1.0*lcs_len/len(A)
   f1 			= (2*precision*recall)/(precision+recall)
   return f1
 
