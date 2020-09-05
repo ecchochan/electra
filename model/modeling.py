@@ -252,6 +252,7 @@ class BertModel(object):
             kernel_initializer=create_initializer(config.initializer_range))
 
   def get_pooled_output(self):
+    return tf.squeeze(self.sequence_output[:, 0:1, :], axis=1)
     return self.pooled_output
 
   def get_sequence_output(self):
