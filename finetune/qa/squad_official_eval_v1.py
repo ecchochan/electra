@@ -110,7 +110,7 @@ def f1_score(prediction, ground_truth):
   precision 	= 1.0*lcs_len/len(prediction_segs)
   recall 		= 1.0*lcs_len/len(ans_segs)
   f1 			= (2*precision*recall)/(precision+recall)
-  print('%r, %r: %s'%(A, B, f1))
+  # print('%r, %r: %s'%(A, B, f1))
   return f1
 
   prediction_tokens = normalize_answer(prediction).split()
