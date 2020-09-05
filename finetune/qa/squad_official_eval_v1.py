@@ -33,30 +33,28 @@ import configure_finetuning
 
 
 def mixed_segmentation(in_str, rm_punc=True):
-	in_str = str(in_str).decode('utf-8').lower().strip()
-	segs_out = []
-	temp_str = ""
-	sp_char = ['-',':','_','*','^','/','\\','~','`','+','=',
-			   '，','。','：','？','！','“','”','；','’','《','》','……','·','、',
-			   '「','」','（','）','－','～','『','』']
-	for char in in_str:
-		if rm_punc and char in sp_char:
-			continue
-		if re.search( r'[\u4e00-\u9fa5]', char) or char in sp_char:
-			if temp_str != "":
-				ss = nltk.word_tokenize(temp_str)
-				segs_out.extend(ss)
-				temp_str = ""
-			segs_out.append(char)
-		else:
-			temp_str += char
+  in_str = str(in_str).lower().strip()
+  segs_out = []
+  temp_str = ""
+  sp_char = ['-',':','_','*','^','/','\\','~','`','+','=',
+        '，','。','：','？','！','“','”','；','’','《','》','……','·','、',
+        '「','」','（','）','－','～','『','』']
+  for char in in_str:
+    if rm_punc and char in sp_char:
+      continue
+    if re.search(r'[\u4e00-\u9fa5]', char) or char in sp_char:
+      if temp_str != "":
+        segs_out.extend(temp_str.split())
+        temp_str = ""
+      segs_out.append(char)
+    else:
+      temp_str += char
 
-	#handling last part
-	if temp_str != "":
-		ss = nltk.word_tokenize(temp_str)
-		segs_out.extend(ss)
+  #handling last part
+  if temp_str != "":
+    segs_out.extend(temp_str.split())
 
-	return segs_out
+  return segs_out
 
 
 def normalize_answer(s):
@@ -68,7 +66,7 @@ def normalize_answer(s):
     return ' '.join(text.split())
 
   def remove_punc(in_str):
-    in_str = str(in_str).decode('utf-8').lower().strip()
+    in_str = str(in_str).lower().strip()
     sp_char = ['-',':','_','*','^','/','\\','~','`','+','=',
           '，','。','：','？','！','“','”','；','’','《','》','……','·','、',
           '「','」','（','）','－','～','『','』']
@@ -104,11 +102,10 @@ def f1_score(prediction, ground_truth):
   A = normalize_answer(ground_truth)
   B = normalize_answer(prediction)
   lcs, lcs_len = find_lcs(A, B)
-
   if lcs_len == 0:
     return 0
-  precision 	= 1.0*lcs_len/len(prediction_segs)
-  recall 		= 1.0*lcs_len/len(ans_segs)
+  precision 	= 1.0*lcs_len/len(B)
+  recall 		= 1.0*lcs_len/len(A)
   f1 			= (2*precision*recall)/(precision+recall)
   # print('%r, %r: %s'%(A, B, f1))
   return f1
