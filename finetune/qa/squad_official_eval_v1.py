@@ -33,28 +33,28 @@ import configure_finetuning
 
 
 def mixed_segmentation(in_str, rm_punc=True):
-	in_str = str(in_str).lower().strip()
-	segs_out = []
-	temp_str = ""
-	sp_char = ['-',':','_','*','^','/','\\','~','`','+','=',
-			   '，','。','：','？','！','“','”','；','’','《','》','……','·','、',
-			   '「','」','（','）','－','～','『','』']
-	for char in in_str:
-		if rm_punc and char in sp_char:
-			continue
-		if re.search(r'[\u4e00-\u9fa5]', char) or char in sp_char:
-			if temp_str != "":
-				segs_out.extend(ss.split())
-				temp_str = ""
-			segs_out.append(char)
-		else:
-			temp_str += char
+  in_str = str(in_str).lower().strip()
+  segs_out = []
+  temp_str = ""
+  sp_char = ['-',':','_','*','^','/','\\','~','`','+','=',
+        '，','。','：','？','！','“','”','；','’','《','》','……','·','、',
+        '「','」','（','）','－','～','『','』']
+  for char in in_str:
+    if rm_punc and char in sp_char:
+      continue
+    if re.search(r'[\u4e00-\u9fa5]', char) or char in sp_char:
+      if temp_str != "":
+        segs_out.extend(ss.split())
+        temp_str = ""
+      segs_out.append(char)
+    else:
+      temp_str += char
 
-	#handling last part
-	if temp_str != "":
+  #handling last part
+  if temp_str != "":
     segs_out.extend(ss.split())
 
-	return segs_out
+  return segs_out
 
 
 def normalize_answer(s):
