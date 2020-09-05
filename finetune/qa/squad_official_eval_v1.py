@@ -42,7 +42,7 @@ def mixed_segmentation(in_str, rm_punc=True):
 	for char in in_str:
 		if rm_punc and char in sp_char:
 			continue
-		if re.search(r'[\u4e00-\u9fa5]', char) or char in sp_char:
+		if re.search( r'[\u4e00-\u9fa5]', char) or char in sp_char:
 			if temp_str != "":
 				ss = nltk.word_tokenize(temp_str)
 				segs_out.extend(ss)
@@ -104,7 +104,7 @@ def f1_score(prediction, ground_truth):
   A = normalize_answer(ground_truth)
   B = normalize_answer(prediction)
   lcs, lcs_len = find_lcs(A, B)
-  
+
   if lcs_len == 0:
     return 0
   precision 	= 1.0*lcs_len/len(prediction_segs)
