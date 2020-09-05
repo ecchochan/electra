@@ -30,7 +30,6 @@ import collections
 import tensorflow.compat.v1 as tf
 
 import configure_finetuning
-import nltk
 
 
 def mixed_segmentation(in_str, rm_punc=True):
@@ -45,8 +44,7 @@ def mixed_segmentation(in_str, rm_punc=True):
 			continue
 		if re.search(r'[\u4e00-\u9fa5]', char) or char in sp_char:
 			if temp_str != "":
-				ss = nltk.word_tokenize(temp_str)
-				segs_out.extend(ss)
+				segs_out.extend(ss.split())
 				temp_str = ""
 			segs_out.append(char)
 		else:
@@ -54,8 +52,7 @@ def mixed_segmentation(in_str, rm_punc=True):
 
 	#handling last part
 	if temp_str != "":
-		ss = nltk.word_tokenize(temp_str)
-		segs_out.extend(ss)
+    segs_out.extend(ss.split())
 
 	return segs_out
 
