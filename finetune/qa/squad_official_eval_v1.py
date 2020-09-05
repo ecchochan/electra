@@ -32,6 +32,33 @@ import tensorflow.compat.v1 as tf
 import configure_finetuning
 
 
+def mixed_segmentation(in_str, rm_punc=True):
+	in_str = str(in_str).decode('utf-8').lower().strip()
+	segs_out = []
+	temp_str = ""
+	sp_char = ['-',':','_','*','^','/','\\','~','`','+','=',
+			   '，','。','：','？','！','“','”','；','’','《','》','……','·','、',
+			   '「','」','（','）','－','～','『','』']
+	for char in in_str:
+		if rm_punc and char in sp_char:
+			continue
+		if re.search(ur'[\u4e00-\u9fa5]', char) or char in sp_char:
+			if temp_str != "":
+				ss = nltk.word_tokenize(temp_str)
+				segs_out.extend(ss)
+				temp_str = ""
+			segs_out.append(char)
+		else:
+			temp_str += char
+
+	#handling last part
+	if temp_str != "":
+		ss = nltk.word_tokenize(temp_str)
+		segs_out.extend(ss)
+
+	return segs_out
+
+
 def normalize_answer(s):
   """Lower text and remove punctuation, articles and extra whitespace."""
   def remove_articles(text):
@@ -40,17 +67,48 @@ def normalize_answer(s):
   def white_space_fix(text):
     return ' '.join(text.split())
 
-  def remove_punc(text):
-    exclude = set(string.punctuation)
-    return ''.join(ch for ch in text if ch not in exclude)
+  def remove_punc(in_str):
+    in_str = str(in_str).decode('utf-8').lower().strip()
+    sp_char = ['-',':','_','*','^','/','\\','~','`','+','=',
+          '，','。','：','？','！','“','”','；','’','《','》','……','·','、',
+          '「','」','（','）','－','～','『','』']
+    out_segs = []
+    for char in in_str:
+      if char in sp_char:
+        continue
+      else:
+        out_segs.append(char)
+    return ''.join(out_segs)
 
   def lower(text):
     return text.lower()
 
-  return white_space_fix(remove_articles(remove_punc(lower(s))))
+  return mixed_segmentation(white_space_fix(remove_articles(remove_punc(lower(s)))))
 
 
+# find longest common string
+def find_lcs(s1, s2):
+	m = [[0 for i in range(len(s2)+1)] for j in range(len(s1)+1)]
+	mmax = 0
+	p = 0
+	for i in range(len(s1)):
+		for j in range(len(s2)):
+			if s1[i] == s2[j]:
+				m[i+1][j+1] = m[i][j]+1
+				if m[i+1][j+1] > mmax:
+					mmax=m[i+1][j+1]
+					p=i+1
+	return s1[p-mmax:p], mmax
+  
 def f1_score(prediction, ground_truth):
+  lcs, lcs_len = find_lcs(normalize_answer(ground_truth), normalize_answer(prediction))
+  if lcs_len == 0:
+    return 0
+  precision 	= 1.0*lcs_len/len(prediction_segs)
+  recall 		= 1.0*lcs_len/len(ans_segs)
+  f1 			= (2*precision*recall)/(precision+recall)
+  return f1
+
   prediction_tokens = normalize_answer(prediction).split()
   ground_truth_tokens = normalize_answer(ground_truth).split()
   common = Counter(prediction_tokens) & Counter(ground_truth_tokens)
