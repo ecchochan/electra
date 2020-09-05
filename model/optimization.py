@@ -188,7 +188,8 @@ def _get_layer_lrs(learning_rate, layer_decay, n_layers):
       "task_specific/": n_layers + 2,
   })
   for layer in range(n_layers):
-    key_to_depths["layer_" + str(layer)] = layer + 1  # for albert
+    key_to_depths["layer_" + str(layer)] = layer + 1 
+  key_to_depths["/group_"] = n_layers + 1 # for albert
   return {
       key: learning_rate * (layer_decay ** (n_layers + 2 - depth))
       for key, depth in key_to_depths.items()
