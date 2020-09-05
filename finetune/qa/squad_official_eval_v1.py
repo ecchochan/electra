@@ -30,10 +30,11 @@ import collections
 import tensorflow.compat.v1 as tf
 
 import configure_finetuning
+import nltk
 
 
 def mixed_segmentation(in_str, rm_punc=True):
-	in_str = str(in_str).decode('utf-8').lower().strip()
+	in_str = str(in_str).lower().strip()
 	segs_out = []
 	temp_str = ""
 	sp_char = ['-',':','_','*','^','/','\\','~','`','+','=',
@@ -68,7 +69,7 @@ def normalize_answer(s):
     return ' '.join(text.split())
 
   def remove_punc(in_str):
-    in_str = str(in_str).decode('utf-8').lower().strip()
+    in_str = str(in_str).lower().strip()
     sp_char = ['-',':','_','*','^','/','\\','~','`','+','=',
           '，','。','：','？','！','“','”','；','’','《','》','……','·','、',
           '「','」','（','）','－','～','『','』']
