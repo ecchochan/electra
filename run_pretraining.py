@@ -68,11 +68,11 @@ class PretrainingModel(object):
             embedding_size=(None if config.untied_generator_embeddings
                             else embedding_size),
             untied_embeddings=config.untied_generator_embeddings,
-            name="generator")
+            name="generator", reuse=reuse)
         mlm_output = self._get_masked_lm_output(masked_inputs, generator)
       else:
         generator = self._build_transformer(
-            masked_inputs, is_training, embedding_size=embedding_size)
+            masked_inputs, is_training, embedding_size=embedding_size, reuse=reuse)
         mlm_output = self._get_masked_lm_output(masked_inputs, generator)
       fake_data = self._get_fake_data(masked_inputs, mlm_output.logits)
       self.mlm_output = mlm_output
@@ -83,7 +83,7 @@ class PretrainingModel(object):
       if config.electra_objective:
         discriminator = self._build_transformer(
             fake_data.inputs, is_training, reuse=not config.untied_generator,
-            embedding_size=embedding_size)
+            embedding_size=embedding_size, reuse=reuse)
         disc_output = self._get_discriminator_output(
             fake_data.inputs, discriminator, fake_data.is_fake_tokens)
         total_loss += config.disc_weight * disc_output.loss
