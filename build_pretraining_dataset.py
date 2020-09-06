@@ -163,11 +163,15 @@ class ExampleBuilder(object):
       return None
     """Creates a pre-training example from the current list of sentences."""
     # small chance to only have one segment as in classification tasks
-    if not self.warned and self.do_sop:
-      print("Creating tfrecords with SOP objective.")
-      self.warned = True
-      
-
+    if not self.warned:
+      objectives = []
+      if self.do_sop:
+        objectives.append('SOP')
+      if self.do_cluster:
+        objectives.append('cluster')
+      if objectives:
+        print("Creating tfrecords with %s objective(s)."%(', '.join(objectives)))
+        
     if self.do_cluster:
       num_sentences = len(self._current_sentences)
       if num_sentences == 1:
