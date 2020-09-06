@@ -48,52 +48,80 @@ class PretrainingModel(object):
       self._bert_config.intermediate_size = 144 * 4
       self._bert_config.num_attention_heads = 4
 
-    # Mask the input
-    masked_inputs = pretrain_helpers.mask(
-        config, pretrain_data.features_to_inputs(features), config.mask_prob)
-
     # Generator
     embedding_size = (
         self._bert_config.hidden_size if config.embedding_size is None else
         config.embedding_size)
-    if config.uniform_generator:
-      mlm_output = self._get_masked_lm_output(masked_inputs, None)
-    elif config.electra_objective and config.untied_generator:
-      generator = self._build_transformer(
-          masked_inputs, is_training,
-          bert_config=get_generator_config(config, self._bert_config),
-          embedding_size=(None if config.untied_generator_embeddings
-                          else embedding_size),
-          untied_embeddings=config.untied_generator_embeddings,
-          name="generator")
-      mlm_output = self._get_masked_lm_output(masked_inputs, generator)
-    else:
-      generator = self._build_transformer(
-          masked_inputs, is_training, embedding_size=embedding_size)
-      mlm_output = self._get_masked_lm_output(masked_inputs, generator)
-    fake_data = self._get_fake_data(masked_inputs, mlm_output.logits)
-    self.mlm_output = mlm_output
-    self.total_loss = config.gen_weight * mlm_output.loss
 
-    # Discriminator
-    disc_output = None
-    if config.electra_objective:
-      discriminator = self._build_transformer(
-          fake_data.inputs, is_training, reuse=not config.untied_generator,
-          embedding_size=embedding_size)
-      disc_output = self._get_discriminator_output(
-          fake_data.inputs, discriminator, fake_data.is_fake_tokens)
-      self.total_loss += config.disc_weight * disc_output.loss
-      sop_pred_model = discriminator
-    else:
-      sop_pred_model = generator
 
-    if masked_inputs.sop_label is not None:
-      import warnings
-      warnings.warn("Training with SOP objective.")
-      sop_output = self._get_sentence_order_output(sop_pred_model.get_pooled_output(), masked_inputs.sop_label)
-      self.total_loss += config.sop_weight * sop_output.loss
+    def get_outputs(features, reuse=False):
+      # Mask the input
+      masked_inputs = pretrain_helpers.mask(
+          config, pretrain_data.features_to_inputs(features), config.mask_prob)
 
+      if config.uniform_generator:
+        mlm_output = self._get_masked_lm_output(masked_inputs, None)
+      elif config.electra_objective and config.untied_generator:
+        generator = self._build_transformer(
+            masked_inputs, is_training,
+            bert_config=get_generator_config(config, self._bert_config),
+            embedding_size=(None if config.untied_generator_embeddings
+                            else embedding_size),
+            untied_embeddings=config.untied_generator_embeddings,
+            name="generator")
+        mlm_output = self._get_masked_lm_output(masked_inputs, generator)
+      else:
+        generator = self._build_transformer(
+            masked_inputs, is_training, embedding_size=embedding_size)
+        mlm_output = self._get_masked_lm_output(masked_inputs, generator)
+      fake_data = self._get_fake_data(masked_inputs, mlm_output.logits)
+      self.mlm_output = mlm_output
+      total_loss = config.gen_weight * mlm_output.loss
+
+      # Discriminator
+      disc_output = None
+      if config.electra_objective:
+        discriminator = self._build_transformer(
+            fake_data.inputs, is_training, reuse=not config.untied_generator,
+            embedding_size=embedding_size)
+        disc_output = self._get_discriminator_output(
+            fake_data.inputs, discriminator, fake_data.is_fake_tokens)
+        total_loss += config.disc_weight * disc_output.loss
+        sop_pred_model = discriminator
+      else:
+        sop_pred_model = generator
+
+      sop_output = None
+      if masked_inputs.sop_label is not None:
+        import warnings
+        warnings.warn("Training with SOP objective.")
+        sop_output = self._get_sentence_order_output(sop_pred_model.get_pooled_output(), masked_inputs.sop_label)
+        total_loss += config.sop_weight * sop_output.loss
+      
+      return (
+        masked_inputs, generator, discriminator, 
+        fake_data,
+        total_loss,
+        mlm_output, sop_output
+        )
+
+    ( masked_inputs, generator, discriminator, 
+      fake_data,
+      total_loss,
+      mlm_output, sop_output
+    ) = get_outputs(features)
+
+    self.total_loss = total_loss
+
+    features2 = {k[:-1]: v for k, v in features.items() if k.endswith('2')}
+    ( masked_inputs2, generator2, discriminator2, 
+      fake_data2,
+      total_loss2,
+      mlm_output2 sop_output2
+    ) = get_outputs(features2, reuse=True)
+
+    self.total_loss += total_loss2
+    
     # Evaluation
     eval_fn_inputs = {
         "input_ids": masked_inputs.input_ids,
