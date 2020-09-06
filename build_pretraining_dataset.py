@@ -654,10 +654,10 @@ o徙氣,嘥氣
         for line in bucket:
           if line or self._blanks_separate_docs:
             example = self._example_builder.add_line(line, input_file)
+            if self.do_cluster:
+              self.make_cluster(example)
+              continue
             if example:
-              if self.do_cluster:
-                self.make_cluster(example)
-                continue
 
               self._writers[self.n_written % len(self._writers)].write(
                   example.SerializeToString())
