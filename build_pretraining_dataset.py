@@ -164,6 +164,7 @@ class ExampleBuilder(object):
     """Creates a pre-training example from the current list of sentences."""
     # small chance to only have one segment as in classification tasks
     if not self.warned:
+      self.warned = True
       objectives = []
       if self.do_sop:
         objectives.append('SOP')
