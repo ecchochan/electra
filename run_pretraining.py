@@ -91,7 +91,7 @@ class PretrainingModel(object):
     if masked_inputs.sop_label is not None:
       import warnings
       warnings.warn("Training with SOP objective.")
-      sop_output = _get_sentence_order_output(sop_pred_model.get_pooled_output(), masked_inputs.sop_label)
+      sop_output = self._get_sentence_order_output(sop_pred_model.get_pooled_output(), masked_inputs.sop_label)
       self.total_loss += config.sop_weight * sop_output.loss
 
     # Evaluation
@@ -427,10 +427,6 @@ def main():
                       help="Location of data files (model weights, etc).")
   parser.add_argument("--model-name", required=True,
                       help="The name of the model being fine-tuned.")
-  parser.add_argument("--do-sop", dest='do_sop',
-                      action='store_true', help="Add SOP features.")
-  parser.add_argument("--do-cluster", dest='do_cluster',
-                      action='store_true', help="Add Cluster features.")
   parser.add_argument("--hparams", default="{}",
                       help="JSON dict of model hyperparameters.")
   parser.add_argument("--albert", action='store_true', default=False,
