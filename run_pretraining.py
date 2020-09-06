@@ -251,7 +251,7 @@ class PretrainingModel(object):
           logits=logits, probs=probs, per_example_loss=label_log_probs,
           loss=loss, preds=preds)
 
-  def _get_discriminator_output(self, inputs, discriminator, labels):
+  def _get_discriminator_output(self, inputs, discriminator, labels, reuse=False):
     """Discriminator binary classifier."""
     with tf.variable_scope("discriminator_predictions", reuse=reuse):
       hidden = tf.layers.dense(
@@ -278,7 +278,7 @@ class PretrainingModel(object):
           preds=preds, labels=labels,
       )
 
-  def _get_sentence_order_output(self, input_tensor, labels):
+  def _get_sentence_order_output(self, input_tensor, labels, reuse=False):
     with tf.variable_scope("cls/seq_relationship", reuse=reuse):
       output_weights = tf.get_variable(
           "output_weights",
