@@ -213,8 +213,8 @@ class ExampleBuilder(object):
   def _make_tf_example(self, first_segment, second_segment, sop_label=None, return_feature=False):
     """Converts two "segments" of text into a tf.train.Example."""
     input_ids = [0]
-    if self.do_cluster and self.do_sop:
-      input_ids.append(0)
+    #if self.do_cluster and self.do_sop:
+    #  input_ids.append(0)               # try no this first
     input_ids.extend(first_segment)
     input_ids.append(1)
     #input_ids = [0] + first_segment + [1]
