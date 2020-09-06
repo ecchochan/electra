@@ -242,7 +242,7 @@ class ExampleWriter(object):
   """Writes pre-training examples to disk."""
 
   def __init__(self, job_id, vocab_file, output_dir, max_seq_length,
-               num_jobs, blanks_separate_docs, do_lower_case, do_sop,
+               num_jobs, blanks_separate_docs, do_lower_case, do_sop, do_cluster
                num_out_files=1000):
     self._blanks_separate_docs = blanks_separate_docs
     tokenizer = CanTokenizer(vocab_file)
@@ -580,7 +580,7 @@ o徙氣,嘥氣
             if not vocab_id:
                 replacements[k] = (':%s:'%v,'','')
     self.replacer = Replacer(replacements)
-    self._example_builder = ExampleBuilder(tokenizer, max_seq_length, do_sop=do_sop)
+    self._example_builder = ExampleBuilder(tokenizer, max_seq_length, do_sop=do_sop, do_cluster=do_cluster)
     self._writers = []
     for i in range(num_out_files):
       if i % num_jobs == job_id:
@@ -686,6 +686,7 @@ def write_examples(job_id, args):
       blanks_separate_docs=args.blanks_separate_docs,
       do_lower_case=args.do_lower_case,
       do_sop=args.do_sop
+      do_cluster=args.do_cluster
   )
   log("Writing tf examples")
   fnames = sorted(tf.io.gfile.listdir(args.corpus_dir))
