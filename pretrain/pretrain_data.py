@@ -46,7 +46,18 @@ def get_input_fn(config: configure_pretraining.PretrainingConfig, is_training,
         "input_mask": tf.io.FixedLenFeature([config.max_seq_length], tf.int64),
         "segment_ids": tf.io.FixedLenFeature([config.max_seq_length], tf.int64),
     }
+    if config.do_sop:
+      name_to_features['sop_label'] = tf.io.FixedLenFeature([], tf.int64)
 
+    if config.do_cluster:
+      name_to_features['input_ids2'] = tf.io.FixedLenFeature([config.max_seq_length], tf.int64)
+      name_to_features['input_mask2'] = tf.io.FixedLenFeature([config.max_seq_length], tf.int64)
+      name_to_features['segment_ids2'] = tf.io.FixedLenFeature([config.max_seq_length], tf.int64)
+      if config.do_sop:
+        name_to_features['sop_label2'] = tf.io.FixedLenFeature([], tf.int64)
+        
+
+    print(name_to_features)
     d = tf.data.Dataset.from_tensor_slices(tf.constant(input_files))
     d = d.repeat()
     d = d.shuffle(buffer_size=len(input_files))

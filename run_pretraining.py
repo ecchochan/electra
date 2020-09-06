@@ -91,7 +91,7 @@ class PretrainingModel(object):
     if masked_inputs.sop_label is not None:
       import warnings
       warnings.warn("Training with SOP objective.")
-      sop_output = _get_sentence_order_output(sop_pred_model.get_pooled_output(), masked_inputs.sop_label)
+      sop_output = self._get_sentence_order_output(sop_pred_model.get_pooled_output(), masked_inputs.sop_label)
       self.total_loss += config.sop_weight * sop_output.loss
 
     # Evaluation
