@@ -115,8 +115,10 @@ class ExampleBuilder(object):
       sep = random.randint(1,len(sentences) - 1)
     else:
       sep = random.randint(0,len(sentences))
-    first_segment.extend(sentences[:sep])
-    second_segment.extend(sentences[sep:])
+    for e in sentences[:sep]:
+      first_segment.extend(e)
+    for e in sentences[:sep]:
+      second_segment.extend(e)
 
     # trim to max_length while accounting for not-yet-added [CLS]/[SEP] tokens
     if self.do_sop:
