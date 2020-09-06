@@ -60,7 +60,7 @@ class PretrainingModel(object):
           config, pretrain_data.features_to_inputs(features), config.mask_prob)
 
       if config.uniform_generator:
-        mlm_output = self._get_masked_lm_output(masked_inputs, None)
+        mlm_output = self._get_masked_lm_output(masked_inputs, None, reuse=reuse)
       elif config.electra_objective and config.untied_generator:
         generator = self._build_transformer(
             masked_inputs, is_training,
@@ -69,11 +69,11 @@ class PretrainingModel(object):
                             else embedding_size),
             untied_embeddings=config.untied_generator_embeddings,
             name="generator", reuse=reuse)
-        mlm_output = self._get_masked_lm_output(masked_inputs, generator)
+        mlm_output = self._get_masked_lm_output(masked_inputs, generator, reuse=reuse)
       else:
         generator = self._build_transformer(
             masked_inputs, is_training, embedding_size=embedding_size, reuse=reuse)
-        mlm_output = self._get_masked_lm_output(masked_inputs, generator)
+        mlm_output = self._get_masked_lm_output(masked_inputs, generator, reuse=reuse)
       fake_data = self._get_fake_data(masked_inputs, mlm_output.logits)
       self.mlm_output = mlm_output
       total_loss = config.gen_weight * mlm_output.loss
@@ -85,7 +85,7 @@ class PretrainingModel(object):
             fake_data.inputs, is_training, reuse=reuse,
             embedding_size=embedding_size)
         disc_output = self._get_discriminator_output(
-            fake_data.inputs, discriminator, fake_data.is_fake_tokens)
+            fake_data.inputs, discriminator, fake_data.is_fake_tokens, reuse=reuse)
         total_loss += config.disc_weight * disc_output.loss
         sop_pred_model = discriminator
       else:
@@ -95,7 +95,8 @@ class PretrainingModel(object):
       if masked_inputs.sop_label is not None:
         import warnings
         warnings.warn("Training with SOP objective.")
-        sop_output = self._get_sentence_order_output(sop_pred_model.get_pooled_output(), masked_inputs.sop_label)
+        sop_output = self._get_sentence_order_output(
+          sop_pred_model.get_pooled_output(), masked_inputs.sop_label, reuse=reuse)
         total_loss += config.sop_weight * sop_output.loss
       
       return (
@@ -202,10 +203,10 @@ class PretrainingModel(object):
       return metrics
     self.eval_metrics = (metric_fn, eval_fn_values)
 
-  def _get_masked_lm_output(self, inputs: pretrain_data.Inputs, model):
+  def _get_masked_lm_output(self, inputs: pretrain_data.Inputs, model, reuse=False):
     """Masked language modeling softmax layer."""
     masked_lm_weights = inputs.masked_lm_weights
-    with tf.variable_scope("generator_predictions"):
+    with tf.variable_scope("generator_predictions", reuse=reuse):
       if self._config.uniform_generator:
         logits = tf.zeros(self._bert_config.vocab_size)
         logits_tiled = tf.zeros(
@@ -252,7 +253,7 @@ class PretrainingModel(object):
 
   def _get_discriminator_output(self, inputs, discriminator, labels):
     """Discriminator binary classifier."""
-    with tf.variable_scope("discriminator_predictions"):
+    with tf.variable_scope("discriminator_predictions", reuse=reuse):
       hidden = tf.layers.dense(
           discriminator.get_sequence_output(),
           units=self._bert_config.hidden_size,
@@ -278,7 +279,7 @@ class PretrainingModel(object):
       )
 
   def _get_sentence_order_output(self, input_tensor, labels):
-    with tf.variable_scope("cls/seq_relationship"):
+    with tf.variable_scope("cls/seq_relationship", reuse=reuse):
       output_weights = tf.get_variable(
           "output_weights",
           shape=[2, self._bert_config.hidden_size],
