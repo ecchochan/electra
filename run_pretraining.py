@@ -82,8 +82,8 @@ class PretrainingModel(object):
       disc_output = None
       if config.electra_objective:
         discriminator = self._build_transformer(
-            fake_data.inputs, is_training, reuse=not config.untied_generator,
-            embedding_size=embedding_size, reuse=reuse)
+            fake_data.inputs, is_training, reuse=reuse,
+            embedding_size=embedding_size)
         disc_output = self._get_discriminator_output(
             fake_data.inputs, discriminator, fake_data.is_fake_tokens)
         total_loss += config.disc_weight * disc_output.loss
