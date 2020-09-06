@@ -685,7 +685,7 @@ def write_examples(job_id, args):
       num_jobs=args.num_processes,
       blanks_separate_docs=args.blanks_separate_docs,
       do_lower_case=args.do_lower_case,
-      do_sop=args.do_sop
+      do_sop=args.do_sop,
       do_cluster=args.do_cluster
   )
   log("Writing tf examples")
