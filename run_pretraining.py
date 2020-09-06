@@ -117,11 +117,11 @@ class PretrainingModel(object):
     ( masked_inputs2, generator2, discriminator2, 
       fake_data2,
       total_loss2,
-      mlm_output2 sop_output2
+      mlm_output2, sop_output2
     ) = get_outputs(features2, reuse=True)
 
     self.total_loss += total_loss2
-    
+
     # Evaluation
     eval_fn_inputs = {
         "input_ids": masked_inputs.input_ids,
