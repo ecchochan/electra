@@ -49,7 +49,7 @@ class ExampleBuilder(object):
     self.do_sop = do_sop
     self.warned = False
 
-  def add_line(self, line):
+  def add_line(self, line, input_file=None):
     """Adds a line of text to the current example being built."""
     line = line.strip().replace("\n", " ")
     if (not line) and self._current_length != 0:  # empty lines separate docs
@@ -60,6 +60,7 @@ class ExampleBuilder(object):
 
 
     unk_count = bert_tokids.count(4)
+    
     '''
     if unk_count > 0:
       p = bert_tokids.index(4)
@@ -73,9 +74,18 @@ class ExampleBuilder(object):
           tokenized_text = chinese_re.sub(r'\1',tokenized_text)
           print(tokenized_text+'\n'+ orig_text)
 
+    if random.random() < 0.0001:
+      tokenized_text = ' '.join(encoded.tokens[:40])
+      orig_text = line[:40]
+      tokenized_text = chinese_re.sub(r'\1',tokenized_text)
+      print(input_file +'\n'+tokenized_text+'\n'+ orig_text)
+
+
 '''
     if unk_count > 5:
       return None
+
+
     self._current_sentences.append(bert_tokids)
     self._current_length += len(bert_tokids)
     if self._current_length >= self._target_length:
@@ -195,7 +205,7 @@ remove_speakers = re.compile(r'^#\d+ ([A-Z]+: )?(#\d+ )?', re.MULTILINE)
 
 bad_unicode = re.compile(r'[\u2060-\u20ff\uAA80-\uFB45\u00AD\u008D\u008F\u009F\u0095\u0094\u0097\u0082\u0083\u0087\u0099囀ਾ]+|矛受畩究悍妤|脖宋鬱駜|ÐÒøÓÐÕ|ㄛ筍|ㄛ婌|ㄛ紨|ㄛ嘟|大虯李李朽|獝獞獟獠|拇謂饢|海瑉|隳哪|堶悸漲Л釔|野怛儞也|鈭鲭|韏啣|蟡㏘|乯儜|牁轎煤|蕻淕|蜁巌|潝砩|坉洩|竷h|匾哺|衷讜|愣勾|划曻|a﹐a¶#|p"0∨"q"|鼐盀|阠鼐|皇瞧|鍩挂槐|肭資指娓|蟛青|眩謖|笥|饇|櫱|肭|亂桓|嫠|芔苙苾苹|攆擺|似饲|恕刷|膘', 
                       re.UNICODE)
-remove_borders = re.compile(r'[┄┅┆┇┈┉┊┋┌┍┎┏┐┑┒┓└┕┖┗┘┙┚┛├┝┞┟┠┡┢┣┤┥┦┧┨┩┪┫┬┭┮┯┰┱┲┳┴┵┶┷┸┹┺┻┼┽┾┿╀╁╂╃╄╅╆╇╈╉╊╋╌╍╎╏║╒╓╔╕╖╗╘╙╚╛╜╝╞╟╠╡╢╣╤╥╦╧╨╩╪╫╬╭╮╯╰╱╲╳╵╷╹╻╼╽╾╿▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟◣◥͜͡╮╯╰◜◝◞◟ᕕᕗ⌇⧸⎩⎠⎞͏⎛͏⎝⎭⧹༼ ༽♢◄ƪʅʋ)]')
+remove_borders = re.compile(r'[┄┅┆┇┈┉┊┋┌┍┎┏┐┑┒┓└┕┖┗┘┙┚┛├┝┞┟┠┡┢┣┤┥┦┧┨┩┪┫┬┭┮┯┰┱┲┳┴┵┶┷┸┹┺┻┼┽┾┿╀╁╂╃╄╅╆╇╈╉╊╋╌╍╎╏║╒╓╔╕╖╗╘╙╚╛╜╝╞╟╠╡╢╣╤╥╦╧╨╩╪╫╬╭╮╯╰╱╲╳╵╷╹╻╼╽╾╿▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟◣◥͜͡╮╯╰◜◝◞◟ᕕᕗ⌇⧸⎩⎠⎞͏⎛͏⎝⎭⧹༼༽♢◄ƪʅʋ)]')
     
 
 class ExampleWriter(object):
@@ -614,7 +624,7 @@ o徙氣,嘥氣
       for bucket in cached:
         for line in bucket:
           if line or self._blanks_separate_docs:
-            example = self._example_builder.add_line(line)
+            example = self._example_builder.add_line(line, input_file)
             if example:
               self._writers[self.n_written % len(self._writers)].write(
                   example.SerializeToString())
