@@ -242,7 +242,7 @@ class ExampleWriter(object):
   """Writes pre-training examples to disk."""
 
   def __init__(self, job_id, vocab_file, output_dir, max_seq_length,
-               num_jobs, blanks_separate_docs, do_lower_case, do_sop, do_cluster
+               num_jobs, blanks_separate_docs, do_lower_case, do_sop, do_cluster,
                num_out_files=1000):
     self._blanks_separate_docs = blanks_separate_docs
     tokenizer = CanTokenizer(vocab_file)
