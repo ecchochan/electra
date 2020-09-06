@@ -103,13 +103,13 @@ class PretrainingModel(object):
         masked_inputs, generator, discriminator, 
         fake_data,
         total_loss,
-        mlm_output, sop_output
+        mlm_output,disc_output, sop_output
         )
 
     ( masked_inputs, generator, discriminator, 
       fake_data,
       total_loss,
-      mlm_output, sop_output
+      mlm_output, disc_output, sop_output
     ) = get_outputs(features)
 
     self.total_loss = total_loss
@@ -118,7 +118,7 @@ class PretrainingModel(object):
     ( masked_inputs2, generator2, discriminator2, 
       fake_data2,
       total_loss2,
-      mlm_output2, sop_output2
+      mlm_output2, disc_output2, sop_output2
     ) = get_outputs(features2, reuse=True)
 
     self.total_loss += total_loss2
