@@ -100,6 +100,8 @@ class ExampleBuilder(object):
     else:
       # -3 due to not yet having [CLS]/[SEP] tokens in the input text
       ss = (self._max_length - 3) // 2
+      if self.do_cluster and self.do_sop:
+        ss -= 1
       first_segment_target_length = ss if not self.do_sop else \
                                     (random.randint(min(8,ss), ss) if random.random() > 0.5 else ss
                                     )
@@ -124,6 +126,8 @@ class ExampleBuilder(object):
     if self.do_sop:
       min_seg_length = random.randint(8, 32)
       first_max_length = (self._max_length - 3 - min_seg_length)             # 256 - 3 - 32 = 221
+      if self.do_cluster and self.do_sop:
+        first_max_length -= 1
       first_segment = first_segment[max(0,                                   # 
                                     len(first_segment) - first_max_length):] # len(segment) = 300
                                                                             # -> 300- 221 = 79
@@ -135,11 +139,13 @@ class ExampleBuilder(object):
                                                                             # 
 
       second_max_length = self._max_length - 3 - len(first_segment)          # 256 - 3 - 221 = 32
+      if self.do_cluster and self.do_sop:
+        second_max_length -= 1
       second_segment = second_segment[:second_max_length]
     else:
       first_segment = first_segment[:self._max_length - 2]
       second_segment = second_segment[:max(0, self._max_length -
-                                          len(first_segment) - 3)]
+                                          len(first_segment) - (3 if not (self.do_cluster and self.do_sop) else 4))]
 
 
     sop = None
@@ -202,6 +208,8 @@ class ExampleBuilder(object):
   def _make_tf_example(self, first_segment, second_segment, sop_label=None, return_feature=False):
     """Converts two "segments" of text into a tf.train.Example."""
     input_ids = [0]
+    if self.do_cluster and self.do_sop:
+      input_ids.append(0)
     input_ids.extend(first_segment)
     input_ids.append(1)
     #input_ids = [0] + first_segment + [1]
