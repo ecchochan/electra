@@ -193,9 +193,9 @@ class ExampleBuilder(object):
 
     # small chance for random-length instead of max_length-length example
     if random.random() < 0.05:
-      self._target_length = random.randint(5, self._max_length if not self.do_cluster else max_length * 2)
+      self._target_length = random.randint(5, self._max_length if not self.do_cluster else self._max_length * 2)
     else:
-      self._target_length = self._max_length if not self.do_cluster else max_length * 2
+      self._target_length = self._max_length if not self.do_cluster else self._max_length * 2
 
     return ret
 
