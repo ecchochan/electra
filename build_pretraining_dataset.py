@@ -60,6 +60,7 @@ class ExampleBuilder(object):
 
 
     unk_count = bert_tokids.count(4)
+    
     '''
     if unk_count > 0:
       p = bert_tokids.index(4)
@@ -76,6 +77,15 @@ class ExampleBuilder(object):
 '''
     if unk_count > 5:
       return None
+
+    if random.random() < 0.0001:
+      tokenized_text = ' '.join(encoded.tokens[:40])
+      orig_text = line[:40]
+      tokenized_text = chinese_re.sub(r'\1',tokenized_text)
+      print(tokenized_text+'\n'+ orig_text)
+
+
+
     self._current_sentences.append(bert_tokids)
     self._current_length += len(bert_tokids)
     if self._current_length >= self._target_length:
