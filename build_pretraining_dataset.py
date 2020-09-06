@@ -49,7 +49,7 @@ class ExampleBuilder(object):
     self.do_sop = do_sop
     self.warned = False
 
-  def add_line(self, line):
+  def add_line(self, line, input_file=None):
     """Adds a line of text to the current example being built."""
     line = line.strip().replace("\n", " ")
     if (not line) and self._current_length != 0:  # empty lines separate docs
@@ -82,7 +82,7 @@ class ExampleBuilder(object):
       tokenized_text = ' '.join(encoded.tokens[:40])
       orig_text = line[:40]
       tokenized_text = chinese_re.sub(r'\1',tokenized_text)
-      print(tokenized_text+'\n'+ orig_text)
+      print(input_file +'\n'+tokenized_text+'\n'+ orig_text)
 
 
 
@@ -624,7 +624,7 @@ o徙氣,嘥氣
       for bucket in cached:
         for line in bucket:
           if line or self._blanks_separate_docs:
-            example = self._example_builder.add_line(line)
+            example = self._example_builder.add_line(line, input_file)
             if example:
               self._writers[self.n_written % len(self._writers)].write(
                   example.SerializeToString())
