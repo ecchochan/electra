@@ -115,13 +115,41 @@ class PretrainingModel(object):
     self.total_loss = total_loss
 
     features2 = {k[:-1]: v for k, v in features.items() if k.endswith('2')}
-    ( masked_inputs2, generator2, discriminator2, 
-      fake_data2,
-      total_loss2,
-      mlm_output2, disc_output2, sop_output2
-    ) = get_outputs(features2, reuse=True)
+    if features2:
+      import warnings
+      warnings.warn("Training with cluster objective.")
+      ( masked_inputs2, generator2, discriminator2, 
+        fake_data2,
+        total_loss2,
+        mlm_output2, disc_output2, sop_output2
+      ) = get_outputs(features2, reuse=True)
+      self.total_loss = (self.total_loss + total_loss2) / 2
 
-    self.total_loss += total_loss2
+      A_pooled = discriminator.get_pooled_output()
+      B_pooled = discriminator2.get_pooled_output()
+      with tf.variable_scope("cluster_proj_A"):
+        A_pooled_proj = tf.layers.dense(
+            A_pooled,
+            units=self._bert_config.hidden_size,
+            activation=modeling.get_activation(self._bert_config.hidden_act),
+            kernel_initializer=modeling.create_initializer(
+                self._bert_config.initializer_range))
+      with tf.variable_scope("cluster_proj_B"):
+        B_pooled_proj = tf.layers.dense(
+            A_pooled,
+            units=self._bert_config.hidden_size,
+            activation=modeling.get_activation(self._bert_config.hidden_act),
+            kernel_initializer=modeling.create_initializer(
+                self._bert_config.initializer_range))
+      y_true = tf.eye(tf.shape(A_pooled)[0])
+      similarity_matrix = tf.matmul(
+        a=A_pooled_proj, b=B_pooled_proj, transpose_b=True)
+
+      y_true_f = tf.cast(y_true, tf.float32)
+      cluster_losses = tf.nn.sigmoid_cross_entropy_with_logits(
+          logits=similarity_matrix, labels=y_true_f)
+      cluster_loss = tf.reduce_sum(loss)
+      self.total_loss += cluster_loss
 
     # Evaluation
     eval_fn_inputs = {
