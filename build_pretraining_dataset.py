@@ -40,13 +40,15 @@ def create_int_feature(values):
 class ExampleBuilder(object):
   """Given a stream of input text, creates pretraining examples."""
 
-  def __init__(self, tokenizer, max_length, do_sop=False):
+  def __init__(self, tokenizer, max_length, do_sop=False, do_cluster=False):
     self._tokenizer = tokenizer
     self._current_sentences = []
     self._current_length = 0
     self._max_length = max_length
     self._target_length = max_length
     self.do_sop = do_sop
+    self.do_cluster = do_cluster
+    self.cluster_bucket = []
     self.warned = False
 
   def add_line(self, line, input_file=None):
@@ -95,8 +97,15 @@ class ExampleBuilder(object):
   def _create_example(self):
     """Creates a pre-training example from the current list of sentences."""
     # small chance to only have one segment as in classification tasks
-    if not self.warned and self.do_sop:
-      print("Creating tfrecords with SOP objective.")
+    if not self.warned:
+      objectives = []
+      if self.do_sop:
+        objectives.append('SOP')
+      if self.do_cluster:
+        objectives.append('cluster')
+      if objectives:
+        print("Creating tfrecords with %s objective(s)."%(', '.join(objectives)))
+        
       self.warned = True
       
     if not self.do_sop and random.random() < 0.1:
@@ -194,6 +203,8 @@ class ExampleBuilder(object):
     if sop_label is not None:
       feature["sop_label"] = create_int_feature([sop_label])
 
+    if self.do_cluster:
+      return feature
     tf_example = tf.train.Example(features=tf.train.Features(feature=feature))
     return tf_example
 
@@ -212,7 +223,7 @@ class ExampleWriter(object):
   """Writes pre-training examples to disk."""
 
   def __init__(self, job_id, vocab_file, output_dir, max_seq_length,
-               num_jobs, blanks_separate_docs, do_lower_case, do_sop,
+               num_jobs, blanks_separate_docs, do_lower_case, do_sop, do_cluster
                num_out_files=1000):
     self._blanks_separate_docs = blanks_separate_docs
     tokenizer = CanTokenizer(vocab_file)
@@ -550,7 +561,7 @@ o徙氣,嘥氣
             if not vocab_id:
                 replacements[k] = (':%s:'%v,'','')
     self.replacer = Replacer(replacements)
-    self._example_builder = ExampleBuilder(tokenizer, max_seq_length, do_sop=do_sop)
+    self._example_builder = ExampleBuilder(tokenizer, max_seq_length, do_sop=do_sop, do_cluster=do_cluster)
     self._writers = []
     for i in range(num_out_files):
       if i % num_jobs == job_id:
@@ -567,6 +578,24 @@ o徙氣,嘥氣
       x = self.replacer.translate(x)
 
       return x
+
+  def make_cluster(self, feature=None):
+    if feature:
+      if len(self.cluster_bucket) > 0:
+        feature_prev = self.cluster_bucket[0]
+        for k, v in feature.items():
+          feature_prev[k+'2'] = v
+        tf_example = tf.train.Example(features=tf.train.Features(feature=feature_prev))
+        self._writers[self.n_written % len(self._writers)].write(
+            tf_example.SerializeToString())
+        self.cluster_bucket = []
+        self.n_written += 1
+        if self.n_written
+      else:
+        self.cluster_bucket.append(feature)
+
+
+
   def write_examples(self, input_file):
     """Writes out examples from the provided input file."""
     with tf.io.gfile.GFile(input_file) as f:
@@ -626,10 +655,17 @@ o徙氣,嘥氣
           if line or self._blanks_separate_docs:
             example = self._example_builder.add_line(line, input_file)
             if example:
+              if self.do_cluster:
+                self.make_cluster(example)
+                continue
+
               self._writers[self.n_written % len(self._writers)].write(
                   example.SerializeToString())
               self.n_written += 1
       example = self._example_builder.add_line("")
+      if self.do_cluster:
+        self.make_cluster(example)
+        return
       if example:
         self._writers[self.n_written % len(self._writers)].write(
             example.SerializeToString())
@@ -655,7 +691,8 @@ def write_examples(job_id, args):
       num_jobs=args.num_processes,
       blanks_separate_docs=args.blanks_separate_docs,
       do_lower_case=args.do_lower_case,
-      do_sop=args.do_sop
+      do_sop=args.do_sop,
+      do_cluster=args.do_cluster
   )
   log("Writing tf examples")
   fnames = sorted(tf.io.gfile.listdir(args.corpus_dir))
@@ -692,6 +729,8 @@ def main():
                       help="Whether blank lines indicate document boundaries.")
   parser.add_argument("--do-sop", dest='do_sop',
                       action='store_true', help="Add SOP features.")
+  parser.add_argument("--do-cluster", dest='do_cluster',
+                      action='store_true', help="Add Cluster features.")
   parser.add_argument("--do-lower-case", dest='do_lower_case',
                       action='store_true', help="Lower case input text.")
   parser.add_argument("--no-lower-case", dest='do_lower_case',
