@@ -427,10 +427,6 @@ def main():
                       help="Location of data files (model weights, etc).")
   parser.add_argument("--model-name", required=True,
                       help="The name of the model being fine-tuned.")
-  parser.add_argument("--do-sop", dest='do_sop',
-                      action='store_true', help="Add SOP features.")
-  parser.add_argument("--do-cluster", dest='do_cluster',
-                      action='store_true', help="Add Cluster features.")
   parser.add_argument("--hparams", default="{}",
                       help="JSON dict of model hyperparameters.")
   parser.add_argument("--albert", action='store_true', default=False,
