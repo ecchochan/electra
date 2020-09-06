@@ -57,7 +57,7 @@ def get_input_fn(config: configure_pretraining.PretrainingConfig, is_training,
         name_to_features['sop_label2'] = tf.io.FixedLenFeature([], tf.int64),
         
 
-
+    print(name_to_features.keys())
     d = tf.data.Dataset.from_tensor_slices(tf.constant(input_files))
     d = d.repeat()
     d = d.shuffle(buffer_size=len(input_files))
