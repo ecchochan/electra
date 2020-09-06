@@ -40,13 +40,14 @@ def create_int_feature(values):
 class ExampleBuilder(object):
   """Given a stream of input text, creates pretraining examples."""
 
-  def __init__(self, tokenizer, max_length, do_sop=False):
+  def __init__(self, tokenizer, max_length, do_sop=False, do_cluster=False):
     self._tokenizer = tokenizer
     self._current_sentences = []
     self._current_length = 0
     self._max_length = max_length
-    self._target_length = max_length
+    self._target_length = max_length if not do_cluster else max_length * 2
     self.do_sop = do_sop
+    self.do_cluster = do_cluster
     self.warned = False
 
   def add_line(self, line, input_file=None):
@@ -57,7 +58,6 @@ class ExampleBuilder(object):
     encoded = self._tokenizer.encode(line)
     # bert_tokens = encoded.tokens
     bert_tokids = encoded.ids 
-
 
     unk_count = bert_tokids.count(4)
     
@@ -82,51 +82,39 @@ class ExampleBuilder(object):
 
 
 '''
-    if unk_count > 5:
-      return None
+    if unk_count > 15:
+      return self._create_example()
 
 
     self._current_sentences.append(bert_tokids)
     self._current_length += len(bert_tokids)
     if self._current_length >= self._target_length:
+      if self.do_cluster and len(self._current_sentences) <= 1:
+        return None
       return self._create_example()
     return None
 
-  def _create_example(self):
-    """Creates a pre-training example from the current list of sentences."""
-    # small chance to only have one segment as in classification tasks
-    if not self.warned and self.do_sop:
-      print("Creating tfrecords with SOP objective.")
-      self.warned = True
-      
+  def make_segments(self, sentences):
     if not self.do_sop and random.random() < 0.1:
       first_segment_target_length = 100000
     else:
       # -3 due to not yet having [CLS]/[SEP] tokens in the input text
-      ss = (self._target_length - 3) // 2
+      ss = (self._max_length - 3) // 2
       first_segment_target_length = ss if not self.do_sop else \
                                     (random.randint(min(8,ss), ss) if random.random() > 0.5 else ss
                                     )
 
     first_segment = []
     second_segment = []
-    if self.do_sop and len(self._current_sentences) == 1:
-      length = first_segment_target_length
-      a = self._current_sentences[0][:length // 2]
-      b = self._current_sentences[0][length // 2:]
-      self._current_sentences = [a, b]
-    for sentence in self._current_sentences:
-      # the sentence goes to the first segment if (1) the first segment is
-      # empty, (2) the sentence doesn't put the first segment over length or
-      # (3) 50% of the time when it does put the first segment over length
-      if (len(first_segment) == 0 or
-          len(first_segment) + len(sentence) < first_segment_target_length or
-          (len(second_segment) == 0 and
-           len(first_segment) < first_segment_target_length and
-           random.random() < 0.5)):
-        first_segment.extend(sentence)
-      else:
-        second_segment.extend(sentence)
+    if self.do_sop and len(sentences) == 1:
+      length = len(sentences[0])
+      a = sentences[0][:length // 2]
+      b = sentences[0][length // 2:]
+      sentences = [a, b]
+
+    sep = random.randint(1,len(sentences) - 1)
+    first_segment = sentences[:sep]
+    second_segment = sentences[sep:]
 
     # trim to max_length while accounting for not-yet-added [CLS]/[SEP] tokens
     if self.do_sop:
@@ -134,13 +122,13 @@ class ExampleBuilder(object):
       first_max_length = (self._max_length - 3 - min_seg_length)             # 256 - 3 - 32 = 221
       first_segment = first_segment[max(0,                                   # 
                                     len(first_segment) - first_max_length):] # len(segment) = 300
-                                                                             # -> 300- 221 = 79
-                                                                             # -> [79:] 
-                                                                             # 
-                                                                             # len(segment) = 64
-                                                                             # -> 64 - 221 = 0
-                                                                             # -> [0:] 
-                                                                             # 
+                                                                            # -> 300- 221 = 79
+                                                                            # -> [79:] 
+                                                                            # 
+                                                                            # len(segment) = 64
+                                                                            # -> 64 - 221 = 0
+                                                                            # -> [0:] 
+                                                                            # 
 
       second_max_length = self._max_length - 3 - len(first_segment)          # 256 - 3 - 221 = 32
       second_segment = second_segment[:second_max_length]
@@ -148,29 +136,68 @@ class ExampleBuilder(object):
       first_segment = first_segment[:self._max_length - 2]
       second_segment = second_segment[:max(0, self._max_length -
                                           len(first_segment) - 3)]
-    
+
+
+    sop = None
     if self.do_sop:
-      sop = 1
+      sop = 1 
       if random.random() > 0.5:
         temp = first_segment
         first_segment = second_segment
         second_segment = temp
         sop = 0
+
+    return first_segment, second_segment, sop
+
+
+  def _create_example(self):
+    if not self._current_sentences:
+      return None
+    """Creates a pre-training example from the current list of sentences."""
+    # small chance to only have one segment as in classification tasks
+    if not self.warned and self.do_sop:
+      print("Creating tfrecords with SOP objective.")
+      self.warned = True
+      
+
+    if self.do_cluster:
+      num_sentences = len(self._current_sentences)
+      if num_sentences == 1:
+        return None
+
+
+      sep = num_sentences // 2 if random.random() > 0.5 else random.randint(1, num_sentences - 1)
+
+      A_sentences = self._current_sentences[:sep]
+      B_sentences = self._current_sentences[sep:]
+      A_first_segment, A_second_segment, A_sop = self.make_segments(A_sentences)
+      B_first_segment, B_second_segment, B_sop = self.make_segments(B_sentences)
+      A_feature = self._make_tf_example(A_first_segment, A_second_segment, A_sop, return_feature=True)
+      B_feature = self._make_tf_example(B_first_segment, B_second_segment, B_sop, return_feature=True)
+
+      for k, v in B_feature.items():
+        A_feature[k+'2'] = v
+      ret = tf.train.Example(features=tf.train.Features(feature=A_feature))
+
+    else:
+      first_segment, second_segment, sop = self.make_segments(self._current_sentences)
+    
+      ret = self._make_tf_example(first_segment, second_segment, sop)
+
+
     # prepare to start building the next example
     self._current_sentences = []
     self._current_length = 0
+
     # small chance for random-length instead of max_length-length example
     if random.random() < 0.05:
-      self._target_length = random.randint(5, self._max_length)
+      self._target_length = random.randint(5, self._max_length if not self.do_cluster else max_length * 2)
     else:
-      self._target_length = self._max_length
+      self._target_length = self._max_length if not self.do_cluster else max_length * 2
 
-    if self.do_sop:
-      return self._make_tf_example(first_segment, second_segment, sop)
-      
-    return self._make_tf_example(first_segment, second_segment, )
+    return ret
 
-  def _make_tf_example(self, first_segment, second_segment, sop_label=None):
+  def _make_tf_example(self, first_segment, second_segment, sop_label=None, return_feature=False):
     """Converts two "segments" of text into a tf.train.Example."""
     input_ids = [0]
     input_ids.extend(first_segment)
@@ -193,6 +220,9 @@ class ExampleBuilder(object):
     }
     if sop_label is not None:
       feature["sop_label"] = create_int_feature([sop_label])
+
+    if return_feature:
+      return feature
 
     tf_example = tf.train.Example(features=tf.train.Features(feature=feature))
     return tf_example
@@ -692,6 +722,8 @@ def main():
                       help="Whether blank lines indicate document boundaries.")
   parser.add_argument("--do-sop", dest='do_sop',
                       action='store_true', help="Add SOP features.")
+  parser.add_argument("--do-cluster", dest='do_cluster',
+                      action='store_true', help="Add Cluster features.")
   parser.add_argument("--do-lower-case", dest='do_lower_case',
                       action='store_true', help="Lower case input text.")
   parser.add_argument("--no-lower-case", dest='do_lower_case',

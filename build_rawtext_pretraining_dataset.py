@@ -43,7 +43,8 @@ def write_examples(job_id, args):
       num_jobs=args.num_processes,
       blanks_separate_docs=False,
       do_lower_case=args.do_lower_case,
-      do_sop=args.do_sop
+      do_sop=args.do_sop,
+      do_cluster=args.do_cluster
   )
   log("Writing tf examples")
   fnames = sorted(tf.io.gfile.listdir(args.data_dir))
@@ -79,6 +80,8 @@ def main():
                       help="Parallelize across multiple processes.")
   parser.add_argument("--do-sop", dest='do_sop',
                       action='store_true', help="Add SOP features.")
+  parser.add_argument("--do-cluster", dest='do_cluster',
+                      action='store_true', help="Add Cluster features.")
   parser.add_argument("--do-lower-case", dest='do_lower_case',
                       action='store_true', help="Lower case input text.")
   parser.add_argument("--no-lower-case", dest='do_lower_case',
