@@ -140,7 +140,7 @@ class PretrainingConfig(object):
 
     if self.do_cluster:
       import warnings
-      warnings.warn("train_batch_size reducded to half for cluster objective ")
+      warnings.warn("train_batch_size reduced to half for cluster objective ")
       self.train_batch_size = self.train_batch_size // 2
 
   def update(self, kwargs):
