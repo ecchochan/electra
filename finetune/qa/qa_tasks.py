@@ -373,7 +373,7 @@ class QATask(task.Task):
         token_is_max_context[len(tokens)] = is_max_context
         tokens.append(all_doc_tokens[split_token_index])
         segment_ids.append(1)
-      tokens.append(2) # ("[SEP]")
+      tokens.append(1) # ("[SEP]")
       segment_ids.append(1)
 
       input_ids = tokens #input_ids = self._tokenizer.convert_tokens_to_ids(tokens)
