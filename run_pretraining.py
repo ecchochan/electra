@@ -149,7 +149,7 @@ class PretrainingModel(object):
       cluster_losses = tf.nn.sigmoid_cross_entropy_with_logits(
           logits=similarity_matrix, labels=y_true_f)
       cluster_loss = tf.reduce_mean(cluster_losses)
-      self.total_loss += cluster_loss
+      self.total_loss += cluster_loss * config.cluster_weight
 
     # Evaluation
     eval_fn_inputs = {
