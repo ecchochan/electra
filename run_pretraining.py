@@ -124,7 +124,7 @@ class PretrainingModel(object):
         mlm_output2, disc_output2, sop_output2
       ) = get_outputs(features2, reuse=True)
       self.total_loss = (self.total_loss + total_loss2) / 2
-
+      '''
       A_pooled = discriminator.get_pooled_output()
       B_pooled = discriminator2.get_pooled_output()
       with tf.variable_scope("cluster_proj_A"):
@@ -150,6 +150,7 @@ class PretrainingModel(object):
           logits=similarity_matrix, labels=y_true_f)
       cluster_loss = tf.reduce_mean(cluster_losses)
       self.total_loss += cluster_loss * config.cluster_weight
+      '''
 
     # Evaluation
     eval_fn_inputs = {
