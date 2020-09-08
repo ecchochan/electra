@@ -48,6 +48,7 @@ class PretrainingModel(object):
       self._bert_config.intermediate_size = 144 * 4
       self._bert_config.num_attention_heads = 4
 
+
     # Mask the input
     masked_inputs = pretrain_helpers.mask(
         config, pretrain_data.features_to_inputs(features), config.mask_prob)
@@ -95,9 +96,7 @@ class PretrainingModel(object):
       self.total_loss += config.sop_weight * sop_output.loss
 
 
-    if config.do_cluster:
-      import warnings
-      warnings.warn("Training with cluster objective.")
+    if features2:
       pass
       '''
       import warnings
