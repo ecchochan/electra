@@ -85,16 +85,17 @@ def get_input_fn(config: configure_pretraining.PretrainingConfig, is_training,
             num_parallel_batches=num_cpu_threads,
             drop_remainder=True))
 
-    print('config.do_cluster:', config.do_cluster)
     if config.do_cluster:
       import warnings
       warnings.warn("Training with cluster objective.")
+      features_unique = tuple(k[:-1] for k in name_to_features if k.endswith('2'))
       def map_for_cluster(features):
-        features2 = {k[:-1]: v for k, v in features.items() if k.endswith('2')}
         features = {
-          k: tf.concat([features[k], features2[k]], 0)
-          for k in features2
+          k: tf.concat([features[k], features[k+'2']], 0)
+          for k in features_unique
         }
+        for k in features_unique:
+          del features[k]
         return features
 
       d = d.map(map_for_cluster)
