@@ -116,6 +116,12 @@ class SpanBasedQAScorer(scorer.Scorer):
       # keep track of the minimum score of null start+end of position 0
       score_null = 1000000  # large and positive
       for (feature_index, feature) in enumerate(features):
+        if (self._name + "_eid") not in feature:
+          print('ERROR: feature not found feature[%r]'%(self._name + "_eid"))
+          continue
+        if feature[self._name + "_eid"] not in unique_id_to_result:
+          print('ERROR: feature not found unique_id_to_result[%r]'%(feature[self._name + "_eid"]))
+          continue
         result = unique_id_to_result[feature[self._name + "_eid"]]
         if self._config.joint_prediction:
           start_indexes = result.start_top_index
@@ -176,7 +182,7 @@ class SpanBasedQAScorer(scorer.Scorer):
           prelim_predictions.append(_PrelimPrediction(
               feature_index=0,
               start_index=0,
-              end_index=0 + 1,
+              end_index=0,
               start_logit=1.0,
               end_logit=1.0))
       prelim_predictions = sorted(
@@ -199,6 +205,7 @@ class SpanBasedQAScorer(scorer.Scorer):
           char_start = offsets[offset+pred.start_index - N][0]  # -N for [CLS]
           char_end = offsets[offset+pred.end_index - N][1]
         except Exception as e:
+          continue
           import traceback
           traceback.print_exc()
           print('char_start/char_end cannot be found')
@@ -208,7 +215,6 @@ class SpanBasedQAScorer(scorer.Scorer):
           print('pred.start_index =', pred.start_index)
           print('pred.end_index =', pred.end_index)
           print('len(offsets) =', len(offsets))
-          continue
         final_text = paragraph_text[char_start:char_end]
 
 
