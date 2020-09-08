@@ -111,6 +111,9 @@ class ExampleBuilder(object):
     second_segment = []
     if self.do_sop and len(sentences) == 1:
       length = len(sentences[0])
+      if length <= 10:
+        return None
+        
       a = sentences[0][:length // 2]
       b = sentences[0][length // 2:]
       sentences = [a, b]
@@ -194,8 +197,11 @@ class ExampleBuilder(object):
 
       A_sentences = self._current_sentences[:sep]
       B_sentences = self._current_sentences[sep:]
-      A_first_segment, A_second_segment, A_sop = self.make_segments(A_sentences)
-      B_first_segment, B_second_segment, B_sop = self.make_segments(B_sentences)
+      try:
+        A_first_segment, A_second_segment, A_sop = self.make_segments(A_sentences)
+        B_first_segment, B_second_segment, B_sop = self.make_segments(B_sentences)
+      except:
+        return None
       A_feature = self._make_tf_example(A_first_segment, A_second_segment, A_sop, return_feature=True)
       B_feature = self._make_tf_example(B_first_segment, B_second_segment, B_sop, return_feature=True)
 
