@@ -109,7 +109,7 @@ class PretrainingModel(object):
     features2 = {k[:-1]: v for k, v in features.items() if k.endswith('2')}
 
     features_combined = {
-      tf.concat([features[k], features2[k]], 0)
+      k: tf.concat([features[k], features2[k]], 0)
       for k in features2
     }
 
