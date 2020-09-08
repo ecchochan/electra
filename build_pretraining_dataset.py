@@ -80,9 +80,9 @@ class ExampleBuilder(object):
       tokenized_text = chinese_re.sub(r'\1',tokenized_text)
       print(input_file +'\n'+tokenized_text+'\n'+ orig_text)
 
-
 '''
-    if unk_count > 15:
+
+    if unk_count > 7:
       return self._create_example()
 
 
@@ -100,8 +100,8 @@ class ExampleBuilder(object):
     else:
       # -3 due to not yet having [CLS]/[SEP] tokens in the input text
       ss = (self._max_length - 3) // 2
-      if self.do_cluster and self.do_sop:
-        ss -= 1
+      #if self.do_cluster and self.do_sop:
+      #  ss -= 1
       first_segment_target_length = ss if not self.do_sop else \
                                     (random.randint(min(8,ss), ss) if random.random() > 0.5 else ss
                                     )
@@ -119,15 +119,19 @@ class ExampleBuilder(object):
       sep = random.randint(0,len(sentences))
     for e in sentences[:sep]:
       first_segment.extend(e)
-    for e in sentences[:sep]:
+    for e in sentences[sep:]:
       second_segment.extend(e)
+
+    if self.do_sop:
+      assert len(first_segment) > 0
+      assert len(second_segment) > 0
 
     # trim to max_length while accounting for not-yet-added [CLS]/[SEP] tokens
     if self.do_sop:
       min_seg_length = random.randint(8, 32)
       first_max_length = (self._max_length - 3 - min_seg_length)             # 256 - 3 - 32 = 221
-      if self.do_cluster and self.do_sop:
-        first_max_length -= 1
+      #if self.do_cluster and self.do_sop:
+      #  first_max_length -= 1
       first_segment = first_segment[max(0,                                   # 
                                     len(first_segment) - first_max_length):] # len(segment) = 300
                                                                             # -> 300- 221 = 79
@@ -139,8 +143,8 @@ class ExampleBuilder(object):
                                                                             # 
 
       second_max_length = self._max_length - 3 - len(first_segment)          # 256 - 3 - 221 = 32
-      if self.do_cluster and self.do_sop:
-        second_max_length -= 1
+      #if self.do_cluster and self.do_sop:
+      #  second_max_length -= 1
       second_segment = second_segment[:second_max_length]
     else:
       first_segment = first_segment[:self._max_length - 2]
