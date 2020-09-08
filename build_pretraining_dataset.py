@@ -96,17 +96,6 @@ class ExampleBuilder(object):
     return None
 
   def make_segments(self, sentences):
-    if not self.do_sop and random.random() < 0.1:
-      first_segment_target_length = 100000
-    else:
-      # -3 due to not yet having [CLS]/[SEP] tokens in the input text
-      ss = (self._max_length - 3) // 2
-      #if self.do_cluster and self.do_sop:
-      #  ss -= 1
-      first_segment_target_length = ss if not self.do_sop else \
-                                    (random.randint(min(8,ss), ss) if random.random() > 0.5 else ss
-                                    )
-
     first_segment = []
     second_segment = []
     if self.do_sop and len(sentences) == 1:
@@ -121,7 +110,10 @@ class ExampleBuilder(object):
     if self.do_sop:
       sep = random.randint(1,len(sentences) - 1)
     else:
-      sep = random.randint(0,len(sentences))
+      if random.random() < 0.1:
+        sep = 999
+      else:
+        sep = random.randint(1,len(sentences))
     for e in sentences[:sep]:
       first_segment.extend(e)
     for e in sentences[sep:]:
