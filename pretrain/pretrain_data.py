@@ -56,8 +56,8 @@ def get_input_fn(config: configure_pretraining.PretrainingConfig, is_training,
       if config.do_sop:
         name_to_features['sop_label2'] = tf.io.FixedLenFeature([], tf.int64)
         
-
     print(name_to_features)
+    
     d = tf.data.Dataset.from_tensor_slices(tf.constant(input_files))
     d = d.repeat()
     d = d.shuffle(buffer_size=len(input_files))
@@ -84,6 +84,16 @@ def get_input_fn(config: configure_pretraining.PretrainingConfig, is_training,
             batch_size=batch_size,
             num_parallel_batches=num_cpu_threads,
             drop_remainder=True))
+
+    if config.do_cluster:
+      def map_for_cluster(features):
+        features2 = {k[:-1]: v for k, v in features.items() if k.endswith('2')}
+        features = {
+          k: tf.concat([features[k], features2[k]], 0)
+          for k in features2
+        }
+        return features
+
     return d
 
   return input_fn
