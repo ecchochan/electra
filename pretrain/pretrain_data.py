@@ -94,8 +94,6 @@ def get_input_fn(config: configure_pretraining.PretrainingConfig, is_training,
           k: tf.concat([features[k], features[k+'2']], 0)
           for k in features_unique
         }
-        for k in features_unique:
-          del features[k+'2']
         return features
 
       d = d.map(map_for_cluster)
