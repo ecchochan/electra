@@ -114,6 +114,7 @@ class ExampleBuilder(object):
       b = sentences[0][length // 2:]
       sentences = [a, b]
 
+    if self.do_sop:
       sep = random.randint(1,len(sentences) - 1)
     else:
       sep = random.randint(0,len(sentences))
@@ -145,7 +146,7 @@ class ExampleBuilder(object):
     else:
       first_segment = first_segment[:self._max_length - 2]
       second_segment = second_segment[:max(0, self._max_length -
-                                          len(first_segment) - (3 if not (self.do_cluster and self.do_sop) else 4))]
+                                          len(first_segment) - (3 if not (self.do_cluster and self.do_sop) else 3))]
 
 
     sop = None
