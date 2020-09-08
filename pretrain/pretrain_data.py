@@ -30,7 +30,7 @@ from util import utils
 
 
 def get_input_fn(config: configure_pretraining.PretrainingConfig, is_training,
-                 num_cpu_threads=4):
+                 num_cpu_threads=12):
   """Creates an `input_fn` closure to be passed to TPUEstimator."""
 
   input_files = []
@@ -85,18 +85,7 @@ def get_input_fn(config: configure_pretraining.PretrainingConfig, is_training,
             num_parallel_batches=num_cpu_threads,
             drop_remainder=True))
 
-    if config.do_cluster:
-      import warnings
-      warnings.warn("Training with cluster objective.")
-      features_unique = tuple(k[:-1] for k in name_to_features if k.endswith('2'))
-      def map_for_cluster(features):
-        features = {
-          k: tf.concat([features[k], features[k+'2']], 0)
-          for k in features_unique
-        }
-        return features
 
-      d = d.map(map_for_cluster)
 
     return d
 

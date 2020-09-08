@@ -48,6 +48,14 @@ class PretrainingModel(object):
       self._bert_config.intermediate_size = 144 * 4
       self._bert_config.num_attention_heads = 4
 
+    if config.do_cluster:
+      import warnings
+      warnings.warn("Training with cluster objective.")
+      features_unique = tuple(k[:-1] for k in features if k.endswith('2'))
+      features = {
+        k: tf.concat([features[k], features[k+'2']], 0)
+        for k in features_unique
+      }
 
     # Mask the input
     masked_inputs = pretrain_helpers.mask(
@@ -97,13 +105,8 @@ class PretrainingModel(object):
 
 
     if config.do_cluster:
-      pass
-      '''
-      import warnings
-      warnings.warn("Training with cluster objective.")
+      A_pooled, B_pooled = tf.split(discriminator.get_pooled_output(), 2)
 
-      A_pooled = discriminator.get_pooled_output()
-      B_pooled = discriminator2.get_pooled_output()
       with tf.variable_scope("cluster_proj_A"):
         A_pooled_proj = tf.layers.dense(
             A_pooled,
@@ -127,6 +130,8 @@ class PretrainingModel(object):
           logits=similarity_matrix, labels=y_true_f)
       cluster_loss = tf.reduce_mean(cluster_losses)
       self.total_loss += cluster_loss * config.cluster_weight
+      pass
+      '''
       '''
 
     # Evaluation
