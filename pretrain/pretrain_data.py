@@ -95,7 +95,7 @@ def get_input_fn(config: configure_pretraining.PretrainingConfig, is_training,
           for k in features_unique
         }
         for k in features_unique:
-          del features[k]
+          del features[k+'2']
         return features
 
       d = d.map(map_for_cluster)
