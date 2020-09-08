@@ -110,7 +110,7 @@ class PretrainingModel(object):
 
     features_combined = {
       tf.concat([features[k], features2[k]], 0)
-      for k in features
+      for k in features2
     }
 
     ( masked_inputs, generator, discriminator, 
