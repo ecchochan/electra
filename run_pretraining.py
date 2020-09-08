@@ -106,24 +106,25 @@ class PretrainingModel(object):
         mlm_output,disc_output, sop_output
         )
 
+    features2 = {k[:-1]: v for k, v in features.items() if k.endswith('2')}
+
+    features_combined = {
+      tf.concat([features[k], features2[k]], 0)
+      for k in features
+    }
+
     ( masked_inputs, generator, discriminator, 
       fake_data,
       total_loss,
       mlm_output, disc_output, sop_output
-    ) = get_outputs(features)
+    ) = get_outputs(features_combined)
 
     self.total_loss = total_loss
 
-    features2 = {k[:-1]: v for k, v in features.items() if k.endswith('2')}
     if features2:
       import warnings
       warnings.warn("Training with cluster objective.")
-      ( masked_inputs2, generator2, discriminator2, 
-        fake_data2,
-        total_loss2,
-        mlm_output2, disc_output2, sop_output2
-      ) = get_outputs(features2, reuse=True)
-      self.total_loss = (self.total_loss + total_loss2) / 2
+
       '''
       A_pooled = discriminator.get_pooled_output()
       B_pooled = discriminator2.get_pooled_output()

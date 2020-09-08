@@ -664,7 +664,7 @@ o徙氣,嘥氣
             bad = True
             break
         if not bad:
-          cached.append(bucket)
+          cached.append(sub_doc.split('\n'))
 
       for bucket in cached:
         for line in bucket:
