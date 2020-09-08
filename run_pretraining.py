@@ -106,15 +106,6 @@ class PretrainingModel(object):
       self.total_loss += config.sop_weight * sop_output.loss
 
 
-
-    ( masked_inputs, generator, discriminator, 
-      fake_data,
-      total_loss,
-      mlm_output, disc_output, sop_output
-    ) = get_outputs(features_combined)
-
-    self.total_loss = total_loss
-
     if features2:
       pass
       '''
