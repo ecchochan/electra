@@ -84,7 +84,8 @@ class ExampleBuilder(object):
 
     if unk_count > 7:
       return self._create_example()
-
+    if len(bert_tokids) == 0:
+      return None
 
     self._current_sentences.append(bert_tokids)
     self._current_length += len(bert_tokids)
