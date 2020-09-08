@@ -176,6 +176,7 @@ class Preprocessor(object):
     if self.do_cluster is None:
       self.do_cluster = config.do_cluster = any(k.endswith('2') for k in example)
       self.do_cluster_fields = tuple(k[:-1] for k in example if k.endswith('2'))
+      print('Preprocessing with cluster')
       
     if self.do_cluster:
       for k in self.do_cluster_fields:
