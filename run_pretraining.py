@@ -96,7 +96,7 @@ class PretrainingModel(object):
       self.total_loss += config.sop_weight * sop_output.loss
 
 
-    if features2:
+    if config.do_cluster:
       pass
       '''
       import warnings
