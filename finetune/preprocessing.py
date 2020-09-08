@@ -38,6 +38,7 @@ class Preprocessor(object):
     self._config = config
     self._tasks = tasks
     self._name_to_task = {task.name: task for task in tasks}
+    self.do_cluster = None
 
     self._feature_specs = feature_spec.get_shared_feature_specs(config)
     for task in tasks:
@@ -171,4 +172,14 @@ class Preprocessor(object):
         example[name] = tf.cast(tensor, tf.int32)
       else:
         example[name] = tensor
+    
+    if self.do_cluster is None:
+      self.do_cluster = config.do_cluster = any(k.endswith('2') for k in example)
+      self.do_cluster_fields = tuple(k[:-1] for k in example if k.endswith('2'))
+      
+    if self.do_cluster:
+      for k in self.do_cluster_fields:
+        example[k] = tf.concat([example[k], example[k+'2']], 0)
+      for k in self.do_cluster_fields:
+        del example[k+'2']
     return example
