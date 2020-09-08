@@ -99,34 +99,30 @@ class ExampleBuilder(object):
       print("Creating tfrecords with SOP objective.")
       self.warned = True
       
-    if not self.do_sop and random.random() < 0.1:
-      first_segment_target_length = 100000
-    else:
-      # -3 due to not yet having [CLS]/[SEP] tokens in the input text
-      ss = (self._target_length - 3) // 2
-      first_segment_target_length = ss if not self.do_sop else \
-                                    (random.randint(min(8,ss), ss) if random.random() > 0.5 else ss
-                                    )
 
     first_segment = []
     second_segment = []
     if self.do_sop and len(self._current_sentences) == 1:
-      length = first_segment_target_length
+      length = len(self._current_sentences[0])
+      if length <= 10:
+        return None
       a = self._current_sentences[0][:length // 2]
       b = self._current_sentences[0][length // 2:]
       self._current_sentences = [a, b]
-    for sentence in self._current_sentences:
-      # the sentence goes to the first segment if (1) the first segment is
-      # empty, (2) the sentence doesn't put the first segment over length or
-      # (3) 50% of the time when it does put the first segment over length
-      if (len(first_segment) == 0 or
-          len(first_segment) + len(sentence) < first_segment_target_length or
-          (len(second_segment) == 0 and
-           len(first_segment) < first_segment_target_length and
-           random.random() < 0.5)):
-        first_segment.extend(sentence)
+      
+
+    if self.do_sop:
+      sep = random.randint(1,len(self._current_sentences) - 1)
+    else:
+      if random.random() < 0.1:
+        sep = 999
       else:
-        second_segment.extend(sentence)
+        sep = random.randint(1,len(self._current_sentences))
+    for e in self._current_sentences[:sep]:
+      first_segment.extend(e)
+    for e in self._current_sentences[sep:]:
+      second_segment.extend(e)
+
 
     # trim to max_length while accounting for not-yet-added [CLS]/[SEP] tokens
     if self.do_sop:
@@ -150,6 +146,15 @@ class ExampleBuilder(object):
                                           len(first_segment) - 3)]
     
     if self.do_sop:
+      try:
+        assert len(first_segment) > 0
+        assert len(second_segment) > 0
+      except:
+        print('sep:', sep)
+        print('len(sentences):', len(self._current_sentences))
+        print('min_seg_length:', min_seg_length)
+        print('first_max_length:', first_max_length)
+        print('second_max_length:', second_max_length)
       sop = 1
       if random.random() > 0.5:
         temp = first_segment
@@ -619,7 +624,7 @@ o徙氣,嘥氣
             bad = True
             break
         if not bad:
-          cached.append(bucket)
+          cached.append(sub_doc.split('\n'))
 
       for bucket in cached:
         for line in bucket:
