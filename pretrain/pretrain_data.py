@@ -85,7 +85,10 @@ def get_input_fn(config: configure_pretraining.PretrainingConfig, is_training,
             num_parallel_batches=num_cpu_threads,
             drop_remainder=True))
 
+    print('config.do_cluster:', config.do_cluster)
     if config.do_cluster:
+      import warnings
+      warnings.warn("Training with cluster objective.")
       def map_for_cluster(features):
         features2 = {k[:-1]: v for k, v in features.items() if k.endswith('2')}
         features = {
