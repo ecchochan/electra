@@ -167,12 +167,7 @@ class Preprocessor(object):
     example = tf.io.parse_single_example(record, self._name_to_feature_config)
     # tf.Example only supports tf.int64, but the TPU only supports tf.int32.
     # So cast all int64 to int32.
-    for name, tensor in example.items():
-      if tensor.dtype == tf.int64:
-        example[name] = tf.cast(tensor, tf.int32)
-      else:
-        example[name] = tensor
-    
+    print(example.keys())
     if self.do_cluster is None:
       self.do_cluster = config.do_cluster = any(k.endswith('2') for k in example)
       self.do_cluster_fields = tuple(k[:-1] for k in example if k.endswith('2'))
@@ -183,4 +178,11 @@ class Preprocessor(object):
         example[k] = tf.concat([example[k], example[k+'2']], 0)
       for k in self.do_cluster_fields:
         del example[k+'2']
+      
+    for name, tensor in example.items():
+      if tensor.dtype == tf.int64:
+        example[name] = tf.cast(tensor, tf.int32)
+      else:
+        example[name] = tensor
+    
     return example
