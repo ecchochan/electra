@@ -122,13 +122,9 @@ class ExampleBuilder(object):
     for e in sentences[sep:]:
       second_segment.extend(e)
 
-    if self.do_sop:
-      assert len(first_segment) > 0
-      assert len(second_segment) > 0
-
     # trim to max_length while accounting for not-yet-added [CLS]/[SEP] tokens
     if self.do_sop:
-      min_seg_length = random.randint(8, 32)
+      min_seg_length = random.randint(16, 32)
       first_max_length = (self._max_length - 3 - min_seg_length)             # 256 - 3 - 32 = 221
       #if self.do_cluster and self.do_sop:
       #  first_max_length -= 1
@@ -154,6 +150,8 @@ class ExampleBuilder(object):
 
     sop = None
     if self.do_sop:
+      assert len(first_segment) > 0
+      assert len(second_segment) > 0
       sop = 1 
       if random.random() > 0.5:
         first_segment, second_segment = second_segment, first_segment
@@ -208,7 +206,7 @@ class ExampleBuilder(object):
 
     # small chance for random-length instead of max_length-length example
     if random.random() < 0.05:
-      self._target_length = random.randint(5, self._max_length if not self.do_cluster else self._max_length * 2)
+      self._target_length = random.randint(15, self._max_length if not self.do_cluster else self._max_length * 2)
     else:
       self._target_length = self._max_length if not self.do_cluster else self._max_length * 2
 
