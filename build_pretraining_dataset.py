@@ -151,8 +151,15 @@ class ExampleBuilder(object):
 
     sop = None
     if self.do_sop:
-      assert len(first_segment) > 0
-      assert len(second_segment) > 0
+      try:
+        assert len(first_segment) > 0
+        assert len(second_segment) > 0
+      except:
+        print('sep:', sep)
+        print('len(sentences):', len(sentences))
+        print('min_seg_length:', min_seg_length)
+        print('first_max_length:', first_max_length)
+        print('second_max_length:', second_max_length)
       sop = 1 
       if random.random() > 0.5:
         first_segment, second_segment = second_segment, first_segment
