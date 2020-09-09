@@ -202,7 +202,10 @@ class ExampleBuilder(object):
       ret = tf.train.Example(features=tf.train.Features(feature=A_feature))
 
     else:
-      first_segment, second_segment, sop = self.make_segments(self._current_sentences)
+      try:
+        first_segment, second_segment, sop = self.make_segments(self._current_sentences)
+      except:
+        return None
     
       ret = self._make_tf_example(first_segment, second_segment, sop)
 
