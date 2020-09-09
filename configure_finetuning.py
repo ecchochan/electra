@@ -37,6 +37,7 @@ class FinetuningConfig(object):
     self.do_eval = True  # evaluate the model
     self.keep_all_models = True  # if False, only keep the last trial's ckpt
     self.albert = False  # use albert
+    self.do_cluster = False
     self.num_hidden_groups = 1
     self.down_scale_factor = 1
     self.inner_group_num = 1
@@ -186,3 +187,6 @@ class FinetuningConfig(object):
       if k not in self.__dict__:
         raise ValueError("Unknown hparam " + k)
       self.__dict__[k] = v
+
+
+

@@ -48,6 +48,15 @@ class PretrainingModel(object):
       self._bert_config.intermediate_size = 144 * 4
       self._bert_config.num_attention_heads = 4
 
+    if config.do_cluster:
+      import warnings
+      warnings.warn("Training with cluster objective.")
+      features_unique = tuple(k[:-1] for k in features if k.endswith('2'))
+      features = {
+        k: tf.concat([features[k], features[k+'2']], 0)
+        for k in features_unique
+      }
+
     # Mask the input
     masked_inputs = pretrain_helpers.mask(
         config, pretrain_data.features_to_inputs(features), config.mask_prob)
@@ -93,6 +102,37 @@ class PretrainingModel(object):
       warnings.warn("Training with SOP objective.")
       sop_output = self._get_sentence_order_output(sop_pred_model.get_pooled_output(), masked_inputs.sop_label)
       self.total_loss += config.sop_weight * sop_output.loss
+
+
+    if config.do_cluster:
+      A_pooled, B_pooled = tf.split(discriminator.get_pooled_output(), 2)
+
+      with tf.variable_scope("cluster_proj_A"):
+        A_pooled_proj = tf.layers.dense(
+            A_pooled,
+            units=self._bert_config.hidden_size,
+            activation=modeling.get_activation(self._bert_config.hidden_act),
+            kernel_initializer=modeling.create_initializer(
+                self._bert_config.initializer_range))
+      with tf.variable_scope("cluster_proj_B"):
+        B_pooled_proj = tf.layers.dense(
+            A_pooled,
+            units=self._bert_config.hidden_size,
+            activation=modeling.get_activation(self._bert_config.hidden_act),
+            kernel_initializer=modeling.create_initializer(
+                self._bert_config.initializer_range))
+      y_true = tf.eye(tf.shape(A_pooled)[0])
+      similarity_matrix = tf.matmul(
+        a=A_pooled_proj, b=B_pooled_proj, transpose_b=True)
+
+      y_true_f = tf.cast(y_true, tf.float32)
+      cluster_losses = tf.nn.sigmoid_cross_entropy_with_logits(
+          logits=similarity_matrix, labels=y_true_f)
+      cluster_loss = tf.reduce_mean(cluster_losses)
+      self.total_loss += cluster_loss * config.cluster_weight
+      pass
+      '''
+      '''
 
     # Evaluation
     eval_fn_inputs = {
@@ -174,10 +214,10 @@ class PretrainingModel(object):
       return metrics
     self.eval_metrics = (metric_fn, eval_fn_values)
 
-  def _get_masked_lm_output(self, inputs: pretrain_data.Inputs, model):
+  def _get_masked_lm_output(self, inputs: pretrain_data.Inputs, model, reuse=False):
     """Masked language modeling softmax layer."""
     masked_lm_weights = inputs.masked_lm_weights
-    with tf.variable_scope("generator_predictions"):
+    with tf.variable_scope("generator_predictions", reuse=reuse):
       if self._config.uniform_generator:
         logits = tf.zeros(self._bert_config.vocab_size)
         logits_tiled = tf.zeros(
@@ -222,9 +262,9 @@ class PretrainingModel(object):
           logits=logits, probs=probs, per_example_loss=label_log_probs,
           loss=loss, preds=preds)
 
-  def _get_discriminator_output(self, inputs, discriminator, labels):
+  def _get_discriminator_output(self, inputs, discriminator, labels, reuse=False):
     """Discriminator binary classifier."""
-    with tf.variable_scope("discriminator_predictions"):
+    with tf.variable_scope("discriminator_predictions", reuse=reuse):
       hidden = tf.layers.dense(
           discriminator.get_sequence_output(),
           units=self._bert_config.hidden_size,
@@ -249,8 +289,8 @@ class PretrainingModel(object):
           preds=preds, labels=labels,
       )
 
-  def _get_sentence_order_output(self, input_tensor, labels):
-    with tf.variable_scope("cls/seq_relationship"):
+  def _get_sentence_order_output(self, input_tensor, labels, reuse=False):
+    with tf.variable_scope("cls/seq_relationship", reuse=reuse):
       output_weights = tf.get_variable(
           "output_weights",
           shape=[2, self._bert_config.hidden_size],

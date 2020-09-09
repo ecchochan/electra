@@ -30,7 +30,7 @@ from util import utils
 
 
 def get_input_fn(config: configure_pretraining.PretrainingConfig, is_training,
-                 num_cpu_threads=4):
+                 num_cpu_threads=12):
   """Creates an `input_fn` closure to be passed to TPUEstimator."""
 
   input_files = []
@@ -56,8 +56,8 @@ def get_input_fn(config: configure_pretraining.PretrainingConfig, is_training,
       if config.do_sop:
         name_to_features['sop_label2'] = tf.io.FixedLenFeature([], tf.int64)
         
-
     print(name_to_features)
+
     d = tf.data.Dataset.from_tensor_slices(tf.constant(input_files))
     d = d.repeat()
     d = d.shuffle(buffer_size=len(input_files))
@@ -84,6 +84,9 @@ def get_input_fn(config: configure_pretraining.PretrainingConfig, is_training,
             batch_size=batch_size,
             num_parallel_batches=num_cpu_threads,
             drop_remainder=True))
+
+
+
     return d
 
   return input_fn
