@@ -29,6 +29,7 @@ from cantokenizer import CanTokenizer
 from replacer import Replacer
 import re
 chinese_re = re.compile(u' *([⺀-⺙⺛-⻳⼀-⿕々〇〡-〩〸-〺〻㐀-䶵一-鿃豈-鶴侮-頻並-龎]) *', re.UNICODE)
+word_re = re.compile(r'[a-zA-Z\'-_]+|[^a-zA-Z\'-_\s]')
 
 seen = set()
 
