@@ -639,17 +639,17 @@ o徙氣,嘥氣
               splitted = []
               last_cursor = 0
               wd_count = 0
-              for e in word_re.finditer(text):
+              for e in word_re.finditer(line):
                   wd_count += 1
                   if wd_count > 80:
                       end = e.span()[1]
-                      splitted.append(text[last_cursor:end])
+                      splitted.append(line[last_cursor:end])
                       wd_count = 0
                       last_cursor = end
 
               end = e.span()[1]
               if end != last_cursor:
-                  splitted.append(text[last_cursor:end])
+                  splitted.append(line[last_cursor:end])
               bucket.extend(splitted)
 
             else:
