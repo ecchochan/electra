@@ -257,12 +257,12 @@ class ExampleBuilder(object):
 
 import re
 from data_utils import too_many_repeat
-remove_url_re = re.compile(r' ?(?:https?:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z_0-9\-]+)+|[a-zA-Z_0-9\-]+(?:\.[a-zA-Z_0-9\-]+)+)(?:\/(?:\?(?:<nl>)?\n *[a-zA-Z0-9\-\._… &%\+]+|[a-zA-Z0-9\.\?\:@\-_=#…&%!\+])+)+ *(?:<nl>\n * ?(?:https?:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)+|[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)+)(?:\/(?:\?(?:<nl>)?\n *[a-zA-Z0-9\-\._… &%\+]+|[a-zA-Z0-9\.\?\:@\-_=#…&%!\+])+)+ *)*')
-remove_speakers = re.compile(r'^#\d+ ([A-Z]+: )?(#\d+ )?', re.MULTILINE)
+remove_url_re = re.compile(r' ?(?:\[?\w+tps?:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z_0-9\-]+)+|[a-zA-Z_0-9\-]+(?:\.[a-zA-Z_0-9\-]+)+)(?:\/(?:\?(?:<nl>)?\n *[a-zA-Z0-9\-\._… &%\+]+|[a-zA-Z0-9\.\?\:@\-_=#…&%!\+])+)+ *(?:<nl>\n * ?(?:https?:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)+|[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)+)(?:\/(?:\?(?:<nl>)?\n *[a-zA-Z0-9\-\._… &%\+]+|[a-zA-Z0-9\.\?\:@\-_=#…&%!\+])+)+ *)*(?:\[\/img\])?')
+remove_speakers = re.compile(r'^#\d+ ([A-Z]+: )?(#\d+ )?(\[img\] )?', re.MULTILINE)
 
 bad_unicode = re.compile(r'[\u2060-\u20ff\uAA80-\uFB45\u00AD\u008D\u008F\u009F\u0095\u0094\u0097\u0082\u0083\u0087\u0099囀ਾ]+|矛受畩究悍妤|脖宋鬱駜|ÐÒøÓÐÕ|ㄛ筍|ㄛ婌|ㄛ紨|ㄛ嘟|大虯李李朽|獝獞獟獠|拇謂饢|海瑉|隳哪|堶悸漲Л釔|野怛儞也|鈭鲭|韏啣|蟡㏘|乯儜|牁轎煤|蕻淕|蜁巌|潝砩|坉洩|竷h|匾哺|衷讜|愣勾|划曻|a﹐a¶#|p"0∨"q"|鼐盀|阠鼐|皇瞧|鍩挂槐|肭資指娓|蟛青|眩謖|笥|饇|櫱|肭|亂桓|嫠|芔苙苾苹|攆擺|似饲|恕刷|膘', 
                       re.UNICODE)
-remove_borders = re.compile(r'[┄┅┆┇┈┉┊┋┌┍┎┏┐┑┒┓└┕┖┗┘┙┚┛├┝┞┟┠┡┢┣┤┥┦┧┨┩┪┫┬┭┮┯┰┱┲┳┴┵┶┷┸┹┺┻┼┽┾┿╀╁╂╃╄╅╆╇╈╉╊╋╌╍╎╏║╒╓╔╕╖╗╘╙╚╛╜╝╞╟╠╡╢╣╤╥╦╧╨╩╪╫╬╭╮╯╰╱╲╳╵╷╹╻╼╽╾╿▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟◣◥͜͡╮╯╰◜◝◞◟ᕕᕗ⌇⧸⎩⎠⎞͏⎛͏⎝⎭⧹༼༽♢◄ƪʅʋ)]')
+remove_borders = re.compile(r'[┄┅┆┇┈┉┊┋┌┍┎┏┐┑┒┓└┕┖┗┘┙┚┛├┝┞┟┠┡┢┣┤┥┦┧┨┩┪┫┬┭┮┯┰┱┲┳┴┵┶┷┸┹┺┻┼┽┾┿╀╁╂╃╄╅╆╇╈╉╊╋╌╍╎╏║╒╓╔╕╖╗╘╙╚╛╜╝╞╟╠╡╢╣╤╥╦╧╨╩╪╫╬╭╮╯╰╱╲╳╵╷╹╻╼╽╾╿▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟◣◥͜͡╮╯╰◜◝◞◟ᕕᕗ⌇⧸⎩⎠⎞͏⎛͏⎝⎭⧹༼༽♢◄ƪʅʋ)]|\[attach\]\d+|\[taguid=\d+\]|\[quote\]|\( Show Blocked User - .*? \)')
     
 
 class ExampleWriter(object):
@@ -632,16 +632,34 @@ o徙氣,嘥氣
       for line in f:
         line = line.strip()
         if line:
-          bucket.append(line)
+          bad = any(1 for e in bad_unicode.finditer(line)) or too_many_repeat(line)
+          if not bad:
+            if len(line) > 120 and sum(1 for e in word_re.finditer(line)) > 120:
+              splitted = []
+              last_cursor = 0
+              wd_count = 0
+              for e in word_re.finditer(text):
+                  wd_count += 1
+                  if wd_count > 80:
+                      end = e.span()[1]
+                      splitted.append(text[last_cursor:end])
+                      wd_count = 0
+                      last_cursor = end
+
+              end = e.span()[1]
+              if end != last_cursor:
+                  splitted.append(text[last_cursor:end])
+              bucket.extend(splitted)
+
+            else:
+              bucket.append(line)
         else:
           bucket.append("")
           sub_doc = '\n'.join(bucket)
           sub_doc = self.remove_url(sub_doc)
           bad = False
-          if not sub_doc.strip() or too_many_repeat(sub_doc):
+          if not sub_doc.strip():
             bad = True
-          if not bad:
-            bad = any(1 for e in bad_unicode.finditer(sub_doc))
             
           if not bad:
             for e in re.finditer(r'[\da-zA-Z_]{10,}', sub_doc):
