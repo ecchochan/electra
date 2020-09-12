@@ -1600,7 +1600,6 @@
 🏍,Motorcycle
 ⛰,Mountain
 ⚜,Fleur-de-lis
-️,Variation Selector-16
 ⛑,Rescue Worker’s Helmet
 🎖,Military Medal
 ⚒,Hammer and Pick
