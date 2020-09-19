@@ -153,7 +153,7 @@ class PretrainingModel(object):
           "sampled_tokids": tf.argmax(fake_data.sampled_tokens, -1,
                                       output_type=tf.int32)
       })
-    if masked_inputs.sop_label is not None:
+    if config.do_sop:
       eval_fn_inputs.update({
         'sop_loss': sop_output.per_example_loss,
         'sop_log_probs': sop_output.log_probs,
@@ -198,7 +198,7 @@ class PretrainingModel(object):
           metrics["disc_recall"] = tf.metrics.accuracy(
               labels=d["disc_labels"], predictions=d["disc_preds"],
               weights=d["disc_labels"] * d["input_mask"])
-      if 'sop_loss' in metrics:
+      if config.do_sop:
         sentence_order_example_loss = metrics['sop_loss']
         sentence_order_log_probs    = metrics['sop_log_probs']
         sentence_order_labels       = metrics['sop_labels']
@@ -217,7 +217,7 @@ class PretrainingModel(object):
             "sentence_order_accuracy": sentence_order_accuracy,
             "sentence_order_loss": sentence_order_mean_loss
         })
-      if 'cluster_loss' in metrics:
+      if config.do_cluster:
         cluster_loss       = metrics['cluster_loss']
         similarity_matrix  = metrics['cluster_similarity_matrix']
         y_true             = metrics['cluster_y_true']
