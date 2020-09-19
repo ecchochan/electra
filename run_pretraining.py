@@ -159,6 +159,12 @@ class PretrainingModel(object):
         'sop_log_probs': sop_output.log_probs,
         'sop_labels': sop_output.labels,
       })
+    if config.do_cluster:
+      eval_fn_inputs.update({
+        'cluster_loss': cluster_loss,
+        'cluster_similarity_matrix': similarity_matrix,
+        'cluster_y_true': y_true,
+      })
     eval_fn_keys = eval_fn_inputs.keys()
     eval_fn_values = [eval_fn_inputs[k] for k in eval_fn_keys]
 
@@ -210,6 +216,19 @@ class PretrainingModel(object):
         metrics.update({
             "sentence_order_accuracy": sentence_order_accuracy,
             "sentence_order_loss": sentence_order_mean_loss
+        })
+      if 'cluster_loss' in metrics:
+        cluster_loss       = metrics['cluster_loss']
+        similarity_matrix  = metrics['cluster_similarity_matrix']
+        y_true             = metrics['cluster_y_true']
+
+        cluster_arg = tf.argmax(similarity_matrix, axis=1)
+        y_true_arg = tf.argmax(y_true, axis=1)
+        cluster_acc = tf.reduce_mean(tf.cast(tf.equal(cluster_arg, y_true_arg), tf.float32))
+
+        metrics.update({
+            "cluster_accuracy": cluster_acc,
+            "cluster_loss": cluster_loss
         })
       return metrics
     self.eval_metrics = (metric_fn, eval_fn_values)
