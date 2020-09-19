@@ -250,6 +250,7 @@ def write_results(config: configure_finetuning.FinetuningConfig, results):
 
 def run_finetuning(config: configure_finetuning.FinetuningConfig):
   """Run finetuning."""
+  from datetime import datetime
 
   # Setup for training
   results = []
@@ -264,7 +265,7 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
 
   # Train and evaluate num_trials models with different random seeds
   while config.num_trials < 0 or trial <= config.num_trials:
-    config.model_dir = generic_model_dir + "_" + str(trial)
+    config.model_dir = generic_model_dir + "_" + str(trial) + "_" + datetime.now().strftime("%Y%m%d%H%M%S")
     if config.do_train:
       utils.rmkdir(config.model_dir)
 
