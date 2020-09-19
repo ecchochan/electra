@@ -199,9 +199,9 @@ class PretrainingModel(object):
               labels=d["disc_labels"], predictions=d["disc_preds"],
               weights=d["disc_labels"] * d["input_mask"])
       if config.do_sop:
-        sentence_order_example_loss = metrics['sop_loss']
-        sentence_order_log_probs    = metrics['sop_log_probs']
-        sentence_order_labels       = metrics['sop_labels']
+        sentence_order_example_loss = d['sop_loss']
+        sentence_order_log_probs    = d['sop_log_probs']
+        sentence_order_labels       = d['sop_labels']
 
         sentence_order_log_probs = tf.reshape(
             sentence_order_log_probs, [-1, sentence_order_log_probs.shape[-1]])
@@ -218,9 +218,9 @@ class PretrainingModel(object):
             "sentence_order_loss": sentence_order_mean_loss
         })
       if config.do_cluster:
-        cluster_loss       = metrics['cluster_loss']
-        similarity_matrix  = metrics['cluster_similarity_matrix']
-        y_true             = metrics['cluster_y_true']
+        cluster_loss       = d['cluster_loss']
+        similarity_matrix  = d['cluster_similarity_matrix']
+        y_true             = d['cluster_y_true']
 
         cluster_arg = tf.argmax(similarity_matrix, axis=1)
         y_true_arg = tf.argmax(y_true, axis=1)
