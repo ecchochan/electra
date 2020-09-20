@@ -141,8 +141,7 @@ class PretrainingModel(object):
         "mlm_loss": mlm_output.per_example_loss,
         "masked_lm_ids": masked_inputs.masked_lm_ids,
         "masked_lm_weights": masked_inputs.masked_lm_weights,
-        "input_mask": masked_inputs.input_mask,
-        "sop_label": masked_inputs.sop_label
+        "input_mask": masked_inputs.input_mask
     }
     if config.electra_objective:
       eval_fn_inputs.update({
@@ -158,6 +157,7 @@ class PretrainingModel(object):
         'sop_loss': sop_output.per_example_loss,
         'sop_log_probs': sop_output.log_probs,
         'sop_labels': sop_output.labels,
+        "sop_label": masked_inputs.sop_label
       })
     if config.do_cluster:
       eval_fn_inputs.update({
