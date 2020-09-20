@@ -161,7 +161,7 @@ class PretrainingModel(object):
       })
     if config.do_cluster:
       eval_fn_inputs.update({
-        'cluster_loss': cluster_loss,
+        'cluster_loss': cluster_losses,
         'cluster_similarity_matrix': similarity_matrix,
         'cluster_y_true': y_true,
       })
@@ -222,8 +222,8 @@ class PretrainingModel(object):
         similarity_matrix  = d['cluster_similarity_matrix']
         y_true             = d['cluster_y_true']
 
-        cluster_arg = tf.argmax(similarity_matrix, axis=1)
-        y_true_arg = tf.argmax(y_true, axis=1)
+        cluster_arg = tf.argmax(similarity_matrix, axis=1, output_type=tf.int32)
+        y_true_arg = tf.argmax(y_true, axis=1, output_type=tf.int32)
         cluster_acc = tf.metrics.accuracy(
             labels=y_true_arg,
             predictions=cluster_arg)
