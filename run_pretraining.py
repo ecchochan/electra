@@ -224,7 +224,11 @@ class PretrainingModel(object):
 
         cluster_arg = tf.argmax(similarity_matrix, axis=1)
         y_true_arg = tf.argmax(y_true, axis=1)
-        cluster_acc = tf.reduce_mean(tf.cast(tf.equal(cluster_arg, y_true_arg), tf.float32))
+        cluster_acc = tf.metrics.accuracy(
+            labels=y_true_arg,
+            predictions=cluster_arg)
+        cluster_loss = tf.metrics.mean(
+            values=cluster_loss)
 
         metrics.update({
             "cluster_accuracy": cluster_acc,
