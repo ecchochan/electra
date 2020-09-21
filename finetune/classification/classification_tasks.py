@@ -360,7 +360,7 @@ class YUENLI(ClassificationTask):
       split = "test"
     import json
     examples = []
-    with tf.io.gfile.GFile(os.path.join(self.config.raw_data_dir(self.name), " mnli_yue_6-"+split + ".json"), "r") as f:
+    with tf.io.gfile.GFile(os.path.join(self.config.raw_data_dir(self.name), "mnli_yue_6-"+split + ".json"), "r") as f:
       lines = json.load(f)
       for eid, (text_a, text_b, label) in enumerate(lines):
         examples.append(InputExample(eid=eid, task_name=self.name,
