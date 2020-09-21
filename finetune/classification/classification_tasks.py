@@ -348,6 +348,29 @@ class MNLI(ClassificationTask):
     return ["test_matched", "test_mismatched", "diagnostic"]
 
 
+class YUENLI(ClassificationTask):
+  """Multi-NLI."""
+
+  def __init__(self, config: configure_finetuning.FinetuningConfig, tokenizer):
+    super(MNLI, self).__init__(config, "yuenli", tokenizer,
+                               [0,1,2,3])
+
+  def get_examples(self, split):
+    if split == "dev":
+      split = "test"
+    import json
+    examples = []
+    with tf.io.gfile.GFile(os.path.join(self.config.raw_data_dir(self.name), " mnli_yue_6-"+split + ".json"), "r") as f:
+      lines = json.load(f)
+      for eid, (text_a, text_b, label) in enumerate(lines):
+        examples.append(InputExample(eid=eid, task_name=self.name,
+                                     text_a=text_a, text_b=text_b, label=label))
+    return examples
+
+  def get_test_splits(self):
+    return ["test"]
+
+
 class MRPC(ClassificationTask):
   """Microsoft Research Paraphrase Corpus."""
 
