@@ -42,6 +42,8 @@ def get_task(config: configure_finetuning.FinetuningConfig, task_name,
     return classification_tasks.MRPC(config, tokenizer)
   elif task_name == "mnli":
     return classification_tasks.MNLI(config, tokenizer)
+  elif task_name == "yuenli":
+    return classification_tasks.YUENLI(config, tokenizer)
   elif task_name == "sst":
     return classification_tasks.SST(config, tokenizer)
   elif task_name == "rte":
