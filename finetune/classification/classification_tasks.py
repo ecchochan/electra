@@ -352,7 +352,7 @@ class YUENLI(ClassificationTask):
   """Multi-NLI."""
 
   def __init__(self, config: configure_finetuning.FinetuningConfig, tokenizer):
-    super(MNLI, self).__init__(config, "yuenli", tokenizer,
+    super(YUENLI, self).__init__(config, "yuenli", tokenizer,
                                [0,1,2,3])
 
   def get_examples(self, split):
