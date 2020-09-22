@@ -288,7 +288,9 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
           if task.name in ["cola", "mrpc", "mnli", "sst", "rte", "qnli", "qqp",
                            "sts", "yuenli"]:
             for split in task.get_test_splits():
-              model_runner.write_classification_outputs([task], trial, split)
+              #model_runner.evaluate()
+              {task.name: model_runner.evaluate_task(task, split=split) for task in model_runner._tasks}
+              # model_runner.write_classification_outputs([task], trial, split)
           elif task.name == "squad":
             scorer = model_runner.evaluate_task(task, "test", False)
             scorer.write_predictions()
