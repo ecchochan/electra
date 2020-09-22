@@ -357,7 +357,13 @@ class YUENLI(ClassificationTask):
 
   def get_examples(self, split):
     if split == "dev":
-      split = "test"
+      split = "mnli_yue_6-test"
+    elif split == 'train':
+      split = "mnli_yue_6-train"
+    elif split == 'test':
+      split = "mnli_yue_6-test"
+    elif split == 'test2':
+      split = 'mnli_en-dev-mismatched'
     import json, random
     examples = []
     lines = []
@@ -372,20 +378,17 @@ class YUENLI(ClassificationTask):
             lines_ = random.sample(lines_, 30000)
           lines += lines_
         
-    with tf.io.gfile.GFile(os.path.join(self.config.raw_data_dir(self.name), "mnli_yue_6-"+split + ".json"), "r") as f:
+    with tf.io.gfile.GFile(os.path.join(self.config.raw_data_dir(self.name), split + ".json"), "r") as f:
       lines += json.load(f)
 
     for eid, (text_a, text_b, label) in enumerate(lines):
       examples.append(InputExample(eid=eid, task_name=self.name,
                                     text_a=text_a, text_b=text_b, label=label))
 
-
-
-
     return examples
 
   def get_test_splits(self):
-    return ["test"]
+    return ["test", "test2"]
 
 
 class MRPC(ClassificationTask):
