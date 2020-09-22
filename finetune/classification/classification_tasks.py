@@ -291,8 +291,8 @@ class ClassificationTask(SingleOutputTask):
     )
     return losses, outputs
 
-  def get_scorer(self):
-    return classification_metrics.AccuracyScorer()
+  def get_scorer(self, **kwargs):
+    return classification_metrics.AccuracyScorer(**kwargs)
 
 
 def _truncate_seq_pair(tokens_a, tokens_b, max_length):

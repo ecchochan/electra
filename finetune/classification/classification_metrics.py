@@ -32,11 +32,12 @@ class SentenceLevelScorer(scorer.Scorer):
 
   __metaclass__ = abc.ABCMeta
 
-  def __init__(self):
+  def __init__(self, mapping={}):
     super(SentenceLevelScorer, self).__init__()
     self._total_loss = 0
     self._true_labels = []
     self._preds = []
+    self._mapping = mapping
 
   def update(self, results):
     super(SentenceLevelScorer, self).update(results)
@@ -54,6 +55,8 @@ class AccuracyScorer(SentenceLevelScorer):
   def _get_results(self):
     correct, count = 0, 0
     for y_true, pred in zip(self._true_labels, self._preds):
+      if pred in self.mapping:
+        pred = self.mapping[pred]
       count += 1
       correct += (1 if y_true == pred else 0)
     return [

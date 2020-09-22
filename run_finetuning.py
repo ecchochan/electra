@@ -189,13 +189,13 @@ class ModelRunner(object):
   def evaluate(self):
     return {task.name: self.evaluate_task(task) for task in self._tasks}
 
-  def evaluate_task(self, task, split="dev", return_results=True):
+  def evaluate_task(self, task, split="dev", return_results=True, **kwargs):
     """Evaluate the current model."""
     utils.log("Evaluating", task.name)
     eval_input_fn, _ = self._preprocessor.prepare_predict([task], split)
     results = self._estimator.predict(input_fn=eval_input_fn,
                                       yield_single_examples=True)
-    scorer = task.get_scorer()
+    scorer = task.get_scorer(**kwargs)
     for r in results:
       if r["task_id"] != len(self._tasks):  # ignore padding examples
         r = utils.nest_dict(r, self._config.task_names)
@@ -287,9 +287,12 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
           # Currently only writing preds for GLUE and SQuAD 2.0 is supported
           if task.name in ["cola", "mrpc", "mnli", "sst", "rte", "qnli", "qqp",
                            "sts", "yuenli"]:
+            mapping = {}
+            if task.name == "yuenli":
+              mapping[1] = 0
             for split in task.get_test_splits():
               #model_runner.evaluate()
-              {task.name: model_runner.evaluate_task(task, split=split) for task in model_runner._tasks}
+              {task.name: model_runner.evaluate_task(task, split=split, mapping=mapping) for task in model_runner._tasks}
               # model_runner.write_classification_outputs([task], trial, split)
           elif task.name == "squad":
             scorer = model_runner.evaluate_task(task, "test", False)
