@@ -366,11 +366,11 @@ class YUENLI(ClassificationTask):
         'mnli_en_zh-train.json',
         'mnli_en-train.json',
       ):
-      with tf.io.gfile.GFile(os.path.join(self.config.raw_data_dir(self.name), fn), "r") as f:
-        lines_ = json.load(f)
-        if len(lines_) > 30000:
-          lines_ = random.sample(lines_, 30000)
-        lines += lines_
+        with tf.io.gfile.GFile(os.path.join(self.config.raw_data_dir(self.name), fn), "r") as f:
+          lines_ = json.load(f)
+          if len(lines_) > 30000:
+            lines_ = random.sample(lines_, 30000)
+          lines += lines_
         
     with tf.io.gfile.GFile(os.path.join(self.config.raw_data_dir(self.name), "mnli_yue_6-"+split + ".json"), "r") as f:
       lines += json.load(f)
