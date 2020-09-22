@@ -78,7 +78,7 @@ class FinetuningModel(object):
 
 
 def model_fn_builder(config: configure_finetuning.FinetuningConfig, tasks,
-                     num_train_steps, pretraining_config=None):
+                     num_train_steps, pretraining_config=None, trained=False):
   """Returns `model_fn` closure for TPUEstimator."""
 
   def model_fn(features, labels, mode, params):
@@ -89,7 +89,7 @@ def model_fn_builder(config: configure_finetuning.FinetuningConfig, tasks,
         config, tasks, is_training, features, num_train_steps)
 
     # Load pre-trained weights from checkpoint
-    init_checkpoint = config.init_checkpoint
+    init_checkpoint = config.init_checkpoint if not trained else config.model_dir
     if pretraining_config is not None:
       init_checkpoint = tf.train.latest_checkpoint(pretraining_config.model_dir)
       utils.log("Using checkpoint", init_checkpoint)
@@ -141,7 +141,7 @@ class ModelRunner(object):
   """Fine-tunes a model on a supervised task."""
 
   def __init__(self, config: configure_finetuning.FinetuningConfig, tasks,
-               pretraining_config=None):
+               pretraining_config=None, trained=False):
     self._config = config
     self._tasks = tasks
     self._preprocessor = preprocessing.Preprocessor(config, self._tasks)
@@ -172,7 +172,8 @@ class ModelRunner(object):
         config=config,
         tasks=self._tasks,
         num_train_steps=self.train_steps,
-        pretraining_config=pretraining_config)
+        pretraining_config=pretraining_config, 
+        trained=trained)
     self._estimator = tf.estimator.tpu.TPUEstimator(
         use_tpu=config.use_tpu,
         model_fn=model_fn,
@@ -272,7 +273,7 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
       config.model_dir = generic_model_dir + '/'+sorted(tf.io.gfile.listdir('/'.join(generic_model_dir.split('/')[:-1])))[-1].rstrip('/')
       print('Loading from checkpoint `%s`'%config.model_dir)
 
-    model_runner = ModelRunner(config, tasks)
+    model_runner = ModelRunner(config, tasks, trained=not config.do_train)
     if config.do_train:
       heading("Start training")
       model_runner.train()
