@@ -270,6 +270,7 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
       utils.rmkdir(config.model_dir)
     else:
       config.model_dir = sorted(tf.io.gfile.listdir('/'.join(generic_model_dir.split('/')[:-1])))[-1]
+      print('Loading from checkpoint `%s`'%config.model_dir)
 
     model_runner = ModelRunner(config, tasks)
     if config.do_train:
