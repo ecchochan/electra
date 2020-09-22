@@ -55,8 +55,8 @@ class AccuracyScorer(SentenceLevelScorer):
   def _get_results(self):
     correct, count = 0, 0
     for y_true, pred in zip(self._true_labels, self._preds):
-      if pred in self.mapping:
-        pred = self.mapping[pred]
+      if pred in self._mapping:
+        pred = self._mapping[pred]
       count += 1
       correct += (1 if y_true == pred else 0)
     return [
