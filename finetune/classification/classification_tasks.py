@@ -358,7 +358,7 @@ class YUENLI(ClassificationTask):
   def get_examples(self, split):
     if split == "dev":
       split = "test"
-    import json
+    import json, random
     examples = []
     lines = []
     if split == 'train':
