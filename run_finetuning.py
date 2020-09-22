@@ -100,8 +100,12 @@ def model_fn_builder(config: configure_finetuning.FinetuningConfig, tasks,
         assignment_map, _ = modeling.get_assignment_map_from_checkpoint(
             tvars, init_checkpoint)
       except tf.errors.NotFoundError as err:
+        init_checkpoint = tf.train.latest_checkpoint(init_checkpoint)
+        if not init_checkpoint:
+          raise
+        utils.log("Using checkpoint", init_checkpoint)
         assignment_map, _ = modeling.get_assignment_map_from_checkpoint(
-            tvars, tf.train.latest_checkpoint(init_checkpoint))
+            tvars, init_checkpoint)
 
       if config.use_tpu:
         def tpu_scaffold():
@@ -275,7 +279,7 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
     if config.do_train:
       utils.rmkdir(config.model_dir)
     else:
-      config.model_dir = generic_model_dir + '/'+sorted(tf.io.gfile.listdir('/'.join(generic_model_dir.split('/')[:-1])))[-1].rstrip('/')
+      config.model_dir = '/'.join(generic_model_dir.split('/')[:-1]) + '/'+sorted(tf.io.gfile.listdir('/'.join(generic_model_dir.split('/')[:-1])))[-1].rstrip('/')
       print('Loading from checkpoint `%s`'%config.model_dir)
 
     model_runner = ModelRunner(config, tasks, trained=not config.do_train)
