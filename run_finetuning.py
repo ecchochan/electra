@@ -269,7 +269,7 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
     if config.do_train:
       utils.rmkdir(config.model_dir)
     else:
-      config.model_dir = sorted(tf.io.gfile.listdir('/'.join(generic_model_dir.split('/')[:-1])))[-1]
+      config.model_dir = generic_model_dir + '/'+sorted(tf.io.gfile.listdir('/'.join(generic_model_dir.split('/')[:-1])))[-1]
       print('Loading from checkpoint `%s`'%config.model_dir)
 
     model_runner = ModelRunner(config, tasks)
@@ -293,7 +293,7 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
               mapping[1] = 0
             for split in task.get_test_splits():
               #model_runner.evaluate()
-              {task.name: model_runner.evaluate_task(task, split=split, mapping=mapping) for task in model_runner._tasks}
+              model_runner.evaluate_task(task, split=split, mapping=mapping)
               # model_runner.write_classification_outputs([task], trial, split)
           elif task.name == "squad":
             scorer = model_runner.evaluate_task(task, "test", False)
