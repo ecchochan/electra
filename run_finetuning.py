@@ -268,6 +268,8 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
     config.model_dir = generic_model_dir + "_" + str(trial) + "_" + datetime.now().strftime("%Y%m%d%H%M%S")
     if config.do_train:
       utils.rmkdir(config.model_dir)
+    else:
+      config.model_dir = sorted(tf.io.gfile.listdir(generic_model_dir))[-1]
 
     model_runner = ModelRunner(config, tasks)
     if config.do_train:
