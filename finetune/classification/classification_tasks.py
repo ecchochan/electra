@@ -361,8 +361,6 @@ class YUENLI(ClassificationTask):
     elif split == 'train':
       split = "mnli_yue_6-train"
     elif split == 'test':
-      split = "mnli_yue_6-test"
-    elif split == 'test2':
       split = 'mnli_en-dev-mismatched'
     import json, random
     examples = []
@@ -388,7 +386,7 @@ class YUENLI(ClassificationTask):
     return examples
 
   def get_test_splits(self):
-    return ["test", "test2"]
+    return ["test"]
 
 
 class MRPC(ClassificationTask):
