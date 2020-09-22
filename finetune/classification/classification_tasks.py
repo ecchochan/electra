@@ -360,11 +360,28 @@ class YUENLI(ClassificationTask):
       split = "test"
     import json
     examples = []
+    lines = []
+    if split == 'train':
+      for fn in (
+        'mnli_en_zh-train.json',
+        'mnli_en-train.json',
+      ):
+      with tf.io.gfile.GFile(os.path.join(self.config.raw_data_dir(self.name), fn), "r") as f:
+        lines_ = json.load(f)
+        if len(lines_) > 30000:
+          lines_ = random.sample(lines_, 30000)
+        lines += lines_
+        
     with tf.io.gfile.GFile(os.path.join(self.config.raw_data_dir(self.name), "mnli_yue_6-"+split + ".json"), "r") as f:
-      lines = json.load(f)
-      for eid, (text_a, text_b, label) in enumerate(lines):
-        examples.append(InputExample(eid=eid, task_name=self.name,
-                                     text_a=text_a, text_b=text_b, label=label))
+      lines += json.load(f)
+
+    for eid, (text_a, text_b, label) in enumerate(lines):
+      examples.append(InputExample(eid=eid, task_name=self.name,
+                                    text_a=text_a, text_b=text_b, label=label))
+
+
+
+
     return examples
 
   def get_test_splits(self):
