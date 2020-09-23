@@ -292,7 +292,7 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
       heading("Run dev set evaluation from %s"%config.model_dir)
       results.append(model_runner.evaluate())
       write_results(config, results)
-      if config.write_test_outputs and trial <= config.n_writes_test:
+      if config.write_test_outputs:
         heading("Running on the test set and writing the predictions")
         for task in tasks:
           # Currently only writing preds for GLUE and SQuAD 2.0 is supported
