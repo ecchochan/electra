@@ -289,7 +289,7 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
       utils.log()
 
     if config.do_eval:
-      heading("Run dev set evaluation")
+      heading("Run dev set evaluation from %s"%config.model_dir)
       results.append(model_runner.evaluate())
       write_results(config, results)
       if config.write_test_outputs and trial <= config.n_writes_test:
