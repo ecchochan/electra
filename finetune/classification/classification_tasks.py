@@ -291,8 +291,8 @@ class ClassificationTask(SingleOutputTask):
     )
     return losses, outputs
 
-  def get_scorer(self):
-    return classification_metrics.AccuracyScorer()
+  def get_scorer(self, **kwargs):
+    return classification_metrics.AccuracyScorer(**kwargs)
 
 
 def _truncate_seq_pair(tokens_a, tokens_b, max_length):
@@ -346,6 +346,47 @@ class MNLI(ClassificationTask):
 
   def get_test_splits(self):
     return ["test_matched", "test_mismatched", "diagnostic"]
+
+
+class YUENLI(ClassificationTask):
+  """Multi-NLI."""
+
+  def __init__(self, config: configure_finetuning.FinetuningConfig, tokenizer):
+    super(YUENLI, self).__init__(config, "yuenli", tokenizer,
+                               [0,1,2,3])
+
+  def get_examples(self, split):
+    if split == "dev":
+      split = "mnli_yue_6-test"
+    elif split == 'train':
+      split = "mnli_yue_6-train"
+    elif split == 'test':
+      split = 'mnli_en-dev-mismatched'
+    import json, random
+    examples = []
+    lines = []
+    if split == 'train':
+      for fn in (
+        'mnli_en_zh-train.json',
+        'mnli_en-train.json',
+      ):
+        with tf.io.gfile.GFile(os.path.join(self.config.raw_data_dir(self.name), fn), "r") as f:
+          lines_ = json.load(f)
+          if len(lines_) > 150000:
+            lines_ = random.sample(lines_, 150000)
+          lines += lines_
+        
+    with tf.io.gfile.GFile(os.path.join(self.config.raw_data_dir(self.name), split + ".json"), "r") as f:
+      lines += json.load(f)
+
+    for eid, (text_a, text_b, label) in enumerate(lines):
+      examples.append(InputExample(eid=eid, task_name=self.name,
+                                    text_a=text_a, text_b=text_b, label=label))
+
+    return examples
+
+  def get_test_splits(self):
+    return ["test"]
 
 
 class MRPC(ClassificationTask):

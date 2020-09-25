@@ -141,8 +141,7 @@ class PretrainingModel(object):
         "mlm_loss": mlm_output.per_example_loss,
         "masked_lm_ids": masked_inputs.masked_lm_ids,
         "masked_lm_weights": masked_inputs.masked_lm_weights,
-        "input_mask": masked_inputs.input_mask,
-        "sop_label": masked_inputs.sop_label
+        "input_mask": masked_inputs.input_mask
     }
     if config.electra_objective:
       eval_fn_inputs.update({
@@ -153,11 +152,18 @@ class PretrainingModel(object):
           "sampled_tokids": tf.argmax(fake_data.sampled_tokens, -1,
                                       output_type=tf.int32)
       })
-    if masked_inputs.sop_label is not None:
+    if config.do_sop:
       eval_fn_inputs.update({
         'sop_loss': sop_output.per_example_loss,
         'sop_log_probs': sop_output.log_probs,
         'sop_labels': sop_output.labels,
+        "sop_label": masked_inputs.sop_label
+      })
+    if config.do_cluster:
+      eval_fn_inputs.update({
+        'cluster_loss': cluster_losses,
+        'cluster_similarity_matrix': similarity_matrix,
+        'cluster_y_true': y_true,
       })
     eval_fn_keys = eval_fn_inputs.keys()
     eval_fn_values = [eval_fn_inputs[k] for k in eval_fn_keys]
@@ -192,10 +198,10 @@ class PretrainingModel(object):
           metrics["disc_recall"] = tf.metrics.accuracy(
               labels=d["disc_labels"], predictions=d["disc_preds"],
               weights=d["disc_labels"] * d["input_mask"])
-      if 'sop_loss' in metrics:
-        sentence_order_example_loss = metrics['sop_loss']
-        sentence_order_log_probs    = metrics['sop_log_probs']
-        sentence_order_labels       = metrics['sop_labels']
+      if config.do_sop:
+        sentence_order_example_loss = d['sop_loss']
+        sentence_order_log_probs    = d['sop_log_probs']
+        sentence_order_labels       = d['sop_labels']
 
         sentence_order_log_probs = tf.reshape(
             sentence_order_log_probs, [-1, sentence_order_log_probs.shape[-1]])
@@ -210,6 +216,23 @@ class PretrainingModel(object):
         metrics.update({
             "sentence_order_accuracy": sentence_order_accuracy,
             "sentence_order_loss": sentence_order_mean_loss
+        })
+      if config.do_cluster:
+        cluster_loss       = d['cluster_loss']
+        similarity_matrix  = d['cluster_similarity_matrix']
+        y_true             = d['cluster_y_true']
+
+        cluster_arg = tf.argmax(similarity_matrix, axis=1, output_type=tf.int32)
+        y_true_arg = tf.argmax(y_true, axis=1, output_type=tf.int32)
+        cluster_acc = tf.metrics.accuracy(
+            labels=y_true_arg,
+            predictions=cluster_arg)
+        cluster_loss = tf.metrics.mean(
+            values=cluster_loss)
+
+        metrics.update({
+            "cluster_accuracy": cluster_acc,
+            "cluster_loss": cluster_loss
         })
       return metrics
     self.eval_metrics = (metric_fn, eval_fn_values)

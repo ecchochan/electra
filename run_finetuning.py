@@ -78,7 +78,7 @@ class FinetuningModel(object):
 
 
 def model_fn_builder(config: configure_finetuning.FinetuningConfig, tasks,
-                     num_train_steps, pretraining_config=None):
+                     num_train_steps, pretraining_config=None, trained=False):
   """Returns `model_fn` closure for TPUEstimator."""
 
   def model_fn(features, labels, mode, params):
@@ -89,15 +89,24 @@ def model_fn_builder(config: configure_finetuning.FinetuningConfig, tasks,
         config, tasks, is_training, features, num_train_steps)
 
     # Load pre-trained weights from checkpoint
-    init_checkpoint = config.init_checkpoint
+    init_checkpoint = config.init_checkpoint if not trained else config.model_dir
     if pretraining_config is not None:
       init_checkpoint = tf.train.latest_checkpoint(pretraining_config.model_dir)
       utils.log("Using checkpoint", init_checkpoint)
     tvars = tf.trainable_variables()
     scaffold_fn = None
     if init_checkpoint:
-      assignment_map, _ = modeling.get_assignment_map_from_checkpoint(
-          tvars, init_checkpoint)
+      try:
+        assignment_map, _ = modeling.get_assignment_map_from_checkpoint(
+            tvars, init_checkpoint)
+      except tf.errors.NotFoundError as err:
+        init_checkpoint = tf.train.latest_checkpoint(init_checkpoint)
+        if not init_checkpoint:
+          raise
+        utils.log("Using checkpoint", init_checkpoint)
+        assignment_map, _ = modeling.get_assignment_map_from_checkpoint(
+            tvars, init_checkpoint)
+
       if config.use_tpu:
         def tpu_scaffold():
           tf.train.init_from_checkpoint(init_checkpoint, assignment_map)
@@ -141,7 +150,7 @@ class ModelRunner(object):
   """Fine-tunes a model on a supervised task."""
 
   def __init__(self, config: configure_finetuning.FinetuningConfig, tasks,
-               pretraining_config=None):
+               pretraining_config=None, trained=False):
     self._config = config
     self._tasks = tasks
     self._preprocessor = preprocessing.Preprocessor(config, self._tasks)
@@ -172,7 +181,8 @@ class ModelRunner(object):
         config=config,
         tasks=self._tasks,
         num_train_steps=self.train_steps,
-        pretraining_config=pretraining_config)
+        pretraining_config=pretraining_config, 
+        trained=trained)
     self._estimator = tf.estimator.tpu.TPUEstimator(
         use_tpu=config.use_tpu,
         model_fn=model_fn,
@@ -189,13 +199,13 @@ class ModelRunner(object):
   def evaluate(self):
     return {task.name: self.evaluate_task(task) for task in self._tasks}
 
-  def evaluate_task(self, task, split="dev", return_results=True):
+  def evaluate_task(self, task, split="dev", return_results=True, **kwargs):
     """Evaluate the current model."""
     utils.log("Evaluating", task.name)
     eval_input_fn, _ = self._preprocessor.prepare_predict([task], split)
     results = self._estimator.predict(input_fn=eval_input_fn,
                                       yield_single_examples=True)
-    scorer = task.get_scorer()
+    scorer = task.get_scorer(**kwargs)
     for r in results:
       if r["task_id"] != len(self._tasks):  # ignore padding examples
         r = utils.nest_dict(r, self._config.task_names)
@@ -268,25 +278,33 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
     config.model_dir = generic_model_dir + "_" + str(trial) + "_" + datetime.now().strftime("%Y%m%d%H%M%S")
     if config.do_train:
       utils.rmkdir(config.model_dir)
+    else:
+      config.model_dir = '/'.join(generic_model_dir.split('/')[:-1]) + '/'+sorted(tf.io.gfile.listdir('/'.join(generic_model_dir.split('/')[:-1])))[-1].rstrip('/')
+      print('Loading from checkpoint `%s`'%config.model_dir)
 
-    model_runner = ModelRunner(config, tasks)
+    model_runner = ModelRunner(config, tasks, trained=not config.do_train)
     if config.do_train:
       heading("Start training")
       model_runner.train()
       utils.log()
 
     if config.do_eval:
-      heading("Run dev set evaluation")
+      heading("Run dev set evaluation from %s"%config.model_dir)
       results.append(model_runner.evaluate())
       write_results(config, results)
-      if config.write_test_outputs and trial <= config.n_writes_test:
+      if config.write_test_outputs:
         heading("Running on the test set and writing the predictions")
         for task in tasks:
           # Currently only writing preds for GLUE and SQuAD 2.0 is supported
           if task.name in ["cola", "mrpc", "mnli", "sst", "rte", "qnli", "qqp",
-                           "sts" "yuenli"]:
+                           "sts", "yuenli"]:
+            mapping = {}
+            if task.name == "yuenli":
+              mapping[1] = 0
             for split in task.get_test_splits():
-              model_runner.write_classification_outputs([task], trial, split)
+              #model_runner.evaluate()
+              model_runner.evaluate_task(task, split=split, mapping=mapping)
+              # model_runner.write_classification_outputs([task], trial, split)
           elif task.name == "squad":
             scorer = model_runner.evaluate_task(task, "test", False)
             scorer.write_predictions()
