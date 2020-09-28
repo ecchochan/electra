@@ -210,6 +210,8 @@ class ExampleBuilder(object):
     
       ret = self._make_tf_example(first_segment, second_segment, sop)
 
+    if ret is None:
+      return None
 
     # prepare to start building the next example
     self._current_sentences = []
@@ -225,6 +227,11 @@ class ExampleBuilder(object):
 
   def _make_tf_example(self, first_segment, second_segment, sop_label=None, return_feature=False):
     """Converts two "segments" of text into a tf.train.Example."""
+    if not first_segment:
+      first_segment = second_segment
+      second_segment = []
+      if not first_segment:
+        return None
     input_ids = [0]
     #if self.do_cluster and self.do_sop:
     #  input_ids.append(0)               # try no this first
@@ -625,7 +632,8 @@ o徙氣,嘥氣
       x = self.replacer.translate(x)
 
       return x
-  def write_examples(self, input_file):
+
+  def example_iterator(self, input_file):
     """Writes out examples from the provided input file."""
     with tf.io.gfile.GFile(input_file) as f:
       cached = []
@@ -702,14 +710,15 @@ o徙氣,嘥氣
           if line or self._blanks_separate_docs:
             example = self._example_builder.add_line(line, input_file)
             if example:
-              self._writers[self.n_written % len(self._writers)].write(
-                  example.SerializeToString())
-              self.n_written += 1
+              yield example.SerializeToString()
       example = self._example_builder.add_line("")
       if example:
-        self._writers[self.n_written % len(self._writers)].write(
-            example.SerializeToString())
-        self.n_written += 1
+        yield example.SerializeToString()
+
+  def write_examples(self, input_file):
+    for example in self.example_iterator(input_file):
+      self._writers[self.n_written % len(self._writers)].write(example)
+      self.n_written += 1
 
   def finish(self):
     for writer in self._writers:
