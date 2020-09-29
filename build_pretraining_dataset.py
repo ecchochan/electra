@@ -266,7 +266,7 @@ class ExampleBuilder(object):
 import re
 from data_utils import too_many_repeat
 remove_url_re = re.compile(r' ?(?:\[?\w+tps?:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z_0-9\-]+)+|[a-zA-Z_0-9\-]+(?:\.[a-zA-Z_0-9\-]+)+)(?:\/(?:\?(?:<nl>)?\n *[a-zA-Z0-9\-\._… &%\+]+|[a-zA-Z0-9\.\?\:@\-_=#…&%!\+])+)+ *(?:<nl>\n * ?(?:https?:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)+|[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)+)(?:\/(?:\?(?:<nl>)?\n *[a-zA-Z0-9\-\._… &%\+]+|[a-zA-Z0-9\.\?\:@\-_=#…&%!\+])+)+ *)*(?:\[\/img\])?')
-remove_speakers = re.compile(r'\[img\] *(<nl>)?\n?|^#\d+ ([A-Z]+: )?(#\d+ )?(\[img\] )?', re.MULTILINE)
+remove_speakers = re.compile(r'\[sosad\]|\[off topic\]|\[img\] *(<nl>)?\n?|^#\d+ ([A-Z]+: )?(#\d+ )?(\[img\] )?', re.MULTILINE)
 
 bad_unicode = re.compile(r'[\u2060-\u20ff\uAA80-\uFB45\u00AD\u008D\u008F\u009F\u0095\u0094\u0097\u0082\u0083\u0087\u0099囀ਾ]+|矛受畩究悍妤|脖宋鬱駜|ÐÒøÓÐÕ|ㄛ筍|ㄛ婌|ㄛ紨|ㄛ嘟|大虯李李朽|獝獞獟獠|拇謂饢|海瑉|隳哪|堶悸漲Л釔|野怛儞也|鈭鲭|韏啣|蟡㏘|乯儜|牁轎煤|蕻淕|蜁巌|潝砩|坉洩|竷h|匾哺|衷讜|愣勾|划曻|a﹐a¶#|p"0∨"q"|鼐盀|阠鼐|皇瞧|鍩挂槐|肭資指娓|蟛青|眩謖|笥|饇|櫱|肭|亂桓|嫠|芔苙苾苹|攆擺|似饲|恕刷|膘', 
                       re.UNICODE)
