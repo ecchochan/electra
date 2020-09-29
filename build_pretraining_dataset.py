@@ -638,10 +638,12 @@ o徙氣,嘥氣
     with tf.io.gfile.GFile(input_file) as f:
       cached = []
       bucket = []
+      any_bad = False
       for line in f:
         line = line.strip()
         if line:
-          bad = any(1 for e in bad_unicode.finditer(line)) or too_many_repeat(line)
+          any_bad = any_bad or any(1 for e in bad_unicode.finditer(line))
+          bad = too_many_repeat(line)
           if not bad:
             if len(line) > 120 and sum(1 for e in word_re.finditer(line)) > 120:
               splitted = []
@@ -681,8 +683,9 @@ o徙氣,嘥氣
                   continue
               bad = True
               break
-          if not bad:
+          if not bad and not any_bad:
             cached.append(sub_doc.split('\n'))
+          any_bad = False
           bucket = []
       if bucket:
         bucket.append("")

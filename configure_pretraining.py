@@ -58,6 +58,7 @@ class PretrainingConfig(object):
     self.num_eval_steps = 100
     self.keep_checkpoint_max = 5 # maximum number of recent checkpoint files to keep;
                                  # change to 0 or None to keep all checkpoints
+    self.position_embeddings_only = False
 
     # model settings
     self.model_size = "small"  # one of "small", "base", or "large"

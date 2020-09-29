@@ -30,7 +30,8 @@ import tensorflow.compat.v1 as tf
 def create_optimizer(
     loss, learning_rate, num_train_steps, weight_decay_rate=0.0, use_tpu=False,
     warmup_steps=0, warmup_proportion=0, lr_decay_power=1.0,
-    layerwise_lr_decay_power=-1, n_transformer_layers=None):
+    layerwise_lr_decay_power=-1, n_transformer_layers=None, 
+    position_embeddings_only=False):
   """Creates an optimizer and training op."""
   global_step = tf.train.get_or_create_global_step()
   learning_rate = tf.train.polynomial_decay(
@@ -44,9 +45,9 @@ def create_optimizer(
   learning_rate *= tf.minimum(
       1.0, tf.cast(global_step, tf.float32) / tf.cast(warmup_steps, tf.float32))
 
-  if layerwise_lr_decay_power > 0:
+  if layerwise_lr_decay_power > 0 or position_embeddings_only:
     learning_rate = _get_layer_lrs(learning_rate, layerwise_lr_decay_power,
-                                   n_transformer_layers)
+                                   n_transformer_layers, position_embeddings_only=position_embeddings_only)
   optimizer = AdamWeightDecayOptimizer(
       learning_rate=learning_rate,
       weight_decay_rate=weight_decay_rate,
@@ -179,7 +180,7 @@ class AdamWeightDecayOptimizer(tf.train.Optimizer):
     return param_name
 
 
-def _get_layer_lrs(learning_rate, layer_decay, n_layers):
+def _get_layer_lrs(learning_rate, layer_decay, n_layers, position_embeddings_only=False):
   """Have lower learning rates for layers closer to the input."""
   key_to_depths = collections.OrderedDict({
       "/embeddings/": 0,
@@ -189,7 +190,14 @@ def _get_layer_lrs(learning_rate, layer_decay, n_layers):
   })
   for layer in range(n_layers):
     key_to_depths["layer_" + str(layer)] = layer + 1  # for albert
-  return {
+  r = {
       key: learning_rate * (layer_decay ** (n_layers + 2 - depth))
       for key, depth in key_to_depths.items()
   }
+
+  if position_embeddings_only:
+    for k in r:
+      if 'position_embeddings' not in k:
+        r[k] = 0
+
+  return r

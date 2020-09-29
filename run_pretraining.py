@@ -397,7 +397,8 @@ def model_fn_builder(config: configure_pretraining.PretrainingConfig):
           weight_decay_rate=config.weight_decay_rate,
           use_tpu=config.use_tpu,
           warmup_steps=config.num_warmup_steps,
-          lr_decay_power=config.lr_decay_power
+          lr_decay_power=config.lr_decay_power,
+          position_embeddings_only=config.position_embeddings_only
       )
       output_spec = tf.estimator.tpu.TPUEstimatorSpec(
           mode=mode,

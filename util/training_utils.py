@@ -99,8 +99,14 @@ def get_bert_config(config):
     args = {"hidden_size": 1024, "num_hidden_layers": 24}
   elif config.model_size == "base":
     args = {"hidden_size": 768, "num_hidden_layers": 12}
+  elif config.model_size == "base_sm":
+    args = {"hidden_size": 768, "num_hidden_layers": 12, "embedding_size": 128}
   elif config.model_size == "small":
     args = {"hidden_size": 256, "num_hidden_layers": 12}
+  elif config.model_size == "smallx":
+    args = {"hidden_size": 256, "num_hidden_layers": 12, "embedding_size": 256}
+  elif config.model_size == "medium":
+    args = {"hidden_size": 512, "num_hidden_layers": 12, "embedding_size": 512, "learning_rate": 3e-4}
   elif config.model_size == "small24":
     args = {"hidden_size": 256, "num_hidden_layers": 24, "embedding_size": 256}
   elif config.model_size == "small24x":
