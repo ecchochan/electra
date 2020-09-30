@@ -218,7 +218,7 @@ class ExampleBuilder(object):
     self._current_length = 0
 
     # small chance for random-length instead of max_length-length example
-    if random.random() < 0.25:
+    if random.random() < 0.3:
       self._target_length = random.randint(15, self._max_length if not self.do_cluster else self._max_length * 2)
     else:
       self._target_length = self._max_length if not self.do_cluster else self._max_length * 2
