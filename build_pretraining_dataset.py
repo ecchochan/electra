@@ -30,6 +30,7 @@ from replacer import Replacer
 import re
 chinese_re = re.compile(u' *([⺀-⺙⺛-⻳⼀-⿕々〇〡-〩〸-〺〻㐀-䶵一-鿃豈-鶴侮-頻並-龎]) *', re.UNICODE)
 word_re = re.compile(r'[a-zA-Z\'-_]+|[^a-zA-Z\'-_\s]')
+from lang_utils import get_lang
 
 seen = set()
 
@@ -157,10 +158,10 @@ class ExampleBuilder(object):
         print('min_seg_length:', min_seg_length)
         print('first_max_length:', first_max_length)
         print('second_max_length:', second_max_length)
-      sop = 1 
+      sop = 0 
       if random.random() > 0.5:
         first_segment, second_segment = second_segment, first_segment
-        sop = 0
+        sop = 1
 
     return first_segment, second_segment, sop
 
@@ -197,6 +198,8 @@ class ExampleBuilder(object):
         return None
       A_feature = self._make_tf_example(A_first_segment, A_second_segment, A_sop, return_feature=True)
       B_feature = self._make_tf_example(B_first_segment, B_second_segment, B_sop, return_feature=True)
+      if not A_feature or not B_feature:
+        return None
 
       for k, v in B_feature.items():
         A_feature[k+'2'] = v
@@ -232,17 +235,17 @@ class ExampleBuilder(object):
       second_segment = []
       if not first_segment:
         return None
-    input_ids = [0]
+    input_ids = [1]   #  0: <pad> , 1: <s> , 2: </s>
     #if self.do_cluster and self.do_sop:
     #  input_ids.append(0)               # try no this first
     input_ids.extend(first_segment)
-    input_ids.append(1)
+    input_ids.append(2)
     #input_ids = [0] + first_segment + [1]
     
     segment_ids = [0] * len(input_ids)
     if second_segment:
       input_ids.extend(second_segment)
-      input_ids.append(1)
+      input_ids.append(2)
       segment_ids += [1] * (len(second_segment) + 1)
     input_mask = [1] * len(input_ids)
     input_ids += [0] * (self._max_length - len(input_ids))
@@ -670,6 +673,8 @@ o徙氣,嘥氣
           sub_doc = self.remove_url(sub_doc)
           bad = False
           if not sub_doc.strip():
+            bad = True
+          if get_lang(sub_doc) not in ('zh','en'):
             bad = True
             
           if not bad:
