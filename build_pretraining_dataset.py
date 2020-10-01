@@ -30,6 +30,7 @@ from replacer import Replacer
 import re
 chinese_re = re.compile(u' *([⺀-⺙⺛-⻳⼀-⿕々〇〡-〩〸-〺〻㐀-䶵一-鿃豈-鶴侮-頻並-龎]) *', re.UNICODE)
 word_re = re.compile(r'[a-zA-Z\'-_]+|[^a-zA-Z\'-_\s]')
+from lang_utils import get_lang
 
 seen = set()
 
@@ -157,10 +158,10 @@ class ExampleBuilder(object):
         print('min_seg_length:', min_seg_length)
         print('first_max_length:', first_max_length)
         print('second_max_length:', second_max_length)
-      sop = 1 
+      sop = 0 
       if random.random() > 0.5:
         first_segment, second_segment = second_segment, first_segment
-        sop = 0
+        sop = 1
 
     return first_segment, second_segment, sop
 
@@ -197,6 +198,8 @@ class ExampleBuilder(object):
         return None
       A_feature = self._make_tf_example(A_first_segment, A_second_segment, A_sop, return_feature=True)
       B_feature = self._make_tf_example(B_first_segment, B_second_segment, B_sop, return_feature=True)
+      if not A_feature or not B_feature:
+        return None
 
       for k, v in B_feature.items():
         A_feature[k+'2'] = v
@@ -210,6 +213,8 @@ class ExampleBuilder(object):
     
       ret = self._make_tf_example(first_segment, second_segment, sop)
 
+    if ret is None:
+      return None
 
     # prepare to start building the next example
     self._current_sentences = []
@@ -225,17 +230,22 @@ class ExampleBuilder(object):
 
   def _make_tf_example(self, first_segment, second_segment, sop_label=None, return_feature=False):
     """Converts two "segments" of text into a tf.train.Example."""
-    input_ids = [0]
+    if not first_segment:
+      first_segment = second_segment
+      second_segment = []
+      if not first_segment:
+        return None
+    input_ids = [1]   #  0: <pad> , 1: <s> , 2: </s>
     #if self.do_cluster and self.do_sop:
     #  input_ids.append(0)               # try no this first
     input_ids.extend(first_segment)
-    input_ids.append(1)
+    input_ids.append(2)
     #input_ids = [0] + first_segment + [1]
     
     segment_ids = [0] * len(input_ids)
     if second_segment:
       input_ids.extend(second_segment)
-      input_ids.append(1)
+      input_ids.append(2)
       segment_ids += [1] * (len(second_segment) + 1)
     input_mask = [1] * len(input_ids)
     input_ids += [0] * (self._max_length - len(input_ids))
@@ -259,7 +269,7 @@ class ExampleBuilder(object):
 import re
 from data_utils import too_many_repeat
 remove_url_re = re.compile(r' ?(?:\[?\w+tps?:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z_0-9\-]+)+|[a-zA-Z_0-9\-]+(?:\.[a-zA-Z_0-9\-]+)+)(?:\/(?:\?(?:<nl>)?\n *[a-zA-Z0-9\-\._… &%\+]+|[a-zA-Z0-9\.\?\:@\-_=#…&%!\+])+)+ *(?:<nl>\n * ?(?:https?:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)+|[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)+)(?:\/(?:\?(?:<nl>)?\n *[a-zA-Z0-9\-\._… &%\+]+|[a-zA-Z0-9\.\?\:@\-_=#…&%!\+])+)+ *)*(?:\[\/img\])?')
-remove_speakers = re.compile(r'^#\d+ ([A-Z]+: )?(#\d+ )?(\[img\] )?', re.MULTILINE)
+remove_speakers = re.compile(r'\[sosad\]|\[off topic\]|\[img\] *(<nl>)?\n?|^#\d+ ([A-Z]+: )?(#\d+ )?(\[img\] )?', re.MULTILINE)
 
 bad_unicode = re.compile(r'[\u2060-\u20ff\uAA80-\uFB45\u00AD\u008D\u008F\u009F\u0095\u0094\u0097\u0082\u0083\u0087\u0099囀ਾ]+|矛受畩究悍妤|脖宋鬱駜|ÐÒøÓÐÕ|ㄛ筍|ㄛ婌|ㄛ紨|ㄛ嘟|大虯李李朽|獝獞獟獠|拇謂饢|海瑉|隳哪|堶悸漲Л釔|野怛儞也|鈭鲭|韏啣|蟡㏘|乯儜|牁轎煤|蕻淕|蜁巌|潝砩|坉洩|竷h|匾哺|衷讜|愣勾|划曻|a﹐a¶#|p"0∨"q"|鼐盀|阠鼐|皇瞧|鍩挂槐|肭資指娓|蟛青|眩謖|笥|饇|櫱|肭|亂桓|嫠|芔苙苾苹|攆擺|似饲|恕刷|膘', 
                       re.UNICODE)
@@ -625,15 +635,18 @@ o徙氣,嘥氣
       x = self.replacer.translate(x)
 
       return x
-  def write_examples(self, input_file):
+
+  def example_iterator(self, input_file):
     """Writes out examples from the provided input file."""
     with tf.io.gfile.GFile(input_file) as f:
       cached = []
       bucket = []
+      any_bad = False
       for line in f:
         line = line.strip()
         if line:
-          bad = any(1 for e in bad_unicode.finditer(line)) or too_many_repeat(line)
+          any_bad = any_bad or any(1 for e in bad_unicode.finditer(line))
+          bad = too_many_repeat(line)
           if not bad:
             if len(line) > 120 and sum(1 for e in word_re.finditer(line)) > 120:
               splitted = []
@@ -661,6 +674,8 @@ o徙氣,嘥氣
           bad = False
           if not sub_doc.strip():
             bad = True
+          if get_lang(sub_doc) not in ('zh','en'):
+            bad = True
             
           if not bad:
             for e in re.finditer(r'[\da-zA-Z_]{10,}', sub_doc):
@@ -673,8 +688,9 @@ o徙氣,嘥氣
                   continue
               bad = True
               break
-          if not bad:
+          if not bad and not any_bad:
             cached.append(sub_doc.split('\n'))
+          any_bad = False
           bucket = []
       if bucket:
         bucket.append("")
@@ -702,14 +718,15 @@ o徙氣,嘥氣
           if line or self._blanks_separate_docs:
             example = self._example_builder.add_line(line, input_file)
             if example:
-              self._writers[self.n_written % len(self._writers)].write(
-                  example.SerializeToString())
-              self.n_written += 1
+              yield example.SerializeToString()
       example = self._example_builder.add_line("")
       if example:
-        self._writers[self.n_written % len(self._writers)].write(
-            example.SerializeToString())
-        self.n_written += 1
+        yield example.SerializeToString()
+
+  def write_examples(self, input_file):
+    for example in self.example_iterator(input_file):
+      self._writers[self.n_written % len(self._writers)].write(example)
+      self.n_written += 1
 
   def finish(self):
     for writer in self._writers:

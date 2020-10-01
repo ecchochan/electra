@@ -1480,7 +1480,6 @@
 🕉,Om
 ♀️,Female Sign
 ♂️,Male Sign
-‍,Zero Width Joiner
 🏻,Light Skin Tone
 🏿,Dark Skin Tone
 🏾,Medium-Dark Skin Tone
