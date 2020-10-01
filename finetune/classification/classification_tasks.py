@@ -101,19 +101,19 @@ class SingleOutputTask(task.Task):
     # the entire model is fine-tuned.
     tokens = []
     segment_ids = []
-    tokens.append(0) #("<s>")
+    tokens.append(1) #("<s>")
     segment_ids.append(0)
     for token in tokens_a:
       tokens.append(token)
       segment_ids.append(0)
-    tokens.append(1) #("</s>")
+    tokens.append(2) #("</s>")
     segment_ids.append(0)
 
     if tokens_b:
       for token in tokens_b:
         tokens.append(token)
         segment_ids.append(1)
-      tokens.append(1) #("</s>")
+      tokens.append(2) #("</s>")
       segment_ids.append(1)
 
     input_ids = tokens # self._tokenizer.convert_tokens_to_ids(tokens)
