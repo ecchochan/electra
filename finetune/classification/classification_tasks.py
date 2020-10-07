@@ -106,6 +106,8 @@ class SingleOutputTask(task.Task):
     for token in tokens_a:
       tokens.append(token)
       segment_ids.append(0)
+    tokens.append(3) #("<nl>")
+    segment_ids.append(0)
     tokens.append(2) #("</s>")
     segment_ids.append(0)
 
@@ -113,6 +115,8 @@ class SingleOutputTask(task.Task):
       for token in tokens_b:
         tokens.append(token)
         segment_ids.append(1)
+      tokens.append(3) #("<nl>")
+      segment_ids.append(1)
       tokens.append(2) #("</s>")
       segment_ids.append(1)
 

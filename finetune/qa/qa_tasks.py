@@ -34,6 +34,7 @@ from model import modeling
 from model import tokenization
 from util import utils
 
+import random
 
 class QAExample(task.Example):
   """Question-answering example."""
@@ -177,7 +178,8 @@ class QATask(task.Task):
   def _add_examples(self, examples, example_failures, paragraph, split):
     tokenizer = self._tokenizer
     paragraph_text = paragraph["context"]
-    encoded = tokenizer.encode(paragraph_text)
+    # encoded = tokenizer.encode(paragraph_text)
+    encoded = self._tokenizer.encode(' '.join(e +("<nl>" if random.random() > 0.75 else "") for e in chinese_sentences_iter(paragraph_text , nlp, ln=""))).ids
     offsets = encoded.offsets
     doc_tokens = encoded.tokens
     doc_ids = encoded.ids
@@ -332,8 +334,8 @@ class QATask(task.Task):
           example.orig_answer_text)
           '''
 
-    # The -3 accounts for [CLS], [SEP] and [SEP]
-    max_tokens_for_doc = self.config.max_seq_length - len(query_tokens) - 3
+    # The -3 accounts for [CLS], [SEP] and [SEP] and <nl>
+    max_tokens_for_doc = self.config.max_seq_length - len(query_tokens) - 4
 
     # We can have documents that are longer than the maximum sequence length.
     # To deal with this we do a sliding window approach, where we take chunks
@@ -361,6 +363,8 @@ class QATask(task.Task):
       for token in query_tokens:
         tokens.append(token)
         segment_ids.append(0)
+      tokens.append(3) # ("[nl]")
+      segment_ids.append(0)
       tokens.append(2) # ("[SEP]")
       segment_ids.append(0)
 
