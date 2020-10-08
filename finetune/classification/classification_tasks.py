@@ -75,7 +75,7 @@ class SingleOutputTask(task.Task):
       # Modifies `tokens_a` and `tokens_b` in place so that the total
       # length is less than the specified length.
       # Account for [CLS], [SEP], [SEP] with "- 3"
-      _truncate_seq_pair(tokens_a, tokens_b, self.config.max_seq_length - 4)
+      _truncate_seq_pair(tokens_a, tokens_b, self.config.max_seq_length - 5)
     else:
       # Account for [CLS] and [SEP] with "- 2"
       if len(tokens_a) > self.config.max_seq_length - 3:
@@ -132,7 +132,7 @@ class SingleOutputTask(task.Task):
       input_mask.append(0)
       segment_ids.append(0)
 
-    assert len(input_ids) == self.config.max_seq_length
+    assert len(input_ids) == self.config.max_seq_length, len(input_ids)
     assert len(input_mask) == self.config.max_seq_length
     assert len(segment_ids) == self.config.max_seq_length
 
