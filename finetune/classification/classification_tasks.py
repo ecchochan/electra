@@ -75,11 +75,11 @@ class SingleOutputTask(task.Task):
       # Modifies `tokens_a` and `tokens_b` in place so that the total
       # length is less than the specified length.
       # Account for [CLS], [SEP], [SEP] with "- 3"
-      _truncate_seq_pair(tokens_a, tokens_b, self.config.max_seq_length - 3)
+      _truncate_seq_pair(tokens_a, tokens_b, self.config.max_seq_length - 4)
     else:
       # Account for [CLS] and [SEP] with "- 2"
-      if len(tokens_a) > self.config.max_seq_length - 2:
-        tokens_a = tokens_a[0:(self.config.max_seq_length - 2)]
+      if len(tokens_a) > self.config.max_seq_length - 3:
+        tokens_a = tokens_a[0:(self.config.max_seq_length - 3)]
 
     # The convention in BERT is:
     # (a) For sequence pairs:
