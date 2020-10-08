@@ -179,6 +179,7 @@ def main(config: configure_finetuning.FinetuningConfig, split, data_dir):
             ', but got dataset with v-' + dataset_json['version'],
             file=sys.stderr)
     dataset = dataset_json['data']
+  print('>>', args.prediction_file)
   with tf.io.gfile.GFile(args.prediction_file) as prediction_file:
     predictions = json.load(prediction_file)
   return evaluate(dataset, predictions)
