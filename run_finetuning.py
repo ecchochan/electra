@@ -279,7 +279,10 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
     if config.do_train:
       utils.rmkdir(config.model_dir)
     else:
-      config.model_dir = '/'.join(generic_model_dir.split('/')[:-1]) + '/'+sorted(tf.io.gfile.listdir('/'.join(generic_model_dir.split('/')[:-1])))[-1].rstrip('/')
+      config.model_dir = '/'.join(generic_model_dir.split('/')[:-1]) + '/'+sorted(tf.io.gfile.listdir(
+        '/'.join(generic_model_dir.split('/')[:-1])  + "/" + ",".join(config.task_names)
+        
+        ))[-1].rstrip('/')
       print('Loading from checkpoint `%s`'%config.model_dir)
 
     model_runner = ModelRunner(config, tasks, trained=not config.do_train)
