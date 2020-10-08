@@ -113,7 +113,7 @@ class FinetuningConfig(object):
     if not tf.io.gfile.exists(self.vocab_file):
       self.vocab_file = os.path.join(self.data_dir, "vocab.txt")
     task_names_str = ",".join(
-        kwargs["task_names"] if "task_names" in kwargs else self.task_names)
+        kwargs["task_names"] if "task_names" in kwargs else self.task_names) + '_'+str(self.max_seq_length)
     self.init_checkpoint = None if self.debug else pretrained_model_dir
     self.model_dir = os.path.join(pretrained_model_dir, "finetuning_models",
                                   task_names_str + "_model")
