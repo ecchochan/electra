@@ -372,8 +372,8 @@ class YUENLI(ClassificationTask):
       ):
         with tf.io.gfile.GFile(os.path.join(self.config.raw_data_dir(self.name), fn), "r") as f:
           lines_ = json.load(f)
-          if len(lines_) > 150000:
-            lines_ = random.sample(lines_, 150000)
+          if len(lines_) > config.yuenli_mix_mnli:
+            lines_ = random.sample(lines_, config.yuenli_mix_mnli)
           lines += lines_
         
     with tf.io.gfile.GFile(os.path.join(self.config.raw_data_dir(self.name), split + ".json"), "r") as f:
