@@ -23,6 +23,8 @@ import os
 
 import tensorflow.compat.v1 as tf
 
+from datetime import datetime
+
 
 class FinetuningConfig(object):
   """Fine-tuning hyperparameters."""
@@ -122,7 +124,7 @@ class FinetuningConfig(object):
                                     task_names_str + "_results.txt")
     self.results_pkl = os.path.join(results_dir,
                                     task_names_str + "_results.pkl")
-    qa_topdir = os.path.join(results_dir, task_names_str + "_qa")
+    qa_topdir = os.path.join(results_dir, task_names_str + "_qa_" + datetime.now().strftime("%Y%m%d%H%M%S"))
     self.qa_eval_file = os.path.join(qa_topdir, "{:}_eval.json").format
     self.qa_preds_file = os.path.join(qa_topdir, "{:}_preds.json").format
     self.qa_na_file = os.path.join(qa_topdir, "{:}_null_odds.json").format
