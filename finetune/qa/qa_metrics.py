@@ -77,8 +77,8 @@ class SpanBasedQAScorer(scorer.Scorer):
 
   def _get_results(self):
     self.write_predictions()
-    if self._name == "squad":
-      squad_official_eval.set_opts(self._config, self._split)
+    if self._name in ('squad','yuerc'):
+      squad_official_eval.set_opts(self._config, self._split, self._name)
       squad_official_eval.main()
       return sorted(utils.load_json(
           self._config.qa_eval_file(self._name)).items())
@@ -99,11 +99,13 @@ class SpanBasedQAScorer(scorer.Scorer):
     _PrelimPrediction = collections.namedtuple(  # pylint: disable=invalid-name
         "PrelimPrediction",
         ["feature_index", "start_index", "end_index", "start_logit",
-         "end_logit"])
+         "end_logit", "answerable_logit"])
 
     all_predictions = collections.OrderedDict()
     all_nbest_json = collections.OrderedDict()
     scores_diff_json = collections.OrderedDict()
+    scores_y_json = collections.OrderedDict()
+    scores_n_json = collections.OrderedDict()
 
     for example in self._eval_examples:
       paragraph_text = example.paragraph_text
@@ -134,7 +136,7 @@ class SpanBasedQAScorer(scorer.Scorer):
         # if we could have irrelevant answers, get the min score of irrelevant
         if self._v2:
           if self._config.answerable_classifier:
-            feature_null_score = result.answerable_logit
+            feature_null_score = result.answerable_logit[0] if self.yn else result.answerable_logit
           else:
             feature_null_score = result.start_logits[0] + result.end_logits[0]
           if feature_null_score < score_null:
@@ -175,7 +177,8 @@ class SpanBasedQAScorer(scorer.Scorer):
                     start_index=start_index,
                     end_index=end_index,
                     start_logit=start_logit,
-                    end_logit=end_logit))
+                    end_logit=end_logit,
+                    answerable_logit=result.answerable_logit))
 
       if self._v2:
         if False and len(prelim_predictions) == 0 and self._config.debug:
@@ -184,20 +187,22 @@ class SpanBasedQAScorer(scorer.Scorer):
               start_index=0,
               end_index=0 + 1,
               start_logit=1.0,
-              end_logit=1.0))
+              end_logit=1.0,
+              answerable_logit=None))
       prelim_predictions = sorted(
           prelim_predictions,
           key=lambda x: (x.start_logit + x.end_logit),
           reverse=True)
 
       _NbestPrediction = collections.namedtuple(  # pylint: disable=invalid-name
-          "NbestPrediction", ["text", "start_logit", "end_logit"])
+          "NbestPrediction", ["text", "start_logit", "end_logit", "y","n"])
 
       seen_predictions = {}
       nbest = []
       for pred in prelim_predictions:
         if len(nbest) >= self._config.n_best_size:
           break
+        answerable_logit = pred.answerable_logit
         feature = features[pred.feature_index]
         offset = feature[self._name + "_doc_span_offset"]
         N = feature['segment_ids'].index(1)
@@ -205,17 +210,9 @@ class SpanBasedQAScorer(scorer.Scorer):
           char_start = offsets[offset+pred.start_index - N][0]  # -N for [CLS]
           char_end = offsets[offset+pred.end_index - N][1]
         except Exception as e:
-          continue
-          import traceback
-          traceback.print_exc()
-          print('char_start/char_end cannot be found')
-          print('feature =', feature)
-          print('N =', N)
-          print('offset =', offset)
-          print('pred.start_index =', pred.start_index)
-          print('pred.end_index =', pred.end_index)
-          print('len(offsets) =', len(offsets))
-          continue
+          char_start = 0
+          char_end = 0
+          
         final_text = paragraph_text[char_start:char_end]
 
 
@@ -241,26 +238,26 @@ class SpanBasedQAScorer(scorer.Scorer):
         orig_text = " ".join(orig_tokens)
 
         final_text = get_final_text(self._config, tok_text, orig_text, tokenizer)
-        """
-
-
 
         if final_text in seen_predictions:
           continue
 
         seen_predictions[final_text] = True
+        """
 
         nbest.append(
             _NbestPrediction(
                 text=final_text,
                 start_logit=pred.start_logit,
-                end_logit=pred.end_logit))
+                end_logit=pred.end_logit, 
+                y=answerable_logit[2],
+                n=answerable_logit[3]))
 
       # In very rare edge cases we could have no valid predictions. So we
       # just create a nonce prediction in this case to avoid failure.
       if not nbest:
         nbest.append(
-            _NbestPrediction(text="empty", start_logit=0.0, end_logit=0.0))
+            _NbestPrediction(text="empty", start_logit=0.0, end_logit=0.0, y=0, n=0))
 
       assert len(nbest) >= 1
 
@@ -288,6 +285,7 @@ class SpanBasedQAScorer(scorer.Scorer):
       if not self._v2:
         all_predictions[example_id] = nbest_json[0]["text"]
       else:
+        
         # predict "" iff the null score - the score of best non-null > threshold
         if self._config.answerable_classifier:
           score_diff = score_null
@@ -295,6 +293,9 @@ class SpanBasedQAScorer(scorer.Scorer):
           score_diff = score_null - best_non_null_entry.start_logit - (
               best_non_null_entry.end_logit)
         scores_diff_json[example_id] = score_diff
+        if self.yn:
+          scores_y_json[example_id] = best_non_null_entry.y
+          scores_n_json[example_id] = best_non_null_entry.n
         all_predictions[example_id] = best_non_null_entry.text
 
       all_nbest_json[example_id] = nbest_json
@@ -305,7 +306,13 @@ class SpanBasedQAScorer(scorer.Scorer):
       utils.write_json({
           k: float(v) for k, v in six.iteritems(scores_diff_json)},
           self._config.qa_na_file(self._name))
-
+      if self.yn:
+        utils.write_json({
+            k: float(v) for k, v in six.iteritems(scores_y_json)},
+            self._config.qa_na_file(self._name + '_y'))
+        utils.write_json({
+            k: float(v) for k, v in six.iteritems(scores_n_json)},
+            self._config.qa_na_file(self._name + '_n'))
 
 def _get_best_indexes(logits, n_best_size):
   """Get the n-best logits from a list."""
