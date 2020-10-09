@@ -138,7 +138,7 @@ class SpanBasedQAScorer(scorer.Scorer):
         # if we could have irrelevant answers, get the min score of irrelevant
         if self._v2:
           if self._config.answerable_classifier:
-            feature_null_score = result.answerable_logit[0] if self.yn else result.answerable_logit
+            feature_null_score = result.answerable_logit[0] if self._config.yn else result.answerable_logit
           else:
             feature_null_score = result.start_logits[0] + result.end_logits[0]
           if feature_null_score < score_null:
@@ -295,7 +295,7 @@ class SpanBasedQAScorer(scorer.Scorer):
           score_diff = score_null - best_non_null_entry.start_logit - (
               best_non_null_entry.end_logit)
         scores_diff_json[example_id] = score_diff
-        if self.yn:
+        if self._config.yn:
           scores_y_json[example_id] = best_non_null_entry.y
           scores_n_json[example_id] = best_non_null_entry.n
         all_predictions[example_id] = best_non_null_entry.text
@@ -308,7 +308,7 @@ class SpanBasedQAScorer(scorer.Scorer):
       utils.write_json({
           k: float(v) for k, v in six.iteritems(scores_diff_json)},
           self._config.qa_na_file(self._name))
-      if self.yn:
+      if self._config.yn:
         utils.write_json({
             k: float(v) for k, v in six.iteritems(scores_y_json)},
             self._config.qa_na_file(self._name + '_y'))
