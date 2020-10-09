@@ -308,6 +308,7 @@ def main():
     dataset = dataset_json['data']
   with tf.io.gfile.GFile(OPTS.pred_file) as f:
     preds = json.load(f)
+  print('preds','>>', len(preds))
   if OPTS.na_prob_file:
     with tf.io.gfile.GFile(OPTS.na_prob_file) as f:
       na_probs = json.load(f)
