@@ -311,20 +311,6 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
           elif task.name == "squad" or task.name == 'yuerc':
             for split in task.get_test_splits():
               scorer = model_runner.evaluate_task(task, split, False)
-              scorer.write_predictions()
-              preds = utils.load_json(config.qa_preds_file(task.name))
-              null_odds = utils.load_json(config.qa_na_file(task.name))
-              if task.name == 'yuerc':
-                yn_odds = utils.load_json(config.qa_na_file(task.name + 'yn'))
-                for q, _ in preds.items():
-                  if yn_odds[q] > config.qa_na_threshold:
-                    preds[q] = ""
-
-              for q, _ in preds.items():
-                if null_odds[q] > config.qa_na_threshold:
-                  preds[q] = ""
-              utils.write_json(preds, config.test_predictions(
-                  task.name, split, trial))
           else:
             utils.log("Skipping task", task.name,
                       "- writing predictions is not supported for this task")
