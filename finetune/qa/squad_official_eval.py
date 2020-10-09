@@ -165,16 +165,8 @@ def apply_no_ans_threshold(scores, na_probs, y_probs, n_probs, qid_to_has_ans, q
   new_scores = {}
   for qid, s in scores.items():
     pred_na = na_probs[qid] > na_prob_thresh
-    if y_probs is not None:
-      pred_y = y_probs[qid] > na_prob_thresh
-    if n_probs is not None:
-      pred_n = n_probs[qid] > na_prob_thresh
     if pred_na:
       new_scores[qid] = float(not qid_to_has_ans[qid])
-    elif y_probs is not None and pred_y:
-      new_scores[qid] = float(qid_to_y[qid])
-    elif n_probs is not None and pred_n:
-      new_scores[qid] = float(qid_to_n[qid])
     else:
       new_scores[qid] = s
       
@@ -294,16 +286,18 @@ def find_best_thresh(preds, scores, na_probs, qid_to_has_ans):
 def find_all_best_thresh(main_eval, preds, exact_raw, f1_raw, na_probs, y_probs, n_probs, qid_to_has_ans, qid_to_y, qid_to_n):
   best_exact, exact_thresh = find_best_thresh(preds, exact_raw, na_probs, qid_to_has_ans)
   best_f1, f1_thresh = find_best_thresh(preds, f1_raw, na_probs, qid_to_has_ans)
-  best_f1_y, f1_y_thresh = find_best_thresh(preds, f1_raw, y_probs, qid_to_y)
-  best_f1_n, f1_n_thresh = find_best_thresh(preds, f1_raw, n_probs, qid_to_n)
   main_eval['best_exact'] = best_exact
   main_eval['best_exact_thresh'] = exact_thresh
   main_eval['best_f1'] = best_f1
   main_eval['best_f1_thresh'] = f1_thresh
-  main_eval['best_f1_y'] = best_f1_y
-  main_eval['best_f1_y_thresh'] = f1_y_thresh
-  main_eval['best_f1_n'] = best_f1_n
-  main_eval['best_f1_n_thresh'] = f1_n_thresh
+  if y_probs is not None:
+    best_f1_y, f1_y_thresh = find_best_thresh(preds, f1_raw, y_probs, qid_to_y)
+    main_eval['best_f1_y'] = best_f1_y
+    main_eval['best_f1_y_thresh'] = f1_y_thresh
+  if n_probs is not None:
+    best_f1_n, f1_n_thresh = find_best_thresh(preds, f1_raw, n_probs, qid_to_n)
+    main_eval['best_f1_n'] = best_f1_n
+    main_eval['best_f1_n_thresh'] = f1_n_thresh
 
 def main():
   with tf.io.gfile.GFile(OPTS.data_file) as f:
