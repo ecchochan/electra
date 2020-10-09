@@ -214,10 +214,11 @@ class QATask(task.Task):
             answer_offset = answer["char_spans"][0][0]
           else:  # SQuAD format
             answer = qa["answers"][0] if "answers" in qa else qa['answer_text']
+            
             if self.yn and (answer == 'yes' or answer == 'no'):
               answer_offset = -100 if answer == 'yes' else -200
             else:
-              answer_offset = answer["answer_start"]
+              answer_offset = answer["answer_start"] if isinstance(answer, dict) else qa['answer_pos']
 
 
           if answer_offset == -100 or answer_offset == -200:
