@@ -218,7 +218,11 @@ class QATask(task.Task):
             if self.yn and (answer == 'yes' or answer == 'no'):
               answer_offset = -100 if answer == 'yes' else -200
             else:
-              answer_offset = answer["answer_start"] if isinstance(answer, dict) else qa['answer_pos']
+              try:
+                answer_offset = answer["answer_start"] if isinstance(answer, dict) else qa['answer_pos']
+              except:
+                print(qa)
+                raise
 
 
           if answer_offset == -100 or answer_offset == -200:
