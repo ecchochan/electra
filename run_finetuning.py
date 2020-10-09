@@ -308,7 +308,7 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
               #model_runner.evaluate()
               model_runner.evaluate_task(task, split=split, mapping=mapping)
               # model_runner.write_classification_outputs([task], trial, split)
-          elif task.name == "squad" or task.name == 'yuerc':
+          elif task.name == "squad" or task.name == 'yuerc' or task.name == 'yuespan':
             for split in task.get_test_splits():
               scorer = model_runner.evaluate_task(task, split, False)
               scorer.write_predictions()

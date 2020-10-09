@@ -695,6 +695,13 @@ class YUERC(SQuADTask):
   def get_test_splits(self):
     return ["test-en", "test-yn"]
 
+class YUESPAN(SQuADTask):
+  def __init__(self, config: configure_finetuning.FinetuningConfig, tokenizer):
+    super(YUESPAN, self).__init__(config, "yuespan", tokenizer, v2=True)
+
+  def get_test_splits(self):
+    return []
+
 
 class SQuAD(SQuADTask):
   def __init__(self, config: configure_finetuning.FinetuningConfig, tokenizer):
