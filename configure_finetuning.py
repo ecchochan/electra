@@ -42,6 +42,7 @@ class FinetuningConfig(object):
     self.down_scale_factor = 1
     self.inner_group_num = 1
     self.yuenli_mix_mnli = 150000
+    self.restore = ""
 
     # model
     self.model_size = "small"  # one of "small", "base", or "large"

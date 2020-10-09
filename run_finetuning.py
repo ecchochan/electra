@@ -278,6 +278,8 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
     config.model_dir = generic_model_dir + "_" + str(trial) + "_" + datetime.now().strftime("%Y%m%d%H%M%S")
     if config.do_train:
       utils.rmkdir(config.model_dir)
+    elif config.restore:
+      config.model_dir = config.restore
     else:
       config.model_dir = '/'.join(generic_model_dir.split('/')[:-1]) + '/'+sorted(e for e in tf.io.gfile.listdir(
         '/'.join(generic_model_dir.split('/')[:-1]) 
@@ -308,7 +310,7 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
               #model_runner.evaluate()
               model_runner.evaluate_task(task, split=split, mapping=mapping)
               # model_runner.write_classification_outputs([task], trial, split)
-          elif task.name == "squad" or task.name == 'yuerc' or task.name == 'yuespan':
+          elif task.name == "squad" or task.name == 'yuerc':
             for split in task.get_test_splits():
               scorer = model_runner.evaluate_task(task, split, False)
               scorer.write_predictions()
