@@ -58,19 +58,23 @@ def parse_args():
     sys.exit(1)
   return parser.parse_args()
 
-def set_opts(config: configure_finetuning.FinetuningConfig, split):
+def set_opts(config: configure_finetuning.FinetuningConfig, split, name):
   global OPTS
   Options = collections.namedtuple("Options", [
       "data_file", "pred_file", "out_file", "na_prob_file", "na_prob_thresh",
       "out_image_dir", "verbose"])
   OPTS = Options(
       data_file=os.path.join(
-          config.raw_data_dir("squad"),
+          config.raw_data_dir(name),
           split + ("-debug" if config.debug else "") + ".json"),
-      pred_file=config.qa_preds_file("squad"),
-      out_file=config.qa_eval_file("squad"),
-      na_prob_file=config.qa_na_file("squad"),
+      pred_file=config.qa_preds_file(name),
+      out_file=config.qa_eval_file(name),
+      na_prob_file=config.qa_na_file(name),
+      y_prob_file=config.qa_na_file(name + '_y'),
+      n_prob_file=config.qa_na_file(name + '_n'),
       na_prob_thresh=config.qa_na_threshold,
+      y_prob_thresh=config.qa_na_threshold,
+      n_prob_thresh=config.qa_na_threshold,
       out_image_dir=None,
       verbose=False
   )
@@ -82,6 +86,22 @@ def make_qid_to_has_ans(dataset):
       for qa in p['qas']:
         qid_to_has_ans[qa['id']] = bool(qa['answers'])
   return qid_to_has_ans
+
+def make_qid_to_y(dataset):
+  qid_to_y = {}
+  for article in dataset:
+    for p in article['paragraphs']:
+      for qa in p['qas']:
+        qid_to_y[qa['id']] = bool(qa['answer_text'] == 'yes')
+  return qid_to_y
+
+def make_qid_to_n(dataset):
+  qid_to_n = {}
+  for article in dataset:
+    for p in article['paragraphs']:
+      for qa in p['qas']:
+        qid_to_n[qa['id']] = bool(qa['answer_text'] == 'no')
+  return qid_to_n
 
 def normalize_answer(s):
   """Lower text and remove punctuation, articles and extra whitespace."""
@@ -140,14 +160,21 @@ def get_raw_scores(dataset, preds):
         f1_scores[qid] = max(compute_f1(a, a_pred) for a in gold_answers)
   return exact_scores, f1_scores
 
-def apply_no_ans_threshold(scores, na_probs, qid_to_has_ans, na_prob_thresh):
+def apply_no_ans_threshold(scores, na_probs, y_probs, n_probs, qid_to_has_ans, qid_to_y, qid_to_n, na_prob_thresh, y_prob_thresh, n_prob_thresh):
   new_scores = {}
   for qid, s in scores.items():
     pred_na = na_probs[qid] > na_prob_thresh
+    pred_y = y_probs[qid] > na_prob_thresh
+    pred_n = n_probs[qid] > na_prob_thresh
     if pred_na:
       new_scores[qid] = float(not qid_to_has_ans[qid])
+    elif pred_y:
+      new_scores[qid] = float(qid_to_y[qid])
+    elif pred_n:
+      new_scores[qid] = float(qid_to_n[qid])
     else:
       new_scores[qid] = s
+      
   return new_scores
 
 def make_eval_dict(exact_scores, f1_scores, qid_list=None):
@@ -261,13 +288,19 @@ def find_best_thresh(preds, scores, na_probs, qid_to_has_ans):
       best_thresh = na_probs[qid]
   return 100.0 * best_score / len(scores), best_thresh
 
-def find_all_best_thresh(main_eval, preds, exact_raw, f1_raw, na_probs, qid_to_has_ans):
+def find_all_best_thresh(main_eval, preds, exact_raw, f1_raw, na_probs, y_probs, n_probs, qid_to_has_ans, qid_to_y, qid_to_n):
   best_exact, exact_thresh = find_best_thresh(preds, exact_raw, na_probs, qid_to_has_ans)
   best_f1, f1_thresh = find_best_thresh(preds, f1_raw, na_probs, qid_to_has_ans)
+  best_f1_y, f1_y_thresh = find_best_thresh(preds, f1_raw, y_probs, qid_to_y)
+  best_f1_n, f1_n_thresh = find_best_thresh(preds, f1_raw, n_probs, qid_to_n)
   main_eval['best_exact'] = best_exact
   main_eval['best_exact_thresh'] = exact_thresh
   main_eval['best_f1'] = best_f1
   main_eval['best_f1_thresh'] = f1_thresh
+  main_eval['best_f1_y'] = best_f1_y
+  main_eval['best_f1_y_thresh'] = f1_y_thresh
+  main_eval['best_f1_n'] = best_f1_n
+  main_eval['best_f1_n_thresh'] = f1_n_thresh
 
 def main():
   with tf.io.gfile.GFile(OPTS.data_file) as f:
@@ -280,14 +313,26 @@ def main():
       na_probs = json.load(f)
   else:
     na_probs = {k: 0.0 for k in preds}
+  if OPTS.y_prob_file:
+    with tf.io.gfile.GFile(OPTS.y_prob_file) as f:
+      y_probs = json.load(f)
+  else:
+    y_probs = {k: 0.0 for k in preds}
+  if OPTS.n_prob_file:
+    with tf.io.gfile.GFile(OPTS.n_prob_file) as f:
+      n_probs = json.load(f)
+  else:
+    n_probs = {k: 0.0 for k in preds}
   qid_to_has_ans = make_qid_to_has_ans(dataset)  # maps qid to True/False
+  qid_to_y = make_qid_to_y(dataset)  # maps qid to True/False
+  qid_to_n = make_qid_to_n(dataset)  # maps qid to True/False
   has_ans_qids = [k for k, v in qid_to_has_ans.items() if v]
   no_ans_qids = [k for k, v in qid_to_has_ans.items() if not v]
   exact_raw, f1_raw = get_raw_scores(dataset, preds)
-  exact_thresh = apply_no_ans_threshold(exact_raw, na_probs, qid_to_has_ans,
-                                        OPTS.na_prob_thresh)
-  f1_thresh = apply_no_ans_threshold(f1_raw, na_probs, qid_to_has_ans,
-                                     OPTS.na_prob_thresh)
+  exact_thresh = apply_no_ans_threshold(exact_raw, na_probs, y_probs, n_probs, qid_to_has_ans, qid_to_y, qid_to_n,
+                                        OPTS.na_prob_thresh, OPTS.y_prob_thresh, OPTS.n_prob_thresh)
+  f1_thresh = apply_no_ans_threshold(f1_raw, na_probs, y_probs, n_probs, qid_to_has_ans, qid_to_y, qid_to_n,
+                                        OPTS.na_prob_thresh, OPTS.y_prob_thresh, OPTS.n_prob_thresh)
   out_eval = make_eval_dict(exact_thresh, f1_thresh)
   if has_ans_qids:
     has_ans_eval = make_eval_dict(exact_thresh, f1_thresh, qid_list=has_ans_qids)
@@ -296,7 +341,7 @@ def main():
     no_ans_eval = make_eval_dict(exact_thresh, f1_thresh, qid_list=no_ans_qids)
     merge_eval(out_eval, no_ans_eval, 'NoAns')
   if OPTS.na_prob_file:
-    find_all_best_thresh(out_eval, preds, exact_raw, f1_raw, na_probs, qid_to_has_ans)
+    find_all_best_thresh(out_eval, preds, exact_raw, f1_raw, na_probs, y_probs, n_probs, qid_to_has_ans, qid_to_y, qid_to_n)
   if OPTS.na_prob_file and OPTS.out_image_dir:
     run_precision_recall_analysis(out_eval, exact_raw, f1_raw, na_probs,
                                   qid_to_has_ans, OPTS.out_image_dir)

@@ -168,11 +168,12 @@ class QATask(task.Task):
   __metaclass__ = abc.ABCMeta
 
   def __init__(self, config: configure_finetuning.FinetuningConfig, name,
-               tokenizer, v2=False):
+               tokenizer, v2=False, yn=False):
     super(QATask, self).__init__(config, name)
     self._tokenizer = tokenizer
     self._examples = {}
     self.v2 = v2
+    self.yn = yn
 
   def _add_examples(self, examples, example_failures, paragraph, split):
     tokenizer = self._tokenizer
@@ -213,25 +214,35 @@ class QATask(task.Task):
             answer_offset = answer["char_spans"][0][0]
           else:  # SQuAD format
             answer = qa["answers"][0]
-            answer_offset = answer["answer_start"]
-          orig_answer_text = answer["text"]
-          answer_length = len(orig_answer_text)
+            if self.yn and (answer == 'yes' or answer == 'no'):
+              answer_offset = -100 if answer == 'yes' else -200
+            else:
+              answer_offset = answer["answer_start"]
 
-          start_position = encoded.char_to_token(answer_offset)
-          end_position = encoded.char_to_token(answer_offset + answer_length - 1)
 
-          actual_text = paragraph_text[offsets[start_position][0]: offsets[end_position][1]]
-          cleaned_answer_text = orig_answer_text
+          if answer_offset == -100 or answer_offset == -200:
+            start_position = answer_offset
+            end_position = answer_offset
+            orig_answer_text = answer
+          else:
+            orig_answer_text = answer["text"]
+            answer_length = len(orig_answer_text)
 
-          actual_text = actual_text.lower()
-          cleaned_answer_text = cleaned_answer_text.lower()
-          if actual_text.find(cleaned_answer_text) == -1:
-            utils.log("Could not find answer: '{:}' in doc vs. "
-                      "'{:}' in provided answer".format(
-                          tokenization.printable_text(actual_text),
-                          tokenization.printable_text(cleaned_answer_text)))
-            example_failures[0] += 1
-            continue
+            start_position = encoded.char_to_token(answer_offset)
+            end_position = encoded.char_to_token(answer_offset + answer_length - 1)
+
+            actual_text = paragraph_text[offsets[start_position][0]: offsets[end_position][1]]
+            cleaned_answer_text = orig_answer_text
+
+            actual_text = actual_text.lower()
+            cleaned_answer_text = cleaned_answer_text.lower()
+            if actual_text.find(cleaned_answer_text) == -1:
+              utils.log("Could not find answer: '{:}' in doc vs. "
+                        "'{:}' in provided answer".format(
+                            tokenization.printable_text(actual_text),
+                            tokenization.printable_text(cleaned_answer_text)))
+              example_failures[0] += 1
+              continue
             
           """
           start_position = char_to_word_offset[answer_offset]
@@ -351,6 +362,9 @@ class QATask(task.Task):
         break
       start_offset += min(length, self.config.doc_stride)
 
+    if tok_start_position == -100 or tok_start_position == -200:
+      assert len(doc_spans) == 1, "yes/no question cannot have seq length longer than max seq length"
+
     for (doc_span_index, doc_span) in enumerate(doc_spans):
       tokens = []
       #token_to_orig_map = {}
@@ -452,10 +466,23 @@ class QATask(task.Task):
             self.name + "_token_is_max_context": token_is_max_context,
         })
       if is_training:
+        if self.yn:
+          if tok_start_position == -100:
+            label = 2
+          elif tok_start_position == -200:
+            label = 3
+          elif example.is_impossible:
+            label = 0
+          else:
+            label = 1
+        else:
+          label = example.is_impossible
+
+
         features.update({
             self.name + "_start_positions": start_position,
             self.name + "_end_positions": end_position,
-            self.name + "_is_impossible": example.is_impossible
+            self.name + "_is_impossible": label
         })
       all_features.append(features)
     return all_features
@@ -556,10 +583,18 @@ class QATask(task.Task):
         final_repr = tf.concat([final_repr, start_feature], -1)
         final_repr = tf.layers.dense(final_repr, 512,
                                      activation=modeling.gelu)
-      answerable_logit = tf.squeeze(tf.layers.dense(final_repr, 1), -1)
-      answerable_loss = tf.nn.sigmoid_cross_entropy_with_logits(
-          labels=tf.cast(features[self.name + "_is_impossible"], tf.float32),
-          logits=answerable_logit)
+      if self.yn:
+        answerable_logit = tf.squeeze(tf.layers.dense(final_repr, 4), -1)
+        log_probs = tf.nn.log_softmax(answerable_logit, axis=-1)
+        label_ids = features[self.name + "_is_impossible"]
+        labels = tf.one_hot(label_ids, depth=4, dtype=tf.float32)
+        answerable_loss = -tf.reduce_sum(labels * log_probs, axis=-1)
+
+      else: 
+        answerable_logit = tf.squeeze(tf.layers.dense(final_repr, 1), -1)
+        answerable_loss = tf.nn.sigmoid_cross_entropy_with_logits(
+            labels=tf.cast(features[self.name + "_is_impossible"], tf.float32),
+            logits=answerable_logit)
       losses += answerable_loss * self.config.answerable_weight
 
     return losses, dict(
@@ -616,8 +651,8 @@ class SQuADTask(QATask):
   """Class for finetuning on SQuAD 2.0 or 1.1."""
 
   def __init__(self, config: configure_finetuning.FinetuningConfig, name,
-               tokenizer, v2=False):
-    super(SQuADTask, self).__init__(config, name, tokenizer, v2=v2)
+               tokenizer, v2=False, yn=False):
+    super(SQuADTask, self).__init__(config, name, tokenizer, v2=v2, yn=yn)
 
   def get_examples(self, split):
     if split in self._examples:
@@ -640,6 +675,13 @@ class SQuADTask(QATask):
 
   def get_scorer(self, split="dev"):
     return qa_metrics.SpanBasedQAScorer(self.config, self, split, self.v2)
+
+class YUERC(SQuADTask):
+  def __init__(self, config: configure_finetuning.FinetuningConfig, tokenizer):
+    super(YUERC, self).__init__(config, "yuerc", tokenizer, v2=True, yn=True)
+
+  def get_test_splits(self):
+    return ["test-en", "test-yn"]
 
 
 class SQuAD(SQuADTask):
