@@ -61,7 +61,7 @@ def parse_args():
 def set_opts(config: configure_finetuning.FinetuningConfig, split, name):
   global OPTS
   Options = collections.namedtuple("Options", [
-      "data_file", "pred_file", "out_file", "na_prob_file", "na_prob_thresh",
+      "data_file", "pred_file", "out_file", "na_prob_file", "y_prob_file", "n_prob_file", "na_prob_thresh", "y_prob_thresh", "n_prob_thresh",
       "out_image_dir", "verbose"])
   OPTS = Options(
       data_file=os.path.join(
