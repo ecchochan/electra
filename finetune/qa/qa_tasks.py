@@ -221,8 +221,7 @@ class QATask(task.Task):
               try:
                 answer_offset = answer["answer_start"] if isinstance(answer, dict) else qa['answer_pos']
               except:
-                print(qa)
-                raise
+                continue
 
 
           if answer_offset == -100 or answer_offset == -200:
