@@ -310,7 +310,7 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
               # model_runner.write_classification_outputs([task], trial, split)
           elif task.name == "squad" or task.name == 'yuerc':
             for split in task.get_test_splits():
-              scorer = model_runner.evaluate_task(task, split, False)
+              scorer = model_runner.evaluate_task(task, split)
           else:
             utils.log("Skipping task", task.name,
                       "- writing predictions is not supported for this task")
