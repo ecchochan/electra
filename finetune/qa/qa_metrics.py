@@ -114,7 +114,7 @@ class SpanBasedQAScorer(scorer.Scorer):
       paragraph_text = example.paragraph_text
       context_encoded = example.context_encoded
       offsets = context_encoded.offsets
-      example_id = example.qas_id if "squad" in self._name or "drcd" in self._name else example.qid
+      example_id = example.qas_id if "squad" in self._name or "drcd" in self._name or "yuerc" in self._name else example.qid
       features = self._task.featurize(example, False, for_eval=True)
       if features is None:
         print('skipped feature')
@@ -306,7 +306,7 @@ class SpanBasedQAScorer(scorer.Scorer):
 
       all_nbest_json[example_id] = nbest_json
 
-    import code; code.interact(local=locals());
+    # import code; code.interact(local=locals());
     utils.write_json(dict(all_predictions),
                      self._config.qa_preds_file(self._name))
     if self._v2:
