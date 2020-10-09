@@ -108,6 +108,8 @@ class SpanBasedQAScorer(scorer.Scorer):
     scores_y_json = collections.OrderedDict()
     scores_n_json = collections.OrderedDict()
 
+    print('self._eval_examples', len(self._eval_examples))
+
     for example in self._eval_examples:
       paragraph_text = example.paragraph_text
       context_encoded = example.context_encoded
