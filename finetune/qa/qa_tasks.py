@@ -207,7 +207,7 @@ class QATask(task.Task):
       is_impossible = False
       if split == "train":
         if self.v2:
-          is_impossible = qa["is_impossible"]
+          is_impossible = qa["is_impossible"] if "is_impossible" in qa else False
         if not is_impossible:
           if "detected_answers" in qa:  # MRQA format
             answer = qa["detected_answers"][0]
