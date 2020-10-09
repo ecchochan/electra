@@ -374,7 +374,8 @@ class QATask(task.Task):
       start_offset += min(length, self.config.doc_stride)
 
     if tok_start_position == -100 or tok_start_position == -200:
-      assert len(doc_spans) == 1, "yes/no question cannot have seq length longer than max seq length"
+      if len(doc_spans) != 1:
+        return 
 
     for (doc_span_index, doc_span) in enumerate(doc_spans):
       tokens = []

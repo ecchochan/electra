@@ -115,6 +115,8 @@ class Preprocessor(object):
   def _example_to_tf_example(self, example, is_training, log=False):
     examples = self._name_to_task[example.task_name].featurize(
         example, is_training, log)
+    if examples is None:
+      return
     if not isinstance(examples, list):
       examples = [examples]
     for example in examples:

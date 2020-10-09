@@ -113,6 +113,8 @@ class SpanBasedQAScorer(scorer.Scorer):
       offsets = context_encoded.offsets
       example_id = example.qas_id if "squad" in self._name or "drcd" in self._name else example.qid
       features = self._task.featurize(example, False, for_eval=True)
+      if features is None:
+        continue
 
       prelim_predictions = []
       # keep track of the minimum score of null start+end of position 0
