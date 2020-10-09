@@ -103,15 +103,20 @@ def make_qid_to_n(dataset):
         qid_to_n[qa['id']] = bool(qa['answer_text'] == 'no') if 'answer_text' in qa else False
   return qid_to_n
 
+import string, re
+exclude = set(string.punctuation)
+for e in '。，？！；：（）＇＂／—＿［］｛｝':
+  exclude.add(e)
+
+remove_articles_regex = re.compile(r'\b(a|an|the)\b', re.UNICODE)
+
 def normalize_answer(s):
   """Lower text and remove punctuation, articles and extra whitespace."""
   def remove_articles(text):
-    regex = re.compile(r'\b(a|an|the)\b', re.UNICODE)
-    return re.sub(regex, ' ', text)
+    return remove_articles_regex.sub(' ', text)
   def white_space_fix(text):
     return ' '.join(text.split())
   def remove_punc(text):
-    exclude = set(string.punctuation)
     return ''.join(ch for ch in text if ch not in exclude)
   def lower(text):
     return text.lower()
@@ -119,7 +124,8 @@ def normalize_answer(s):
 
 def get_tokens(s):
   if not s: return []
-  return normalize_answer(s).split()
+  return re.findall(r'[\u4e00-\u9fff]|[^ ]+',normalize_answer(s))
+  #return normalize_answer(s).split()
 
 def compute_exact(a_gold, a_pred):
   return int(normalize_answer(a_gold) == normalize_answer(a_pred))
@@ -345,7 +351,7 @@ def main():
     no_ans_eval = make_eval_dict(exact_thresh, f1_thresh, qid_list=no_ans_qids)
     merge_eval(out_eval, no_ans_eval, 'NoAns')
 
-  import code;  code.interact(local=locals());
+  # import code;  code.interact(local=locals());
   if OPTS.na_prob_file:
     find_all_best_thresh(out_eval, preds, exact_raw, f1_raw, na_probs, y_probs, n_probs, qid_to_has_ans, qid_to_y, qid_to_n)
   if OPTS.na_prob_file and OPTS.out_image_dir:
