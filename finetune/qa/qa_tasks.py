@@ -226,7 +226,7 @@ class QATask(task.Task):
             end_position = answer_offset
             orig_answer_text = answer
           else:
-            orig_answer_text = answer["text"]
+            orig_answer_text = answer["text"] if isinstance(answer, dict) else answer
             answer_length = len(orig_answer_text)
 
             start_position = encoded.char_to_token(answer_offset)
