@@ -344,6 +344,8 @@ def main():
   if no_ans_qids:
     no_ans_eval = make_eval_dict(exact_thresh, f1_thresh, qid_list=no_ans_qids)
     merge_eval(out_eval, no_ans_eval, 'NoAns')
+
+  import code;  code.interact(local=locals());
   if OPTS.na_prob_file:
     find_all_best_thresh(out_eval, preds, exact_raw, f1_raw, na_probs, y_probs, n_probs, qid_to_has_ans, qid_to_y, qid_to_n)
   if OPTS.na_prob_file and OPTS.out_image_dir:
