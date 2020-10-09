@@ -239,6 +239,9 @@ class QATask(task.Task):
               print('answer_offset', answer_offset)
               raise
 
+            if start_position is None or end_position is None:
+              continue
+
             actual_text = paragraph_text[offsets[start_position][0]: offsets[end_position][1]]
             cleaned_answer_text = orig_answer_text
 
