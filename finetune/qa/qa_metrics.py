@@ -117,6 +117,7 @@ class SpanBasedQAScorer(scorer.Scorer):
       example_id = example.qas_id if "squad" in self._name or "drcd" in self._name else example.qid
       features = self._task.featurize(example, False, for_eval=True)
       if features is None:
+        print('skipped feature')
         continue
 
       prelim_predictions = []
@@ -305,6 +306,7 @@ class SpanBasedQAScorer(scorer.Scorer):
 
       all_nbest_json[example_id] = nbest_json
 
+    import code; code.interact(local=locals());
     utils.write_json(dict(all_predictions),
                      self._config.qa_preds_file(self._name))
     if self._v2:
