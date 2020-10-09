@@ -207,17 +207,21 @@ class QATask(task.Task):
       is_impossible = False
       if split == "train":
         if self.v2:
-          is_impossible = qa["is_impossible"]
+          is_impossible = qa["is_impossible"] if "is_impossible" in qa else qa['answer_text'] == ''
         if not is_impossible:
           if "detected_answers" in qa:  # MRQA format
             answer = qa["detected_answers"][0]
             answer_offset = answer["char_spans"][0][0]
           else:  # SQuAD format
-            answer = qa["answers"][0]
+            answer = qa["answers"][0] if "answers" in qa else qa['answer_text']
+            
             if self.yn and (answer == 'yes' or answer == 'no'):
               answer_offset = -100 if answer == 'yes' else -200
             else:
-              answer_offset = answer["answer_start"]
+              try:
+                answer_offset = answer["answer_start"] if isinstance(answer, dict) else qa['answer_pos']
+              except:
+                continue
 
 
           if answer_offset == -100 or answer_offset == -200:
@@ -225,11 +229,18 @@ class QATask(task.Task):
             end_position = answer_offset
             orig_answer_text = answer
           else:
-            orig_answer_text = answer["text"]
+            orig_answer_text = answer["text"] if isinstance(answer, dict) else answer
             answer_length = len(orig_answer_text)
 
-            start_position = encoded.char_to_token(answer_offset)
-            end_position = encoded.char_to_token(answer_offset + answer_length - 1)
+            try:
+              start_position = encoded.char_to_token(answer_offset)
+              end_position = encoded.char_to_token(answer_offset + answer_length - 1)
+            except:
+              print('answer_offset', answer_offset)
+              raise
+
+            if start_position is None or end_position is None:
+              continue
 
             actual_text = paragraph_text[offsets[start_position][0]: offsets[end_position][1]]
             cleaned_answer_text = orig_answer_text
@@ -361,6 +372,10 @@ class QATask(task.Task):
       if start_offset + length == len(all_doc_tokens):
         break
       start_offset += min(length, self.config.doc_stride)
+    if is_training:
+      if tok_start_position == -100 or tok_start_position == -200:
+        if len(doc_spans) != 1:
+          return 
 
     if tok_start_position == -100 or tok_start_position == -200:
       assert len(doc_spans) == 1, "yes/no question cannot have seq length longer than max seq length"
@@ -584,7 +599,7 @@ class QATask(task.Task):
         final_repr = tf.layers.dense(final_repr, 512,
                                      activation=modeling.gelu)
       if self.yn:
-        answerable_logit = tf.squeeze(tf.layers.dense(final_repr, 4), -1)
+        answerable_logit = tf.layers.dense(final_repr, 4)
         log_probs = tf.nn.log_softmax(answerable_logit, axis=-1)
         label_ids = features[self.name + "_is_impossible"]
         labels = tf.one_hot(label_ids, depth=4, dtype=tf.float32)

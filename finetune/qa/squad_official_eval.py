@@ -61,7 +61,7 @@ def parse_args():
 def set_opts(config: configure_finetuning.FinetuningConfig, split, name):
   global OPTS
   Options = collections.namedtuple("Options", [
-      "data_file", "pred_file", "out_file", "na_prob_file", "na_prob_thresh",
+      "data_file", "pred_file", "out_file", "na_prob_file", "y_prob_file", "n_prob_file", "na_prob_thresh", "y_prob_thresh", "n_prob_thresh",
       "out_image_dir", "verbose"])
   OPTS = Options(
       data_file=os.path.join(
@@ -92,7 +92,7 @@ def make_qid_to_y(dataset):
   for article in dataset:
     for p in article['paragraphs']:
       for qa in p['qas']:
-        qid_to_y[qa['id']] = bool(qa['answer_text'] == 'yes')
+        qid_to_y[qa['id']] = bool(qa['answer_text'] == 'yes') if 'answer_text' in qa else False
   return qid_to_y
 
 def make_qid_to_n(dataset):
@@ -100,7 +100,7 @@ def make_qid_to_n(dataset):
   for article in dataset:
     for p in article['paragraphs']:
       for qa in p['qas']:
-        qid_to_n[qa['id']] = bool(qa['answer_text'] == 'no')
+        qid_to_n[qa['id']] = bool(qa['answer_text'] == 'no') if 'answer_text' in qa else False
   return qid_to_n
 
 def normalize_answer(s):
@@ -153,6 +153,7 @@ def get_raw_scores(dataset, preds):
           gold_answers = ['']
         if qid not in preds:
           print('Missing prediction for %s' % qid)
+          raise
           continue
         a_pred = preds[qid]
         # Take max over all gold answers
@@ -164,13 +165,15 @@ def apply_no_ans_threshold(scores, na_probs, y_probs, n_probs, qid_to_has_ans, q
   new_scores = {}
   for qid, s in scores.items():
     pred_na = na_probs[qid] > na_prob_thresh
-    pred_y = y_probs[qid] > na_prob_thresh
-    pred_n = n_probs[qid] > na_prob_thresh
+    if y_probs is not None:
+      pred_y = y_probs[qid] > na_prob_thresh
+    if n_probs is not None:
+      pred_n = n_probs[qid] > na_prob_thresh
     if pred_na:
       new_scores[qid] = float(not qid_to_has_ans[qid])
-    elif pred_y:
+    elif y_probs is not None and pred_y:
       new_scores[qid] = float(qid_to_y[qid])
-    elif pred_n:
+    elif n_probs is not None and pred_n:
       new_scores[qid] = float(qid_to_n[qid])
     else:
       new_scores[qid] = s
@@ -308,21 +311,28 @@ def main():
     dataset = dataset_json['data']
   with tf.io.gfile.GFile(OPTS.pred_file) as f:
     preds = json.load(f)
+  print('preds','>>', len(preds))
   if OPTS.na_prob_file:
     with tf.io.gfile.GFile(OPTS.na_prob_file) as f:
       na_probs = json.load(f)
   else:
     na_probs = {k: 0.0 for k in preds}
   if OPTS.y_prob_file:
-    with tf.io.gfile.GFile(OPTS.y_prob_file) as f:
-      y_probs = json.load(f)
+    try:
+      with tf.io.gfile.GFile(OPTS.y_prob_file) as f:
+        y_probs = json.load(f)
+    except:
+      y_probs = None
   else:
-    y_probs = {k: 0.0 for k in preds}
+    y_probs = None
   if OPTS.n_prob_file:
-    with tf.io.gfile.GFile(OPTS.n_prob_file) as f:
-      n_probs = json.load(f)
+    try:
+      with tf.io.gfile.GFile(OPTS.n_prob_file) as f:
+        n_probs = json.load(f)
+    except:
+      n_probs = None
   else:
-    n_probs = {k: 0.0 for k in preds}
+    n_probs = None
   qid_to_has_ans = make_qid_to_has_ans(dataset)  # maps qid to True/False
   qid_to_y = make_qid_to_y(dataset)  # maps qid to True/False
   qid_to_n = make_qid_to_n(dataset)  # maps qid to True/False

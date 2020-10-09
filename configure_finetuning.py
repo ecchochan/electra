@@ -44,6 +44,7 @@ class FinetuningConfig(object):
     self.down_scale_factor = 1
     self.inner_group_num = 1
     self.hidden_dropout_prob = 0
+    self.yuenli_mix_mnli = 150000
 
     # model
     self.model_size = "small"  # one of "small", "base", or "large"
@@ -119,7 +120,7 @@ class FinetuningConfig(object):
     self.init_checkpoint = None if self.debug else pretrained_model_dir
     self.model_dir = os.path.join(pretrained_model_dir, "finetuning_models",
                                   task_names_str + "_model")
-    results_dir = os.path.join(pretrained_model_dir, "results")
+    results_dir = os.path.join('./', "results")
     self.results_txt = os.path.join(results_dir,
                                     task_names_str + "_results.txt")
     self.results_pkl = os.path.join(results_dir,
@@ -132,7 +133,7 @@ class FinetuningConfig(object):
         pretrained_model_dir, "finetuning_tfrecords",
         task_names_str + "_tfrecords" + ("-debug" if self.debug else ""))
     self.test_predictions = os.path.join(
-        pretrained_model_dir, "test_predictions",
+        './', "test_predictions",
         "{:}_{:}_{:}_predictions.pkl").format
 
     # update defaults with passed-in hyperparameters

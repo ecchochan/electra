@@ -92,6 +92,7 @@ class SpanBasedQAScorer(scorer.Scorer):
   def write_predictions(self):
     """Write final predictions to the json file."""
     tokenizer = self.tokenizer
+    yn = self._name == 'yuerc'
     unique_id_to_result = {}
     for result in self._all_results:
       unique_id_to_result[result.unique_id] = result
@@ -107,12 +108,17 @@ class SpanBasedQAScorer(scorer.Scorer):
     scores_y_json = collections.OrderedDict()
     scores_n_json = collections.OrderedDict()
 
+    print('self._eval_examples', len(self._eval_examples))
+
     for example in self._eval_examples:
       paragraph_text = example.paragraph_text
       context_encoded = example.context_encoded
       offsets = context_encoded.offsets
-      example_id = example.qas_id if "squad" in self._name or "drcd" in self._name else example.qid
+      example_id = example.qas_id if "squad" in self._name or "drcd" in self._name or "yuerc" in self._name else example.qid
       features = self._task.featurize(example, False, for_eval=True)
+      if features is None:
+        print('skipped feature')
+        continue
 
       prelim_predictions = []
       # keep track of the minimum score of null start+end of position 0
@@ -136,7 +142,7 @@ class SpanBasedQAScorer(scorer.Scorer):
         # if we could have irrelevant answers, get the min score of irrelevant
         if self._v2:
           if self._config.answerable_classifier:
-            feature_null_score = result.answerable_logit[0] if self.yn else result.answerable_logit
+            feature_null_score = result.answerable_logit[0] if yn else result.answerable_logit
           else:
             feature_null_score = result.start_logits[0] + result.end_logits[0]
           if feature_null_score < score_null:
@@ -250,8 +256,8 @@ class SpanBasedQAScorer(scorer.Scorer):
                 text=final_text,
                 start_logit=pred.start_logit,
                 end_logit=pred.end_logit, 
-                y=answerable_logit[2],
-                n=answerable_logit[3]))
+                y=answerable_logit[2] if yn else None,
+                n=answerable_logit[3] if yn else None))
 
       # In very rare edge cases we could have no valid predictions. So we
       # just create a nonce prediction in this case to avoid failure.
@@ -293,20 +299,21 @@ class SpanBasedQAScorer(scorer.Scorer):
           score_diff = score_null - best_non_null_entry.start_logit - (
               best_non_null_entry.end_logit)
         scores_diff_json[example_id] = score_diff
-        if self.yn:
+        if yn:
           scores_y_json[example_id] = best_non_null_entry.y
           scores_n_json[example_id] = best_non_null_entry.n
         all_predictions[example_id] = best_non_null_entry.text
 
       all_nbest_json[example_id] = nbest_json
 
+    # import code; code.interact(local=locals());
     utils.write_json(dict(all_predictions),
                      self._config.qa_preds_file(self._name))
     if self._v2:
       utils.write_json({
           k: float(v) for k, v in six.iteritems(scores_diff_json)},
           self._config.qa_na_file(self._name))
-      if self.yn:
+      if yn:
         utils.write_json({
             k: float(v) for k, v in six.iteritems(scores_y_json)},
             self._config.qa_na_file(self._name + '_y'))
