@@ -256,8 +256,8 @@ class SpanBasedQAScorer(scorer.Scorer):
                 text=final_text,
                 start_logit=pred.start_logit,
                 end_logit=pred.end_logit, 
-                y=answerable_logit[2],
-                n=answerable_logit[3]))
+                y=answerable_logit[2] if yn else None,
+                n=answerable_logit[3] if yn else None))
 
       # In very rare edge cases we could have no valid predictions. So we
       # just create a nonce prediction in this case to avoid failure.
