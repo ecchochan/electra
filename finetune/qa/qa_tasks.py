@@ -229,8 +229,12 @@ class QATask(task.Task):
             orig_answer_text = answer["text"] if isinstance(answer, dict) else answer
             answer_length = len(orig_answer_text)
 
-            start_position = encoded.char_to_token(answer_offset)
-            end_position = encoded.char_to_token(answer_offset + answer_length - 1)
+            try:
+              start_position = encoded.char_to_token(answer_offset)
+              end_position = encoded.char_to_token(answer_offset + answer_length - 1)
+            except:
+              print('answer_offset', answer_offset)
+              raise
 
             actual_text = paragraph_text[offsets[start_position][0]: offsets[end_position][1]]
             cleaned_answer_text = orig_answer_text
