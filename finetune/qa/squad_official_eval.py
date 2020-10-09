@@ -92,7 +92,7 @@ def make_qid_to_y(dataset):
   for article in dataset:
     for p in article['paragraphs']:
       for qa in p['qas']:
-        qid_to_y[qa['id']] = bool(qa['answer_text'] == 'yes')
+        qid_to_y[qa['id']] = bool(qa['answer_text'] == 'yes') if 'answer_text' in qa else False
   return qid_to_y
 
 def make_qid_to_n(dataset):
@@ -100,7 +100,7 @@ def make_qid_to_n(dataset):
   for article in dataset:
     for p in article['paragraphs']:
       for qa in p['qas']:
-        qid_to_n[qa['id']] = bool(qa['answer_text'] == 'no')
+        qid_to_n[qa['id']] = bool(qa['answer_text'] == 'no') if 'answer_text' in qa else False
   return qid_to_n
 
 def normalize_answer(s):
