@@ -596,7 +596,7 @@ class QATask(task.Task):
         final_repr = tf.layers.dense(final_repr, 512,
                                      activation=modeling.gelu)
       if self.yn:
-        answerable_logit = tf.squeeze(tf.layers.dense(final_repr, 4), -1)
+        answerable_logit = tf.layers.dense(final_repr, 4)
         log_probs = tf.nn.log_softmax(answerable_logit, axis=-1)
         label_ids = features[self.name + "_is_impossible"]
         labels = tf.one_hot(label_ids, depth=4, dtype=tf.float32)
