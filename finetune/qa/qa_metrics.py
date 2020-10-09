@@ -77,7 +77,7 @@ class SpanBasedQAScorer(scorer.Scorer):
 
   def _get_results(self):
     self.write_predictions()
-    if self._name in ('squad','yuerc'):
+    if self._name in ('squad','yuerc','yuespan'):
       squad_official_eval.set_opts(self._config, self._split, self._name)
       squad_official_eval.main()
       return sorted(utils.load_json(
@@ -114,7 +114,7 @@ class SpanBasedQAScorer(scorer.Scorer):
       paragraph_text = example.paragraph_text
       context_encoded = example.context_encoded
       offsets = context_encoded.offsets
-      example_id = example.qas_id if "squad" in self._name or "drcd" in self._name or "yuerc" in self._name else example.qid
+      example_id = example.qas_id if "squad" in self._name or "drcd" in self._name or "yuerc" in self._nameor "yuespan" in self._name else example.qid
       features = self._task.featurize(example, False, for_eval=True)
       if features is None:
         print('skipped feature')
