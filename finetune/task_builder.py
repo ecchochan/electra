@@ -58,6 +58,8 @@ def get_task(config: configure_finetuning.FinetuningConfig, task_name,
     return qa_tasks.SQuAD(config, tokenizer)
   elif task_name == "yuerc":
     return qa_tasks.YUERC(config, tokenizer)
+  elif task_name == "yuerc2":
+    return qa_tasks.YUERC2(config, tokenizer)
   elif task_name == "yuespan":
     return qa_tasks.YUESPAN(config, tokenizer)
   elif task_name == "drcd":

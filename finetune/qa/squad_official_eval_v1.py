@@ -49,11 +49,8 @@ def mixed_segmentation(in_str, rm_punc=True):
       segs_out.append(char)
     else:
       temp_str += char
-
-  #handling last part
   if temp_str != "":
     segs_out.extend(temp_str.split())
-
   return segs_out
 
 import string, re
@@ -108,17 +105,6 @@ def f1_score(prediction, ground_truth):
   f1 			= (2*precision*recall)/(precision+recall)
   return f1
 
-  prediction_tokens = normalize_answer(prediction).split()
-  ground_truth_tokens = normalize_answer(ground_truth).split()
-  common = Counter(prediction_tokens) & Counter(ground_truth_tokens)
-  num_same = sum(common.values())
-  if num_same == 0:
-    return 0
-  precision = 1.0 * num_same / len(prediction_tokens)
-  recall = 1.0 * num_same / len(ground_truth_tokens)
-  f1 = (2 * precision * recall) / (precision + recall)
-  return f1
-
 
 def exact_match_score(prediction, ground_truth):
   return (normalize_answer(prediction) == normalize_answer(ground_truth))
@@ -149,10 +135,8 @@ def evaluate(dataset, predictions):
             exact_match_score, prediction, ground_truths)
         f1 += metric_max_over_ground_truths(
             f1_score, prediction, ground_truths)
-
   exact_match = 100.0 * exact_match / total
   f1 = 100.0 * f1 / total
-
   return {'exact_match': exact_match, 'f1': f1}
 
 

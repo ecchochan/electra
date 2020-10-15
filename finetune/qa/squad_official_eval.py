@@ -121,11 +121,8 @@ def mixed_segmentation(in_str, rm_punc=True):
       segs_out.append(char)
     else:
       temp_str += char
-
-  #handling last part
   if temp_str != "":
     segs_out.extend(temp_str.split())
-
   return segs_out
 
 import string, re
@@ -209,7 +206,6 @@ def get_raw_scores(dataset, preds):
         f1_scores[qid] = max(compute_f1(a, a_pred) for a in gold_answers)
         if f1_scores[qid] < 0.5:
           wrongs.append(qid)
-          
   return exact_scores, f1_scores, wrongs
 
 def apply_no_ans_threshold(scores, na_probs, y_probs, n_probs, qid_to_has_ans, qid_to_y, qid_to_n, na_prob_thresh, y_prob_thresh, n_prob_thresh):
@@ -220,7 +216,6 @@ def apply_no_ans_threshold(scores, na_probs, y_probs, n_probs, qid_to_has_ans, q
       new_scores[qid] = float(not qid_to_has_ans[qid])
     else:
       new_scores[qid] = s
-      
   return new_scores
 
 def make_eval_dict(exact_scores, f1_scores, qid_list=None):
@@ -395,7 +390,6 @@ def main():
   if no_ans_qids:
     no_ans_eval = make_eval_dict(exact_thresh, f1_thresh, qid_list=no_ans_qids)
     merge_eval(out_eval, no_ans_eval, 'NoAns')
-
   # import code;  code.interact(local=locals());
   if OPTS.na_prob_file:
     find_all_best_thresh(out_eval, preds, exact_raw, f1_raw, na_probs, y_probs, n_probs, qid_to_has_ans, qid_to_y, qid_to_n)

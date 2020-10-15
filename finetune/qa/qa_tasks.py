@@ -293,7 +293,7 @@ class QATask(task.Task):
           end_position = -1
           orig_answer_text = answer
       else:
-        orig_answer_text = qa['answer_text'] if "answer_text" in qa else (qa["answers"][0] if 'answers' in qa and qa['answers'] else "")
+        orig_answer_text = qa['answer_text'] if "answer_text" in qa else (qa["answers"][0]['text'] if 'answers' in qa and qa['answers'] else "")
 
       example = QAExample(
           task_name=self.name,
@@ -487,9 +487,9 @@ class QATask(task.Task):
           elif tok_start_position == -200:
             label = 3
           elif example.is_impossible:
-            label = 0
-          else:
             label = 1
+          else:
+            label = 0
         else:
           label = example.is_impossible
 
@@ -696,7 +696,14 @@ class YUERC(SQuADTask):
     super(YUERC, self).__init__(config, "yuerc", tokenizer, v2=True, yn=True)
 
   def get_test_splits(self):
-    return ["test-en", "test-yn"]
+    return ["test-zh", "test-yn"]
+
+class YUERC2(SQuADTask):
+  def __init__(self, config: configure_finetuning.FinetuningConfig, tokenizer):
+    super(YUERC2, self).__init__(config, "yuerc2", tokenizer, v2=True, yn=True)
+
+  def get_test_splits(self):
+    return ["test-zh", "test-yn"]
 
 class YUESPAN(SQuADTask):
   def __init__(self, config: configure_finetuning.FinetuningConfig, tokenizer):

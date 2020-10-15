@@ -77,7 +77,7 @@ class SpanBasedQAScorer(scorer.Scorer):
 
   def _get_results(self):
     self.write_predictions()
-    if self._name in ('squad','yuerc','yuespan'):
+    if self._name in ('squad','yuerc', 'yuerc2','yuespan'):
       squad_official_eval.set_opts(self._config, self._split, self._name)
       squad_official_eval.main()
       return sorted(utils.load_json(
@@ -92,7 +92,7 @@ class SpanBasedQAScorer(scorer.Scorer):
   def write_predictions(self):
     """Write final predictions to the json file."""
     tokenizer = self.tokenizer
-    yn = self._name == 'yuerc'
+    yn = self._name == 'yuerc' or self._name == 'yuerc2'
     unique_id_to_result = {}
     for result in self._all_results:
       unique_id_to_result[result.unique_id] = result
@@ -143,7 +143,7 @@ class SpanBasedQAScorer(scorer.Scorer):
         feature_null_score = 0
         if self._v2:
           if self._config.answerable_classifier:
-            feature_null_score = result.answerable_logit[0] if yn else result.answerable_logit
+            feature_null_score = result.answerable_logit[1] if yn else result.answerable_logit
           else:
             feature_null_score = result.start_logits[0] + result.end_logits[0]
           if feature_null_score < score_null:
