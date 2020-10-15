@@ -292,7 +292,7 @@ class QATask(task.Task):
           start_position = -1
           end_position = -1
           orig_answer_text = answer
-      if orig_answer_text is None:
+      else:
         answer = qa['answer_text'] if "answer_text" in qa else (qa["answers"][0] if 'answers' in qa and qa['answers'] else "")
 
       example = QAExample(

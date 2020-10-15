@@ -100,7 +100,7 @@ class SpanBasedQAScorer(scorer.Scorer):
     _PrelimPrediction = collections.namedtuple(  # pylint: disable=invalid-name
         "PrelimPrediction",
         ["feature_index", "start_index", "end_index", "start_logit",
-         "end_logit", "answerable_logit"])
+         "end_logit", "answerable_logit", "feature_null_score"])
 
     all_predictions = collections.OrderedDict()
     all_nbest_json = collections.OrderedDict()
@@ -140,6 +140,7 @@ class SpanBasedQAScorer(scorer.Scorer):
           end_indexes = _get_best_indexes(result.end_logits,
                                           self._config.n_best_size)
         # if we could have irrelevant answers, get the min score of irrelevant
+        feature_null_score = 0
         if self._v2:
           if self._config.answerable_classifier:
             feature_null_score = result.answerable_logit[0] if yn else result.answerable_logit
@@ -184,7 +185,8 @@ class SpanBasedQAScorer(scorer.Scorer):
                     end_index=end_index,
                     start_logit=start_logit,
                     end_logit=end_logit,
-                    answerable_logit=result.answerable_logit))
+                    answerable_logit=result.answerable_logit,
+                    feature_null_score=feature_null_score))
 
       if self._v2:
         if False and len(prelim_predictions) == 0 and self._config.debug:
@@ -194,14 +196,15 @@ class SpanBasedQAScorer(scorer.Scorer):
               end_index=0 + 1,
               start_logit=1.0,
               end_logit=1.0,
-              answerable_logit=None))
+              answerable_logit=None,
+              feature_null_score=0))
       prelim_predictions = sorted(
           prelim_predictions,
           key=lambda x: (x.start_logit + x.end_logit),
           reverse=True)
 
       _NbestPrediction = collections.namedtuple(  # pylint: disable=invalid-name
-          "NbestPrediction", ["text", "start_logit", "end_logit", "y","n"])
+          "NbestPrediction", ["text", "start_logit", "end_logit", "null_score", "y","n"])
 
       seen_predictions = {}
       nbest = []
@@ -256,6 +259,7 @@ class SpanBasedQAScorer(scorer.Scorer):
                 text=final_text,
                 start_logit=pred.start_logit,
                 end_logit=pred.end_logit, 
+                null_score=pred.feature_null_score,
                 y=answerable_logit[2] if yn else None,
                 n=answerable_logit[3] if yn else None))
 
@@ -263,7 +267,7 @@ class SpanBasedQAScorer(scorer.Scorer):
       # just create a nonce prediction in this case to avoid failure.
       if not nbest:
         nbest.append(
-            _NbestPrediction(text="empty", start_logit=0.0, end_logit=0.0, y=0, n=0))
+            _NbestPrediction(text="empty", start_logit=0.0, end_logit=0.0, null_score=0.0, y=0, n=0))
 
       assert len(nbest) >= 1
 
