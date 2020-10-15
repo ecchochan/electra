@@ -207,7 +207,7 @@ class QATask(task.Task):
       is_impossible = False
       if split == "train":
         if self.v2:
-          is_impossible = qa["is_impossible"] if "is_impossible" in qa else (qa['answer_text'] == '')
+          is_impossible = (qa['answer_text'] == '') if "is_impossible" not in qa else qa["is_impossible"]
         if not is_impossible:
           if "detected_answers" in qa:  # MRQA format
             answer = qa["detected_answers"][0]
@@ -291,7 +291,9 @@ class QATask(task.Task):
         else:
           start_position = -1
           end_position = -1
-          orig_answer_text = ""
+          orig_answer_text = answer
+      if orig_answer_text is None:
+        answer = qa['answer_text'] if "answer_text" in qa else (qa["answers"][0] if 'answers' in qa and qa['answers'] else "")
 
       example = QAExample(
           task_name=self.name,
