@@ -161,6 +161,7 @@ class CanTokenizer(BaseTokenizer):
         special_chars: str = SPECIAL_CHARS,
         zh_norm: bool = True,
         handle_simpl: bool = True,
+        do_postprocess: bool = False
     ):
 
         if vocab_file is not None:
@@ -196,6 +197,16 @@ class CanTokenizer(BaseTokenizer):
         )])
         tokenizer.pre_tokenizer = BertPreTokenizer()
 
+        if vocab_file is not None and do_postprocess:
+            sep_token_id = tokenizer.token_to_id(str(sep_token))
+            if sep_token_id is None:
+                raise TypeError("sep_token not found in the vocabulary")
+            cls_token_id = tokenizer.token_to_id(str(cls_token))
+            if cls_token_id is None:
+                raise TypeError("cls_token not found in the vocabulary")
+            tokenizer.post_processor = BertProcessing(
+                (str(sep_token), sep_token_id), (str(cls_token), cls_token_id)
+            )
         
         tokenizer.decoder = decoders.WordPiece(prefix=wordpieces_prefix)
 

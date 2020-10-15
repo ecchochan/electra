@@ -84,7 +84,7 @@ def make_qid_to_has_ans(dataset):
   for article in dataset:
     for p in article['paragraphs']:
       for qa in p['qas']:
-        qid_to_has_ans[qa['id']] = bool(qa['answers'])
+        qid_to_has_ans[qa['id']] = bool(qa['answer_text']) if 'answer_text' in qa else bool(qa['answers'])
   return qid_to_has_ans
 
 def make_qid_to_y(dataset):
@@ -103,10 +103,32 @@ def make_qid_to_n(dataset):
         qid_to_n[qa['id']] = bool(qa['answer_text'] == 'no') if 'answer_text' in qa else False
   return qid_to_n
 
+
+def mixed_segmentation(in_str, rm_punc=True):
+  in_str = str(in_str).lower().strip()
+  segs_out = []
+  temp_str = ""
+  sp_char = ['-',':','_','*','^','/','\\','~','`','+','=',
+        '，','。','：','？','！','“','”','；','’','《','》','……','·','、',
+        '「','」','（','）','－','～','『','』']
+  for char in in_str:
+    if rm_punc and char in sp_char:
+      continue
+    if re.search(r'[\u4e00-\u9fa5]', char) or char in sp_char:
+      if temp_str != "":
+        segs_out.extend(temp_str.split())
+        temp_str = ""
+      segs_out.append(char)
+    else:
+      temp_str += char
+
+  #handling last part
+  if temp_str != "":
+    segs_out.extend(temp_str.split())
+
+  return segs_out
+
 import string, re
-exclude = set(string.punctuation)
-for e in '。，？！；：（）＇＂／—＿［］｛｝':
-  exclude.add(e)
 
 remove_articles_regex = re.compile(r'\b(a|an|the)\b', re.UNICODE)
 
@@ -116,11 +138,35 @@ def normalize_answer(s):
     return remove_articles_regex.sub(' ', text)
   def white_space_fix(text):
     return ' '.join(text.split())
-  def remove_punc(text):
-    return ''.join(ch for ch in text if ch not in exclude)
+  def remove_punc(in_str):
+    in_str = str(in_str).lower().strip()
+    sp_char = set(['-',':','_','*','^','/','\\','~','`','+','=',
+          '，','。','：','？','！','“','”','；','’','《','》','…','·','、',
+          '「','」','（','）','－','～','『','』'] + list(string.punctuation))
+    out_segs = []
+    for char in in_str:
+      if char in sp_char:
+        continue
+      else:
+        out_segs.append(char)
+    return ''.join(out_segs)
   def lower(text):
     return text.lower()
-  return white_space_fix(remove_articles(remove_punc(lower(s))))
+  return mixed_segmentation(white_space_fix(remove_articles(remove_punc(lower(s)))))
+
+# find longest common string
+def find_lcs(s1, s2):
+	m = [[0 for i in range(len(s2)+1)] for j in range(len(s1)+1)]
+	mmax = 0
+	p = 0
+	for i in range(len(s1)):
+		for j in range(len(s2)):
+			if s1[i] == s2[j]:
+				m[i+1][j+1] = m[i][j]+1
+				if m[i+1][j+1] > mmax:
+					mmax=m[i+1][j+1]
+					p=i+1
+	return s1[p-mmax:p], mmax
 
 def get_tokens(s):
   if not s: return []
@@ -131,41 +177,40 @@ def compute_exact(a_gold, a_pred):
   return int(normalize_answer(a_gold) == normalize_answer(a_pred))
 
 def compute_f1(a_gold, a_pred):
-  gold_toks = get_tokens(a_gold)
-  pred_toks = get_tokens(a_pred)
-  common = collections.Counter(gold_toks) & collections.Counter(pred_toks)
-  num_same = sum(common.values())
-  if len(gold_toks) == 0 or len(pred_toks) == 0:
-    # If either is no-answer, then F1 is 1 if they agree, 0 otherwise
-    return int(gold_toks == pred_toks)
-  if num_same == 0:
+  A = normalize_answer(a_gold)
+  B = normalize_answer(a_pred)
+  lcs, lcs_len = find_lcs(A, B)
+  if lcs_len == 0:
     return 0
-  precision = 1.0 * num_same / len(pred_toks)
-  recall = 1.0 * num_same / len(gold_toks)
-  f1 = (2 * precision * recall) / (precision + recall)
+  precision 	= 1.0*lcs_len/len(B)
+  recall 		= 1.0*lcs_len/len(A)
+  f1 			= (2*precision*recall)/(precision+recall)
   return f1
 
 def get_raw_scores(dataset, preds):
   exact_scores = {}
   f1_scores = {}
+  wrongs = []
   for article in dataset:
     for p in article['paragraphs']:
       for qa in p['qas']:
         qid = qa['id']
         gold_answers = [a['text'] for a in qa['answers']
-                        if normalize_answer(a['text'])]
+                        if normalize_answer(a['text'])] if 'answers' in qa else [qa['answer_text']]
         if not gold_answers:
           # For unanswerable questions, only correct answer is empty string
           gold_answers = ['']
         if qid not in preds:
           print('Missing prediction for %s' % qid)
-          raise
           continue
         a_pred = preds[qid]
         # Take max over all gold answers
         exact_scores[qid] = max(compute_exact(a, a_pred) for a in gold_answers)
         f1_scores[qid] = max(compute_f1(a, a_pred) for a in gold_answers)
-  return exact_scores, f1_scores
+        if f1_scores[qid] < 0.5:
+          wrongs.append(qid)
+          
+  return exact_scores, f1_scores, wrongs
 
 def apply_no_ans_threshold(scores, na_probs, y_probs, n_probs, qid_to_has_ans, qid_to_y, qid_to_n, na_prob_thresh, y_prob_thresh, n_prob_thresh):
   new_scores = {}
@@ -338,7 +383,7 @@ def main():
   qid_to_n = make_qid_to_n(dataset)  # maps qid to True/False
   has_ans_qids = [k for k, v in qid_to_has_ans.items() if v]
   no_ans_qids = [k for k, v in qid_to_has_ans.items() if not v]
-  exact_raw, f1_raw = get_raw_scores(dataset, preds)
+  exact_raw, f1_raw, wrongs = get_raw_scores(dataset, preds)
   exact_thresh = apply_no_ans_threshold(exact_raw, na_probs, y_probs, n_probs, qid_to_has_ans, qid_to_y, qid_to_n,
                                         OPTS.na_prob_thresh, OPTS.y_prob_thresh, OPTS.n_prob_thresh)
   f1_thresh = apply_no_ans_threshold(f1_raw, na_probs, y_probs, n_probs, qid_to_has_ans, qid_to_y, qid_to_n,

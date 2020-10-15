@@ -213,7 +213,7 @@ class QATask(task.Task):
             answer = qa["detected_answers"][0]
             answer_offset = answer["char_spans"][0][0]
           else:  # SQuAD format
-            answer = qa["answers"][0] if "answers" in qa else qa['answer_text']
+            answer = qa['answer_text'] if "answer_text" in qa else qa["answers"][0]
             
             if self.yn and (answer == 'yes' or answer == 'no'):
               answer_offset = -100 if answer == 'yes' else -200
@@ -709,9 +709,19 @@ class SQuAD(SQuADTask):
     super(SQuAD, self).__init__(config, "squad", tokenizer, v2=True)
 
 
+class CAIL2019(SQuADTask):
+  def __init__(self, config: configure_finetuning.FinetuningConfig, tokenizer):
+    super(CAIL2019, self).__init__(config, "cail2019", tokenizer, v2=True)
+
+
 class DRCD(SQuADTask):
   def __init__(self, config: configure_finetuning.FinetuningConfig, tokenizer):
     super(DRCD, self).__init__(config, "drcd", tokenizer)
+
+
+class CMRC2018(SQuADTask):
+  def __init__(self, config: configure_finetuning.FinetuningConfig, tokenizer):
+    super(CMRC2018, self).__init__(config, "cmrc2018", tokenizer)
 
 
 class SQuADv1(SQuADTask):

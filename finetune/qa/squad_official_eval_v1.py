@@ -56,20 +56,21 @@ def mixed_segmentation(in_str, rm_punc=True):
 
   return segs_out
 
+import string, re
+
+remove_articles_regex = re.compile(r'\b(a|an|the)\b', re.UNICODE)
 
 def normalize_answer(s):
   """Lower text and remove punctuation, articles and extra whitespace."""
   def remove_articles(text):
-    return re.sub(r'\b(a|an|the)\b', ' ', text)
-
+    return remove_articles_regex.sub(' ', text)
   def white_space_fix(text):
     return ' '.join(text.split())
-
   def remove_punc(in_str):
     in_str = str(in_str).lower().strip()
-    sp_char = ['-',':','_','*','^','/','\\','~','`','+','=',
-          '，','。','：','？','！','“','”','；','’','《','》','……','·','、',
-          '「','」','（','）','－','～','『','』']
+    sp_char = set(['-',':','_','*','^','/','\\','~','`','+','=',
+          '，','。','：','？','！','“','”','；','’','《','》','…','·','、',
+          '「','」','（','）','－','～','『','』'] + list(string.punctuation))
     out_segs = []
     for char in in_str:
       if char in sp_char:
@@ -77,10 +78,8 @@ def normalize_answer(s):
       else:
         out_segs.append(char)
     return ''.join(out_segs)
-
   def lower(text):
     return text.lower()
-
   return mixed_segmentation(white_space_fix(remove_articles(remove_punc(lower(s)))))
 
 

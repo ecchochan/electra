@@ -62,6 +62,10 @@ def get_task(config: configure_finetuning.FinetuningConfig, task_name,
     return qa_tasks.YUESPAN(config, tokenizer)
   elif task_name == "drcd":
     return qa_tasks.DRCD(config, tokenizer)
+  elif task_name == "cail2019":
+    return qa_tasks.CAIL2019(config, tokenizer)
+  elif task_name == "cmrc2018":
+    return qa_tasks.CMRC2018(config, tokenizer)
   elif task_name == "squadv1":
     return qa_tasks.SQuADv1(config, tokenizer)
   elif task_name == "newsqa":
