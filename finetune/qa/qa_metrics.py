@@ -304,9 +304,9 @@ class SpanBasedQAScorer(scorer.Scorer):
               best_non_null_entry.end_logit)
         scores_diff_json[example_id] = score_diff
         if yn:
-          scores_y_json[example_id] = best_non_null_entry.y
-          scores_n_json[example_id] = best_non_null_entry.n
-        all_predictions[example_id] = best_non_null_entry.text
+          scores_y_json[example_id] = best_non_null_entry.y if best_non_null_entry else 0
+          scores_n_json[example_id] = best_non_null_entry.n if best_non_null_entry else 0
+        all_predictions[example_id] = best_non_null_entry.text if best_non_null_entry else ""
 
       all_nbest_json[example_id] = nbest_json
       print('truth:', example.orig_answer_text,', pred:',nbest_json[0]["text"], ', null:',score_null)
