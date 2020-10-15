@@ -696,14 +696,14 @@ class YUERC(SQuADTask):
     super(YUERC, self).__init__(config, "yuerc", tokenizer, v2=True, yn=True)
 
   def get_test_splits(self):
-    return ["test-zh", "test-yn"]
+    return ["testzh", "testyn"]
 
 class YUERC2(SQuADTask):
   def __init__(self, config: configure_finetuning.FinetuningConfig, tokenizer):
     super(YUERC2, self).__init__(config, "yuerc2", tokenizer, v2=True, yn=True)
 
   def get_test_splits(self):
-    return ["test-zh", "test-yn"]
+    return ["testzh", "testyn"]
 
 class YUESPAN(SQuADTask):
   def __init__(self, config: configure_finetuning.FinetuningConfig, tokenizer):
