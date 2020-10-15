@@ -309,9 +309,9 @@ class SpanBasedQAScorer(scorer.Scorer):
         all_predictions[example_id] = best_non_null_entry.text if best_non_null_entry else ""
 
       all_nbest_json[example_id] = nbest_json
-      print('truth:', example.orig_answer_text,', pred:',nbest_json[0]["text"], ', null:',score_null)
+      # print('truth:', example.orig_answer_text,', pred:',nbest_json[0]["text"], ', null:',score_null)
 
-    import code; code.interact(local=locals());
+    # import code; code.interact(local=locals());
     utils.write_json(dict(all_predictions),
                      self._config.qa_preds_file(self._name))
     if self._v2:
