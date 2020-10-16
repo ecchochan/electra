@@ -337,11 +337,11 @@ def find_all_best_thresh(main_eval, preds, exact_raw, f1_raw, na_probs, y_probs,
   main_eval['best_f1'] = best_f1
   main_eval['best_f1_thresh'] = f1_thresh
   if y_probs is not None:
-    best_f1_y, f1_y_thresh = find_best_thresh(preds, f1_raw, y_probs, qid_to_y)
+    best_f1_y, f1_y_thresh = find_best_thresh(preds, f1_raw, y_probs, {k:not v for k, v in qid_to_y.items()})
     main_eval['best_f1_y'] = best_f1_y
     main_eval['best_f1_y_thresh'] = f1_y_thresh
   if n_probs is not None:
-    best_f1_n, f1_n_thresh = find_best_thresh(preds, f1_raw, n_probs, qid_to_n)
+    best_f1_n, f1_n_thresh = find_best_thresh(preds, f1_raw, n_probs, {k:not v for k, v in qid_to_n.items()})
     main_eval['best_f1_n'] = best_f1_n
     main_eval['best_f1_n_thresh'] = f1_n_thresh
 

@@ -201,7 +201,7 @@ class ModelRunner(object):
 
   def evaluate_task(self, task, split="dev", return_results=True, **kwargs):
     """Evaluate the current model."""
-    utils.log("Evaluating", task.name)
+    utils.log("Evaluating", task.name, split)
     eval_input_fn, _ = self._preprocessor.prepare_predict([task], split)
     results = self._estimator.predict(input_fn=eval_input_fn,
                                       yield_single_examples=True)
@@ -312,7 +312,7 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
               # model_runner.write_classification_outputs([task], trial, split)
           elif task.name == "squad" or task.name == 'yuerc' or task.name == 'yuerc2':
             for split in task.get_test_splits():
-              scorer = model_runner.evaluate_task(task, split)
+              write_results(config, [model_runner.evaluate_task(task, split)])
               
           else:
             utils.log("Skipping task", task.name,
