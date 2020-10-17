@@ -322,7 +322,7 @@ class QATask(task.Task):
   def featurize(self, example: QAExample, is_training, log=False,
                 for_eval=False):
     all_features = []
-    query_tokens = self._tokenizer.encode(example.question_text).ids
+    query_tokens = self._tokenizer.encode('Question: '+ example.question_text).ids
     all_doc_tokens = example.doc_ids
 
     if len(query_tokens) > self.config.max_query_length:
