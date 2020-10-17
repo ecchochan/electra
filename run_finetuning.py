@@ -196,8 +196,8 @@ class ModelRunner(object):
     self._estimator.train(
         input_fn=self._train_input_fn, max_steps=self.train_steps)
 
-  def evaluate(self):
-    return {task.name: self.evaluate_task(task) for task in self._tasks}
+  def evaluate(self, split):
+    return {task.name: self.evaluate_task(task, split=split) for task in self._tasks}
 
   def evaluate_task(self, task, split="dev", return_results=True, **kwargs):
     """Evaluate the current model."""
@@ -295,7 +295,7 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
 
     if config.do_eval:
       heading("Run dev set evaluation from %s"%config.model_dir)
-      results.append(model_runner.evaluate())
+      results.append(model_runner.evaluate(config.dev))
       write_results(config, results)
       if config.write_test_outputs:
         heading("Running on the test set and writing the predictions")
