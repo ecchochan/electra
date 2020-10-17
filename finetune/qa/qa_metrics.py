@@ -77,7 +77,7 @@ class SpanBasedQAScorer(scorer.Scorer):
 
   def _get_results(self):
     self.write_predictions()
-    if self._name in ('squad','yuerc','yuespan'):
+    if self._name in ('squad','yuerc', 'yuerc2','yuespan'):
       squad_official_eval.set_opts(self._config, self._split, self._name)
       squad_official_eval.main()
       return sorted(utils.load_json(
@@ -92,7 +92,7 @@ class SpanBasedQAScorer(scorer.Scorer):
   def write_predictions(self):
     """Write final predictions to the json file."""
     tokenizer = self.tokenizer
-    yn = self._name == 'yuerc'
+    yn = self._name == 'yuerc' or self._name == 'yuerc2'
     unique_id_to_result = {}
     for result in self._all_results:
       unique_id_to_result[result.unique_id] = result
@@ -100,7 +100,7 @@ class SpanBasedQAScorer(scorer.Scorer):
     _PrelimPrediction = collections.namedtuple(  # pylint: disable=invalid-name
         "PrelimPrediction",
         ["feature_index", "start_index", "end_index", "start_logit",
-         "end_logit", "answerable_logit"])
+         "end_logit", "answerable_logit", "feature_null_score"])
 
     all_predictions = collections.OrderedDict()
     all_nbest_json = collections.OrderedDict()
@@ -140,9 +140,10 @@ class SpanBasedQAScorer(scorer.Scorer):
           end_indexes = _get_best_indexes(result.end_logits,
                                           self._config.n_best_size)
         # if we could have irrelevant answers, get the min score of irrelevant
+        feature_null_score = 0
         if self._v2:
           if self._config.answerable_classifier:
-            feature_null_score = result.answerable_logit[0] if yn else result.answerable_logit
+            feature_null_score = result.answerable_logit[1] if yn else result.answerable_logit
           else:
             feature_null_score = result.start_logits[0] + result.end_logits[0]
           if feature_null_score < score_null:
@@ -184,7 +185,8 @@ class SpanBasedQAScorer(scorer.Scorer):
                     end_index=end_index,
                     start_logit=start_logit,
                     end_logit=end_logit,
-                    answerable_logit=result.answerable_logit))
+                    answerable_logit=result.answerable_logit,
+                    feature_null_score=feature_null_score))
 
       if self._v2:
         if False and len(prelim_predictions) == 0 and self._config.debug:
@@ -194,14 +196,15 @@ class SpanBasedQAScorer(scorer.Scorer):
               end_index=0 + 1,
               start_logit=1.0,
               end_logit=1.0,
-              answerable_logit=None))
+              answerable_logit=None,
+              feature_null_score=0))
       prelim_predictions = sorted(
           prelim_predictions,
           key=lambda x: (x.start_logit + x.end_logit),
           reverse=True)
 
       _NbestPrediction = collections.namedtuple(  # pylint: disable=invalid-name
-          "NbestPrediction", ["text", "start_logit", "end_logit", "y","n"])
+          "NbestPrediction", ["text", "start_logit", "end_logit", "null_score", "y","n"])
 
       seen_predictions = {}
       nbest = []
@@ -256,6 +259,7 @@ class SpanBasedQAScorer(scorer.Scorer):
                 text=final_text,
                 start_logit=pred.start_logit,
                 end_logit=pred.end_logit, 
+                null_score=pred.feature_null_score,
                 y=answerable_logit[2] if yn else None,
                 n=answerable_logit[3] if yn else None))
 
@@ -263,7 +267,7 @@ class SpanBasedQAScorer(scorer.Scorer):
       # just create a nonce prediction in this case to avoid failure.
       if not nbest:
         nbest.append(
-            _NbestPrediction(text="empty", start_logit=0.0, end_logit=0.0, y=0, n=0))
+            _NbestPrediction(text="empty", start_logit=0.0, end_logit=0.0, null_score=0.0, y=0, n=0))
 
       assert len(nbest) >= 1
 
@@ -300,11 +304,12 @@ class SpanBasedQAScorer(scorer.Scorer):
               best_non_null_entry.end_logit)
         scores_diff_json[example_id] = score_diff
         if yn:
-          scores_y_json[example_id] = best_non_null_entry.y
-          scores_n_json[example_id] = best_non_null_entry.n
-        all_predictions[example_id] = best_non_null_entry.text
+          scores_y_json[example_id] = best_non_null_entry.y if best_non_null_entry else 0
+          scores_n_json[example_id] = best_non_null_entry.n if best_non_null_entry else 0
+        all_predictions[example_id] = best_non_null_entry.text if best_non_null_entry else ""
 
       all_nbest_json[example_id] = nbest_json
+      # print('truth:', example.orig_answer_text,', pred:',nbest_json[0]["text"], ', null:',score_null)
 
     # import code; code.interact(local=locals());
     utils.write_json(dict(all_predictions),

@@ -201,7 +201,7 @@ class ModelRunner(object):
 
   def evaluate_task(self, task, split="dev", return_results=True, **kwargs):
     """Evaluate the current model."""
-    utils.log("Evaluating", task.name)
+    utils.log("Evaluating", task.name, split)
     eval_input_fn, _ = self._preprocessor.prepare_predict([task], split)
     results = self._estimator.predict(input_fn=eval_input_fn,
                                       yield_single_examples=True)
@@ -310,23 +310,10 @@ def run_finetuning(config: configure_finetuning.FinetuningConfig):
               #model_runner.evaluate()
               model_runner.evaluate_task(task, split=split, mapping=mapping)
               # model_runner.write_classification_outputs([task], trial, split)
-          elif task.name == "squad" or task.name == 'yuerc':
+          elif task.name == "squad" or task.name == 'yuerc' or task.name == 'yuerc2':
             for split in task.get_test_splits():
-              scorer = model_runner.evaluate_task(task, split, False)
-              scorer.write_predictions()
-              preds = utils.load_json(config.qa_preds_file(task.name))
-              null_odds = utils.load_json(config.qa_na_file(task.name))
-              if task.name == 'yuerc':
-                yn_odds = utils.load_json(config.qa_na_file(task.name + 'yn'))
-                for q, _ in preds.items():
-                  if yn_odds[q] > config.qa_na_threshold:
-                    preds[q] = ""
-
-              for q, _ in preds.items():
-                if null_odds[q] > config.qa_na_threshold:
-                  preds[q] = ""
-              utils.write_json(preds, config.test_predictions(
-                  task.name, split, trial))
+              write_results(config, [model_runner.evaluate_task(task, split)])
+              
           else:
             utils.log("Skipping task", task.name,
                       "- writing predictions is not supported for this task")
