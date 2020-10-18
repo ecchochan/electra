@@ -71,13 +71,13 @@ labels_mapping = {
  '》': 30
 }
 
-def get_logits(x, n, config):
+def get_logits(x, n, bert_config):
     hidden = tf.layers.dense(
         x,
-        units=config.hidden_size,
-        activation=modeling.get_activation(config.hidden_act),
+        units=bert_config.hidden_size,
+        activation=modeling.get_activation(bert_config.hidden_act),
         kernel_initializer=modeling.create_initializer(
-            config.initializer_range))
+            bert_config.initializer_range))
     logits = tf.squeeze(tf.layers.dense(hidden, units=1), -1) if n == 1 else tf.layers.dense(hidden, units=n)
     return logits
 
@@ -189,7 +189,7 @@ class MultiTaggingTask(task.Task):
       self, bert_model, features, is_training, percent_done):
 
     reprs = bert_model.get_sequence_output()
-    blogits = get_logits(reprs, 1, self.config)
+    blogits = get_logits(reprs, 1, bert_model.bert_config)
     weights = tf.cast(features["input_mask"], tf.float32)
     blabels = features[self.name + "_has_label"]
     blabelsf = tf.cast(blabels, tf.float32)
@@ -204,8 +204,8 @@ class MultiTaggingTask(task.Task):
     n_classes = len(labels_mapping)
     reprs = pretrain_helpers.gather_positions(
         reprs, features[self.name + "_labeled_positions"])
-    logits1 = get_logits(reprs, n_classes, self.config) #tf.layers.dense(reprs, n_classes)
-    logits2 = get_logits(reprs, n_classes, self.config) #tf.layers.dense(reprs, n_classes)
+    logits1 = get_logits(reprs, n_classes, bert_model.bert_config) #tf.layers.dense(reprs, n_classes)
+    logits2 = get_logits(reprs, n_classes, bert_model.bert_config) #tf.layers.dense(reprs, n_classes)
     losses = (tf.nn.softmax_cross_entropy_with_logits(
         labels=tf.one_hot(features[self.name + "_labels1"], n_classes),
         logits=logits1) + tf.nn.softmax_cross_entropy_with_logits(

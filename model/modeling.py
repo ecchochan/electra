@@ -167,6 +167,7 @@ class BertModel(object):
         is invalid.
     """
     bert_config = copy.deepcopy(bert_config)
+    self.bert_config = bert_config
     if not is_training:
       bert_config.hidden_dropout_prob = 0.0
       bert_config.attention_probs_dropout_prob = 0.0
