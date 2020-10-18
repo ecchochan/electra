@@ -71,15 +71,17 @@ labels_mapping = {
  '》': 30
 }
 
-def get_logits(x, n, bert_config):
+def get_logits(x, n, bert_config, project=False):
+  if project:
     hidden = tf.layers.dense(
-        x,
-        units=bert_config.hidden_size,
-        activation=modeling.get_activation(bert_config.hidden_act),
-        kernel_initializer=modeling.create_initializer(
-            bert_config.initializer_range))
-    logits = tf.squeeze(tf.layers.dense(hidden, units=1), -1) if n == 1 else tf.layers.dense(hidden, units=n)
-    return logits
+      x,
+      units=bert_config.hidden_size,
+      activation=modeling.get_activation(bert_config.hidden_act),
+      kernel_initializer=modeling.create_initializer(
+          bert_config.initializer_range))
+
+  logits = tf.squeeze(tf.layers.dense(hidden, units=1), -1) if n == 1 else tf.layers.dense(hidden, units=n)
+  return logits
 
 class TaggingExample(task.Example):
   """A single tagged input sequence."""
