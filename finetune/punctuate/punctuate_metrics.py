@@ -136,7 +136,11 @@ class AccuracyScorer(WordLevelScorer):
     y, n = 0, n_neg
     best_y, best_n = 0, n_neg
 
-    for l, p in sorted(zip(blabels, bprobs), key=lambda x: x[1]):
+    sorted_b = sorted(zip(blabels, bprobs), key=lambda x: x[1])
+
+    print(sorted_b[:10])
+
+    for l, p in sorted_b:
       if l:
         y += 1
       else:
