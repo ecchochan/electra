@@ -37,6 +37,8 @@ class WordLevelScorer(scorer.Scorer):
     self._total_words = 0
     self._labels1 = []
     self._labels2 = []
+    self._bprobs = []
+    self._blabels = []
     self._preds1 = []
     self._preds2 = []
     self._preds_emp1 = []
@@ -47,6 +49,9 @@ class WordLevelScorer(scorer.Scorer):
   def update(self, results):
     super(WordLevelScorer, self).update(results)
     self._total_loss += results['loss']
+    seq_length = int(round(np.sum(results['input_mask'])))
+    self._bprobs.append(results['bprobs'][:seq_length])
+    self._blabels.append(results['blabels'][:seq_length])
     n_words = int(round(np.sum(results['labels_mask'])))
     self._labels1.append(results['labels1'][:n_words])
     self._labels2.append(results['labels2'][:n_words])
@@ -60,7 +65,7 @@ class WordLevelScorer(scorer.Scorer):
   def get_loss(self):
     return self._total_loss / max(1, self._total_words)
 
-
+'''
 class AccuracyScorer(WordLevelScorer):
   """Computes accuracy scores."""
 
@@ -108,7 +113,7 @@ class AccuracyScorer(WordLevelScorer):
         ('thresh_2',       thresh2),
         ('loss', self.get_loss())
     ]
-
+'''
 
 class AccuracyScorer(WordLevelScorer):
   """Computes accuracy scores."""
@@ -118,35 +123,39 @@ class AccuracyScorer(WordLevelScorer):
     self._auto_fail_label = auto_fail_label
 
   def _get_results(self):
-    correct1, count1, correct1_, count1_ = 0, 0, 0, 0
-    correct2, count2, correct2_, count2_ = 0, 0, 0, 0
+    correct1, count1 = 0, 0
+    correct2, count2 = 0, 0
+
+    bprobs = [e for e in self._bprobs for e in e]
+    blabels = [e for e in self._blabels for e in e]
+    n_neg = sum(blabels)
+    cur_score = n_neg
+    best_bscore = cur_score
+    best_bthresh = -1000
+
+    for l, p in sorted(zip(blabels, bprobs), key=lambda x: x[1]):
+      cur_score += -1 if not l else 1
+      if cur_score > best_bscore:
+        best_bscore = cur_score
+        best_bthresh = p
+
     for labels, preds in zip(self._labels1, self._preds1):
       for y_true, y_pred in zip(labels, preds):
         if y_true: 
           count1 += 1
-          correct1 += (1 if y_pred == y_true and y_true != self._auto_fail_label
-                      else 0)
-        else:
-          count1_ += 1
-          correct1_ += (1 if y_pred == y_true and y_true != self._auto_fail_label
-                      else 0)
+          correct1 += (1 if y_pred == y_true else 0)
+                      
     for labels, preds in zip(self._labels2, self._preds2):
       for y_true, y_pred in zip(labels, preds):
         if y_true: 
           count2 += 1
-          correct2 += (1 if y_pred == y_true and y_true != self._auto_fail_label
-                      else 0)
-        else:
-          count2_ += 1
-          correct2_ += (1 if y_pred == y_true and y_true != self._auto_fail_label
-                      else 0)
+          correct2 += (1 if y_pred == y_true else 0)
+                      
     return [
+        ('baccuracy', 100.0 * best_bscore / len(bprobs)),
         ('accuracy', 100.0 * (correct1+correct2) / (count1+count2)),
         ('accuracy_1', 100.0 * correct1 / count1),
         ('accuracy_2', 100.0 * correct2 / count2),
-        ('accuracy_b', 100.0 * (correct1_+correct2_) / (count1_+count2_)),
-        ('accuracy_b_1', 100.0 * correct1_ / count1_),
-        ('accuracy_b_2', 100.0 * correct2_ / count2_),
         ('loss', self.get_loss())
     ]
 

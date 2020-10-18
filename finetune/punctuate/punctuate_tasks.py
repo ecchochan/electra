@@ -25,6 +25,7 @@ import os
 import tensorflow.compat.v1 as tf
 
 import configure_finetuning
+from model import modeling
 from finetune import feature_spec
 from finetune import task
 from finetune.punctuate import punctuate_metrics
@@ -70,17 +71,27 @@ labels_mapping = {
  '》': 30
 }
 
-
+def get_logits(x, n, config):
+    hidden = tf.layers.dense(
+        x,
+        units=config.hidden_size,
+        activation=modeling.get_activation(config.hidden_act),
+        kernel_initializer=modeling.create_initializer(
+            config.initializer_range))
+    logits = tf.squeeze(tf.layers.dense(hidden, units=1), -1) if n == 1 else tf.layers.dense(hidden, units=n)
+    return logits
 
 class TaggingExample(task.Example):
   """A single tagged input sequence."""
 
-  def __init__(self, eid, task_name, input_ids, input_mask, segment_ids, labels1, labels2):
+  def __init__(self, eid, task_name, input_ids, input_mask, labels_mask, label_positions, has_label, labels1, labels2):
     super(TaggingExample, self).__init__(task_name)
     self.eid = eid
     self.input_ids = input_ids
     self.input_mask = input_mask
-    self.segment_ids = segment_ids
+    self.labels_mask = labels_mask
+    self.label_positions = label_positions
+    self.has_label = has_label
     self.labels1 = labels1
     self.labels2 = labels2
 
@@ -98,7 +109,8 @@ class MultiTaggingTask(task.Task):
   def get_examples(self, split):
     if split == 'dev':
       split = 'test'
-    chunk_size = self.config.max_seq_length*5*2
+    n_features = 7
+    chunk_size = self.config.max_seq_length*n_features*2
     examples = []
     i = 0
     with tf.io.gfile.GFile(os.path.join(self.config.raw_data_dir(self.name),"punctuate.data."+split), "rb") as f:
@@ -108,11 +120,13 @@ class MultiTaggingTask(task.Task):
         (
           ids, 
           input_mask,
-          segment_ids,
+          labels_mask,
+          label_positions,
+          has_label,
           labels1,
           labels2
-        ) = data.reshape((5,-1))
-        example = TaggingExample(i, self.name, ids, input_mask, segment_ids, labels1, labels2)
+        ) = data.reshape((n_features,-1))
+        example = TaggingExample(i, self.name, ids, input_mask, labels_mask, label_positions, has_label, labels1, labels2)
         data = f.read(chunk_size)
         examples.append(example)
         i += 1
@@ -122,18 +136,22 @@ class MultiTaggingTask(task.Task):
   def featurize(self, example: TaggingExample, is_training, log=False):
     input_ids = example.input_ids
     input_mask = example.input_mask
-    segment_ids = example.segment_ids
-    labels1 = example.labels1
+    segment_ids = example.input_mask
+    label_positions = example.label_positions
+    has_label = example.has_label
+    labels1 = example.labels1 
     labels2 = example.labels2
+    labels_mask = example.labels_mask
     pad = lambda x: x + [0] * (self.config.max_seq_length - len(x))
-    labeled_positions = np.array(pad(np.arange(input_mask.sum()).tolist()))
     
     assert len(input_ids) == self.config.max_seq_length
     assert len(input_mask) == self.config.max_seq_length
+    assert len(labels_mask) == self.config.max_seq_length
     assert len(segment_ids) == self.config.max_seq_length
     assert len(labels1) == self.config.max_seq_length
     assert len(labels2) == self.config.max_seq_length
-    assert len(labeled_positions) == self.config.max_seq_length
+    assert len(label_positions) == self.config.max_seq_length
+    assert len(has_label) == self.config.max_seq_length
 
     return {
         "input_ids": input_ids,
@@ -143,7 +161,9 @@ class MultiTaggingTask(task.Task):
         self.name + "_eid": example.eid,
         self.name + "_labels1": labels1,
         self.name + "_labels2": labels2,
-        self.name + "_labeled_positions": labeled_positions
+        self.name + "_has_label": has_label,
+        self.name + "_labels_mask": labels_mask,
+        self.name + "_labeled_positions": label_positions
     }
 
   def get_scorer(self):
@@ -156,38 +176,58 @@ class MultiTaggingTask(task.Task):
                                  [self.config.max_seq_length]),
         feature_spec.FeatureSpec(self.name + "_labels2",
                                  [self.config.max_seq_length]),
+        feature_spec.FeatureSpec(self.name + "_has_label",
+                                 [self.config.max_seq_length]),
+        feature_spec.FeatureSpec(self.name + "_labels_mask",
+                                 [self.config.max_seq_length],
+                                 is_int_feature=False),
         feature_spec.FeatureSpec(self.name + "_labeled_positions",
                                  [self.config.max_seq_length]),
     ]
 
   def get_prediction_module(
       self, bert_model, features, is_training, percent_done):
-    n_classes = len(labels_mapping)
+
     reprs = bert_model.get_sequence_output()
+    blogits = get_logits(reprs, 1, self.config)
+    weights = tf.cast(features["input_mask"], tf.float32)
+    blabels = features[self.name + "_has_label"]
+    blabelsf = tf.cast(blabels, tf.float32)
+    blosses = tf.nn.sigmoid_cross_entropy_with_logits(
+        logits=blogits, labels=blabelsf) * weights
+    per_example_loss = (tf.reduce_sum(blosses, axis=-1) /
+                        (1e-6 + tf.reduce_sum(weights, axis=-1)))
+    bloss = tf.reduce_sum(blosses) / (1e-6 + tf.reduce_sum(weights))
+    bprobs = tf.nn.sigmoid(blogits)
+    # bpreds = tf.cast(tf.round((tf.sign(blogits) + 1) / 2), tf.int32)
+
+    n_classes = len(labels_mapping)
     reprs = pretrain_helpers.gather_positions(
         reprs, features[self.name + "_labeled_positions"])
-    logits1 = tf.layers.dense(reprs, n_classes)
-    logits2 = tf.layers.dense(reprs, n_classes)
+    logits1 = get_logits(reprs, n_classes, self.config) #tf.layers.dense(reprs, n_classes)
+    logits2 = get_logits(reprs, n_classes, self.config) #tf.layers.dense(reprs, n_classes)
     losses = (tf.nn.softmax_cross_entropy_with_logits(
         labels=tf.one_hot(features[self.name + "_labels1"], n_classes),
         logits=logits1) + tf.nn.softmax_cross_entropy_with_logits(
         labels=tf.one_hot(features[self.name + "_labels2"], n_classes),
         logits=logits2)) / 2
-    losses *= tf.cast(features["input_mask"], dtype=tf.float32, name=None)
-    losses = tf.reduce_sum(losses, axis=-1)
+    losses *= features[self.name + "_labels_mask"]
+    losses = tf.reduce_sum(losses, axis=-1) + bloss / 2
     return losses, dict(
         loss=losses,
         logits1=logits1,
         logits2=logits2,
-        predictions_empty1=logits1[:, :, 0],
-        predictions_empty2=logits2[:, :, 0],
+        #predictions_empty1=logits1[:, :, 0],
+        #predictions_empty2=logits2[:, :, 0],
         #predictions1=tf.argmax(logits1[:, :, 1:], axis=-1),
         #predictions2=tf.argmax(logits2[:, :, 1:], axis=-1),
+        bprobs=bprobs,
+        blabels=blabels,
         predictions1=tf.argmax(logits1, axis=-1),
         predictions2=tf.argmax(logits2, axis=-1),
         labels1=features[self.name + "_labels1"],
         labels2=features[self.name + "_labels2"],
-        labels_mask=features["input_mask"],
+        labels_mask=features[self.name + "_labels_mask"],
         eid=features[self.name + "_eid"],
     )
 
