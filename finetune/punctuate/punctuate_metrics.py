@@ -126,7 +126,7 @@ class AccuracyScorer(WordLevelScorer):
     correct1, count1 = 0, 0
     correct2, count2 = 0, 0
 
-    bprobs = [e for e in self._bprobs for e in e]
+    bprobs = [-e for e in self._bprobs for e in e]
     blabels = [e for e in self._blabels for e in e]
     n_neg = len(blabels) - sum(blabels)
     cur_score = n_neg
