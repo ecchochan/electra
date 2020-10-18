@@ -128,7 +128,7 @@ class AccuracyScorer(WordLevelScorer):
 
     bprobs = [e for e in self._bprobs for e in e]
     blabels = [e for e in self._blabels for e in e]
-    n_neg = sum(blabels)
+    n_neg = len(blabels) - sum(blabels)
     cur_score = n_neg
     best_bscore = cur_score
     best_bthresh = -1000
