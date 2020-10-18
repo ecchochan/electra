@@ -133,11 +133,21 @@ class AccuracyScorer(WordLevelScorer):
     best_bscore = cur_score
     best_bthresh = -1000
 
+    y, n = 0, n_neg
+    best_y, best_n = 0, n_neg
+
     for l, p in sorted(zip(blabels, bprobs), key=lambda x: x[1]):
+      if l:
+        y += 1
+      else:
+        n -= 1
+
       cur_score += -1 if not l else 1
       if cur_score > best_bscore:
         best_bscore = cur_score
         best_bthresh = p
+        best_y = y
+        best_n = n
 
     for labels, preds in zip(self._labels1, self._preds1):
       for y_true, y_pred in zip(labels, preds):
@@ -153,6 +163,8 @@ class AccuracyScorer(WordLevelScorer):
                       
     return [
         ('baccuracy', 100.0 * best_bscore / len(bprobs)),
+        ('best_y', 100.0 * best_y / (len(bprobs) - n_neg))
+        ('best_n', 100.0 * best_n / n_neg)
         ('best_bthresh', best_bthresh)
         ('accuracy', 100.0 * (correct1+correct2) / (count1+count2)),
         ('accuracy_1', 100.0 * correct1 / count1),
