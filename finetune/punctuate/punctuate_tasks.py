@@ -126,7 +126,7 @@ class MultiTaggingTask(task.Task):
     labels1 = example.labels1
     labels2 = example.labels2
     pad = lambda x: x + [0] * (self.config.max_seq_length - len(x))
-    labeled_positions = pad(np.arange(input_mask.sum()))
+    labeled_positions = np.array(pad(np.arange(input_mask.sum()).tolist()))
     
     assert len(input_ids) == self.config.max_seq_length
     assert len(input_mask) == self.config.max_seq_length
