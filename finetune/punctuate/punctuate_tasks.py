@@ -71,7 +71,7 @@ labels_mapping = {
  '》': 30
 }
 
-def get_logits(x, n, bert_config, project=False):
+def get_logits(x, n, bert_config, project=True):
   if project:
     x = tf.layers.dense(
       x,
