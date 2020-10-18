@@ -170,7 +170,7 @@ class MultiTaggingTask(task.Task):
         logits=logits1) + tf.nn.softmax_cross_entropy_with_logits(
         labels=tf.one_hot(features[self.name + "_labels2"], n_classes),
         logits=logits2)) / 2
-    losses *= features["input_mask"]
+    losses *= tf.cast(features[self.name + "_labels_mask"], dtype=tf.float32, name=None)
     losses = tf.reduce_sum(losses, axis=-1)
     return losses, dict(
         loss=losses,
