@@ -165,7 +165,7 @@ class AccuracyScorer(WordLevelScorer):
         ('baccuracy', 100.0 * best_bscore / len(bprobs)),
         ('best_y', 100.0 * best_y / (len(bprobs) - n_neg)),
         ('best_n', 100.0 * best_n / n_neg),
-        ('best_bthresh', best_bthresh)
+        ('best_bthresh', best_bthresh),
         ('accuracy', 100.0 * (correct1+correct2) / (count1+count2)),
         ('accuracy_1', 100.0 * correct1 / count1),
         ('accuracy_2', 100.0 * correct2 / count2),
