@@ -63,22 +63,35 @@ class AccuracyScorer(WordLevelScorer):
     self._auto_fail_label = auto_fail_label
 
   def _get_results(self):
-    correct1, count1 = 0, 0
-    correct2, count2 = 0, 0
+    correct1, count1, correct1_, count1_ = 0, 0, 0, 0
+    correct2, count2, correct2_, count2_ = 0, 0, 0, 0
     for labels, preds in zip(self._labels1, self._preds1):
       for y_true, y_pred in zip(labels, preds):
-        count1 += 1
-        correct1 += (1 if y_pred == y_true and y_true != self._auto_fail_label
-                    else 0)
+        if y_true: 
+          count1 += 1
+          correct1 += (1 if y_pred == y_true and y_true != self._auto_fail_label
+                      else 0)
+        else:
+          count1_ += 1
+          correct1_ += (1 if y_pred == y_true and y_true != self._auto_fail_label
+                      else 0)
     for labels, preds in zip(self._labels2, self._preds2):
       for y_true, y_pred in zip(labels, preds):
-        count2 += 1
-        correct2 += (1 if y_pred == y_true and y_true != self._auto_fail_label
-                    else 0)
+        if y_true: 
+          count2 += 1
+          correct2 += (1 if y_pred == y_true and y_true != self._auto_fail_label
+                      else 0)
+        else:
+          count2_ += 1
+          correct2_ += (1 if y_pred == y_true and y_true != self._auto_fail_label
+                      else 0)
     return [
         ('accuracy', 100.0 * (correct1+correct2) / (count1+count2)),
         ('accuracy_1', 100.0 * correct1 / count1),
         ('accuracy_2', 100.0 * correct2 / count2),
+        ('accuracy_b', 100.0 * (correct1_+correct2_) / (count1_+count2_)),
+        ('accuracy_b_1', 100.0 * correct1_ / count1_),
+        ('accuracy_b_2', 100.0 * correct2_ / count2_),
         ('loss', self.get_loss())
     ]
 
