@@ -69,7 +69,7 @@ class FinetuningModel(object):
     for task in tasks:
       with tf.variable_scope("task_specific/" + task.name):
         task_losses, task_outputs = task.get_prediction_module(
-            bert_model, features, is_training, percent_done, bert_config=bert_config)
+            bert_model, features, is_training, percent_done)
         losses.append(task_losses)
         self.outputs[task.name] = task_outputs
     self.loss = tf.reduce_sum(
