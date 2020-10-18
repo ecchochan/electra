@@ -52,8 +52,8 @@ class WordLevelScorer(scorer.Scorer):
     self._labels2.append(results['labels2'][:n_words])
     self._preds1.append(results['predictions1'][:n_words])
     self._preds2.append(results['predictions2'][:n_words])
-    self._preds_emp1.append(results['predictions_empty1'][:n_words])
-    self._preds_emp2.append(results['predictions_empty2'][:n_words])
+    #self._preds_emp1.append(results['predictions_empty1'][:n_words])
+    #self._preds_emp2.append(results['predictions_empty2'][:n_words])
     self._total_loss += np.sum(results['loss'])
     self._total_words += n_words
 
@@ -78,7 +78,7 @@ class AccuracyScorer(WordLevelScorer):
     best_score = cur_score
     best_thresh = 0.0
     best_num_emp = num_emp
-    best_num_pos = num_emp
+    best_num_pos = 0
     num_pos = 0
     
     for y_true, y_pred, emp_score in flattened:
@@ -106,6 +106,47 @@ class AccuracyScorer(WordLevelScorer):
         ('accuracy_2',     100.0 * best_num_pos2 / (num_samples2 - num_emp_samples2)),
         ('accuracy_2_emp', 100.0 * best_num_emp2 / num_emp_samples2),
         ('thresh_2',       thresh2),
+        ('loss', self.get_loss())
+    ]
+
+
+class AccuracyScorer(WordLevelScorer):
+  """Computes accuracy scores."""
+
+  def __init__(self, auto_fail_label=None):
+    super(AccuracyScorer, self).__init__()
+    self._auto_fail_label = auto_fail_label
+
+  def _get_results(self):
+    correct1, count1, correct1_, count1_ = 0, 0, 0, 0
+    correct2, count2, correct2_, count2_ = 0, 0, 0, 0
+    for labels, preds in zip(self._labels1, self._preds1):
+      for y_true, y_pred in zip(labels, preds):
+        if y_true: 
+          count1 += 1
+          correct1 += (1 if y_pred == y_true and y_true != self._auto_fail_label
+                      else 0)
+        else:
+          count1_ += 1
+          correct1_ += (1 if y_pred == y_true and y_true != self._auto_fail_label
+                      else 0)
+    for labels, preds in zip(self._labels2, self._preds2):
+      for y_true, y_pred in zip(labels, preds):
+        if y_true: 
+          count2 += 1
+          correct2 += (1 if y_pred == y_true and y_true != self._auto_fail_label
+                      else 0)
+        else:
+          count2_ += 1
+          correct2_ += (1 if y_pred == y_true and y_true != self._auto_fail_label
+                      else 0)
+    return [
+        ('accuracy', 100.0 * (correct1+correct2) / (count1+count2)),
+        ('accuracy_1', 100.0 * correct1 / count1),
+        ('accuracy_2', 100.0 * correct2 / count2),
+        ('accuracy_b', 100.0 * (correct1_+correct2_) / (count1_+count2_)),
+        ('accuracy_b_1', 100.0 * correct1_ / count1_),
+        ('accuracy_b_2', 100.0 * correct2_ / count2_),
         ('loss', self.get_loss())
     ]
 
