@@ -125,12 +125,15 @@ class MultiTaggingTask(task.Task):
     segment_ids = example.segment_ids
     labels1 = example.labels1
     labels2 = example.labels2
-    labeled_positions = np.arange(input_mask.sum())
+    pad = lambda x: x + [0] * (self.config.max_seq_length - len(x))
+    labeled_positions = pad(np.arange(input_mask.sum()))
+    
     assert len(input_ids) == self.config.max_seq_length
     assert len(input_mask) == self.config.max_seq_length
     assert len(segment_ids) == self.config.max_seq_length
     assert len(labels1) == self.config.max_seq_length
     assert len(labels2) == self.config.max_seq_length
+    assert len(labeled_positions) == self.config.max_seq_length
 
     return {
         "input_ids": input_ids,
