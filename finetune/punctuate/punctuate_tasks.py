@@ -190,7 +190,8 @@ class MultiTaggingTask(task.Task):
 
     reprs = bert_model.get_sequence_output()
     blogits = get_logits(reprs, 1, bert_model.bert_config)
-    weights = tf.cast(features["input_mask"], tf.float32)
+    input_mask = features["input_mask"]
+    weights = tf.cast(input_mask, tf.float32)
     blabels = features[self.name + "_has_label"]
     blabelsf = tf.cast(blabels, tf.float32)
     blosses = tf.nn.sigmoid_cross_entropy_with_logits(
@@ -217,6 +218,7 @@ class MultiTaggingTask(task.Task):
         loss=losses,
         logits1=logits1,
         logits2=logits2,
+        input_mask=input_mask,
         #predictions_empty1=logits1[:, :, 0],
         #predictions_empty2=logits2[:, :, 0],
         #predictions1=tf.argmax(logits1[:, :, 1:], axis=-1),
