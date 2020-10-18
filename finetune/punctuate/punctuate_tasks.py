@@ -81,7 +81,7 @@ def get_logits(x, n, bert_config, project=True, is_training=False):
           bert_config.initializer_range))
 
   if is_training:
-    x = tf.nn.dropout(x, keep_prob=0.9)
+    x = tf.nn.dropout(x, keep_prob=0.5)
 
   logits = tf.squeeze(tf.layers.dense(x, units=1), -1) if n == 1 else tf.layers.dense(x, units=n)
   return logits
