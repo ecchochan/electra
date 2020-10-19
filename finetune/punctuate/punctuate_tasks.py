@@ -72,8 +72,6 @@ labels_mapping = {
 }
 
 def get_logits(x, n, bert_config, project=True, is_training=False):
-  if is_training:
-    x = tf.nn.dropout(x, keep_prob=0.9)
   if project:
     x = tf.layers.dense(
       x,
@@ -82,6 +80,8 @@ def get_logits(x, n, bert_config, project=True, is_training=False):
       kernel_initializer=modeling.create_initializer(
           bert_config.initializer_range))
 
+  if is_training:
+    x = tf.nn.dropout(x, keep_prob=0.9)
 
   logits = tf.squeeze(tf.layers.dense(x, units=1), -1) if n == 1 else tf.layers.dense(x, units=n)
   return logits
