@@ -114,7 +114,7 @@ class SpanBasedQAScorer(scorer.Scorer):
       paragraph_text = example.paragraph_text
       context_encoded = example.context_encoded
       offsets = context_encoded.offsets
-      example_id = example.qas_id if "squad" in self._name or "drcd" in self._name or "yuerc" in self._name or "yuespan" in self._name else example.qid
+      example_id = example.qas_id if "squad" in self._name or "drcd" in self._name or "yuerc" in self._name or "yuespan" in self._name or "cmrc2018" in self._name else example.qid
       features = self._task.featurize(example, False, for_eval=True)
       if features is None:
         print('skipped feature')
