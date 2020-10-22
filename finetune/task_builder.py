@@ -84,7 +84,7 @@ def get_task(config: configure_finetuning.FinetuningConfig, task_name,
     return tagging_tasks.Chunking(config, tokenizer)
   elif task_name == "punctuate":
     return punctuate_tasks.Punctuate(config, tokenizer)
-  elif task_name == "punctuate":
+  elif task_name == "cluster":
     return cluster_tasks.Cluster(config, tokenizer)
   else:
     raise ValueError("Unknown task " + task_name)
