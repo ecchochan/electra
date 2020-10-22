@@ -50,7 +50,12 @@ class FinetuningModel(object):
       bert_config.intermediate_size = 144 * 4
       bert_config.num_attention_heads = 4
       '''
-
+    features_double = tuple(k[:-1] for k in features if k.endswith('2'))
+    if features_double:
+      for k in features_double:
+        features[k] = tf.concat([features[k], features[k+'2']], 0)
+        del features[k+'2']
+        
     assert config.max_seq_length <= bert_config.max_position_embeddings
     bert_model = modeling.BertModel(
         bert_config=bert_config,

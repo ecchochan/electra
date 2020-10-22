@@ -24,6 +24,7 @@ from finetune.classification import classification_tasks
 from finetune.qa import qa_tasks
 from finetune.tagging import tagging_tasks
 from finetune.punctuate import punctuate_tasks
+from finetune.cluster import cluster_tasks
 from model import tokenization
 
 from cantokenizer import CanTokenizer
@@ -83,5 +84,7 @@ def get_task(config: configure_finetuning.FinetuningConfig, task_name,
     return tagging_tasks.Chunking(config, tokenizer)
   elif task_name == "punctuate":
     return punctuate_tasks.Punctuate(config, tokenizer)
+  elif task_name == "punctuate":
+    return cluster_tasks.Cluster(config, tokenizer)
   else:
     raise ValueError("Unknown task " + task_name)
