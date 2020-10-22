@@ -88,7 +88,7 @@ class ClusteringTask(task.Task):
     input_mask2 = example.attention_mask2
 
 
-    segment_ids = np.zeros(self.config.max_seq_length)
+    segment_ids = np.zeros(self.config.max_seq_length, dtype=np.int16)
 
     assert len(input_ids) == self.config.max_seq_length
     assert len(input_ids2) == self.config.max_seq_length
