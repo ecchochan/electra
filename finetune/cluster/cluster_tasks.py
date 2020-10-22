@@ -129,17 +129,17 @@ class ClusteringTask(task.Task):
     with tf.variable_scope("cluster_proj_A"):
       A_pooled_proj = tf.layers.dense(
           A_pooled,
-          units=self._bert_config.hidden_size,
-          activation=modeling.get_activation(self._bert_config.hidden_act),
+          units=bert_model.bert_config.hidden_size,
+          activation=modeling.get_activation(bert_model.bert_config.hidden_act),
           kernel_initializer=modeling.create_initializer(
-              self._bert_config.initializer_range))
+              bert_model.bert_config.initializer_range))
     with tf.variable_scope("cluster_proj_B"):
       B_pooled_proj = tf.layers.dense(
           A_pooled,
-          units=self._bert_config.hidden_size,
-          activation=modeling.get_activation(self._bert_config.hidden_act),
+          units=bert_model.bert_config.hidden_size,
+          activation=modeling.get_activation(bert_model.bert_config.hidden_act),
           kernel_initializer=modeling.create_initializer(
-              self._bert_config.initializer_range))
+              bert_model.bert_config.initializer_range))
 
     y_true = tf.eye(tf.shape(A_pooled)[0])
     similarity_matrix = tf.matmul(
