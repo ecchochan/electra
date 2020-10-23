@@ -35,8 +35,8 @@ class WordLevelScorer(scorer.Scorer):
     super(WordLevelScorer, self).__init__()
     self._total_loss = 0
     self._total_words = 0
-    self._y_true_arg = []
-    self._cluster_arg = []
+    self._A_pooled_projs = []
+    self._B_pooled_projs = []
     
     
 
@@ -46,8 +46,8 @@ class WordLevelScorer(scorer.Scorer):
     
     self._total_loss += np.sum(results['loss'])
     self._total_words += 1
-    self._y_true_arg.append(results['y_true_arg'])
-    self._cluster_arg.append(results['cluster_arg'])
+    self._A_pooled_projs.append(results['A_pooled_proj'])
+    self._B_pooled_projs.append(results['B_pooled_proj'])
 
   def get_loss(self):
     return self._total_loss / max(1, self._total_words)
@@ -60,12 +60,38 @@ class AccuracyScorer(WordLevelScorer):
 
   def _get_results(self):
     count, correct = 0, 0
-    for y_true, y_pred in zip(self._y_true_arg, self._cluster_arg):
-      if y_true: 
-        count += 1
-        correct += (1 if y_pred == y_true else 0)
-    return [
-        ('accuracy', 100.0 * correct / count),
-        ('loss', self.get_loss())
+    A_pooled_projs = np.concatenate(self._A_pooled_projs)
+    B_pooled_projs = np.concatenate(self._B_pooled_projs)
+    import math
+    Ns = (1, 3, 5, 10)
+    ntop_scopes = {
+        n: [0, 0]
+        for n in Ns
+    }
+    num_sections = math.ceil(A_pooled_projs.shape[0] / 256)-1
+    avg_dist_sum = 0
+    avg_dist_count = 0
+    for a, b in zip(np.array_split(A_pooled_projs, num_sections), np.array_split(B_pooled_projs, num_sections)):
+        sim = np.matmul(a, b.T)
+        eye = np.identity(sim.shape[0])
+        avg_dist_sum += (sim * eye).sum() 
+        avg_dist_count += eye.sum()
+        for n in Ns:
+            topn = sim.argsort(axis=1)[:,:n]
+            ntop_scopes[n][1] += len(topn)
+            for i, topns in zip(range(len(topn)), topn):
+                if i in topns:
+                    ntop_scopes[n][0] += 1
+
+    ret = []
+
+    for n, (a, b) in ntop_scopes.items():
+      ret.append(("acc_"+str(n), a/b))
+
+    ret += [
+      ("avg_dist", avg_dist_sum / avg_dist_count)
+      ('loss', self.get_loss())
     ]
+
+    return ret
 
