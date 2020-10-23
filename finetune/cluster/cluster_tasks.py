@@ -151,12 +151,8 @@ class ClusteringTask(task.Task):
     cluster_loss = tf.reduce_mean(cluster_losses)
     losses = cluster_loss 
 
-    if not is_training:
-      cluster_arg = tf.argmax(similarity_matrix, axis=1, output_type=tf.int32)
-      y_true_arg = tf.argmax(y_true, axis=1, output_type=tf.int32)
-    else:
-      cluster_arg = None
-      y_true_arg = None
+    cluster_arg = tf.argmax(similarity_matrix, axis=1, output_type=tf.int32)
+    y_true_arg = tf.argmax(y_true, axis=1, output_type=tf.int32)
 
     return losses, dict(
         loss=losses,
