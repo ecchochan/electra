@@ -150,9 +150,14 @@ class ClusteringTask(task.Task):
         logits=similarity_matrix, labels=y_true_f)
     cluster_loss = tf.reduce_mean(cluster_losses)
     losses = cluster_loss 
+    
+    cluster_arg = tf.argmax(similarity_matrix, axis=1, output_type=tf.int32)
+    y_true_arg = tf.argmax(y_true, axis=1, output_type=tf.int32)
 
     return losses, dict(
         loss=losses,
+        y_true_arg=y_true_arg,
+        cluster_arg=cluster_arg,
         eid=features[self.name + "_eid"],
     )
 

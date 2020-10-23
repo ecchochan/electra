@@ -208,8 +208,11 @@ class ModelRunner(object):
     """Evaluate the current model."""
     utils.log("Evaluating", task.name, split)
     eval_input_fn, _ = self._preprocessor.prepare_predict([task], split)
+    yield_single_examples = True
+    if task.name == "cluster":
+      yield_single_examples = False
     results = self._estimator.predict(input_fn=eval_input_fn,
-                                      yield_single_examples=True)
+                                      yield_single_examples=yield_single_examples)
     scorer = task.get_scorer(**kwargs)
     for r in results:
       if r["task_id"] != len(self._tasks):  # ignore padding examples
