@@ -135,7 +135,7 @@ class ClusteringTask(task.Task):
               bert_model.bert_config.initializer_range))
     with tf.variable_scope("cluster_proj_B"):
       B_pooled_proj = tf.layers.dense(
-          A_pooled,
+          B_pooled,
           units=bert_model.bert_config.hidden_size,
           activation=modeling.get_activation(bert_model.bert_config.hidden_act),
           kernel_initializer=modeling.create_initializer(
