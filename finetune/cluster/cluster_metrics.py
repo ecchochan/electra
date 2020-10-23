@@ -60,7 +60,7 @@ class AccuracyScorer(WordLevelScorer):
 
   def _get_results(self):
     count, correct = 0, 0
-    for labels, preds in zip(self._y_true_arg, self._cluster_arg):
+    for y_true, y_pred in zip(self._y_true_arg, self._cluster_arg):
       if y_true: 
         count += 1
         correct += (1 if y_pred == y_true else 0)
