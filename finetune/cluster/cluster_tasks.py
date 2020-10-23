@@ -148,7 +148,7 @@ class ClusteringTask(task.Task):
     y_true_f = tf.cast(y_true, tf.float32)
     cluster_losses = tf.nn.sigmoid_cross_entropy_with_logits(
         logits=similarity_matrix, labels=y_true_f)
-    cluster_loss = tf.reduce_mean(cluster_losses)
+    cluster_loss = tf.reduce_sum(cluster_losses, axis=-1)
     losses = cluster_loss 
 
     return losses, dict(
