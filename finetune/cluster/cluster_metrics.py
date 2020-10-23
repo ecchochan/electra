@@ -35,7 +35,8 @@ class WordLevelScorer(scorer.Scorer):
     super(WordLevelScorer, self).__init__()
     self._total_loss = 0
     self._total_words = 0
-    self._accs = []
+    self._y_true_arg = []
+    self._cluster_arg = []
     
     
 
@@ -45,7 +46,8 @@ class WordLevelScorer(scorer.Scorer):
     
     self._total_loss += np.sum(results['loss'])
     self._total_words += 1
-    self._accs.append(results['cluster_acc'])
+    self._y_true_arg.append(results['y_true_arg'])
+    self._cluster_arg.append(results['cluster_arg'])
 
   def get_loss(self):
     return self._total_loss / max(1, self._total_words)
@@ -57,8 +59,14 @@ class AccuracyScorer(WordLevelScorer):
     super(AccuracyScorer, self).__init__()
 
   def _get_results(self):
+    count, correct = 0, 0
+    for labels, preds in zip(self._y_true_arg, self._cluster_arg):
+      for y_true, y_pred in zip(labels, preds):
+        if y_true: 
+          count += 1
+          correct += (1 if y_pred == y_true else 0)
     return [
-        ('accuracy', 100.0 * sum(self._accs) / len(self._accs)),
+        ('accuracy', 100.0 * correct / count),
         ('loss', self.get_loss())
     ]
 

@@ -154,15 +154,14 @@ class ClusteringTask(task.Task):
     if not is_training:
       cluster_arg = tf.argmax(similarity_matrix, axis=1, output_type=tf.int32)
       y_true_arg = tf.argmax(y_true, axis=1, output_type=tf.int32)
-      cluster_acc = tf.metrics.accuracy(
-          labels=y_true_arg,
-          predictions=cluster_arg)
     else:
-      cluster_acc = None
+      cluster_arg = None
+      y_true_arg = None
 
     return losses, dict(
         loss=losses,
-        cluster_acc=cluster_acc,
+        y_true_arg=y_true_arg,
+        cluster_arg=cluster_arg,
         eid=features[self.name + "_eid"],
     )
 
