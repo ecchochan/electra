@@ -97,7 +97,7 @@ class AccuracyScorer(WordLevelScorer):
       ret.append(("acc_"+str(n), a/b))
 
     ret += [
-      ("avg_dist", avg_dist_sum / avg_dist_count)
+      ("avg_dist", avg_dist_sum / avg_dist_count),
       ('loss', self.get_loss())
     ]
 
