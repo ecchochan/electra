@@ -211,6 +211,7 @@ class ModelRunner(object):
     yield_single_examples = True
     if task.name == "cluster":
       yield_single_examples = False
+    print("yield_single_examples", yield_single_examples)
     results = self._estimator.predict(input_fn=eval_input_fn,
                                       yield_single_examples=yield_single_examples)
     scorer = task.get_scorer(**kwargs)
