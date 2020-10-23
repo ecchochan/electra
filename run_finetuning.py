@@ -209,8 +209,6 @@ class ModelRunner(object):
     utils.log("Evaluating", task.name, split)
     eval_input_fn, _ = self._preprocessor.prepare_predict([task], split)
     yield_single_examples = True
-    if task.name == "cluster":
-      yield_single_examples = False
     print("yield_single_examples", yield_single_examples)
     results = self._estimator.predict(input_fn=eval_input_fn,
                                       yield_single_examples=yield_single_examples)
