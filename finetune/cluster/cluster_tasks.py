@@ -153,8 +153,6 @@ class ClusteringTask(task.Task):
 
     return losses, dict(
         loss=losses,
-        y_true_arg=y_true_arg,
-        cluster_arg=cluster_arg,
         eid=features[self.name + "_eid"],
     )
 
