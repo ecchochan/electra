@@ -93,7 +93,8 @@ class AccuracyScorer(WordLevelScorer):
 
     ret = []
 
-    for n, (a, b) in ntop_scopes.items():
+    for n in Ns:
+      (a, b) = ntop_scopes[n]
       ret.append(("acc_"+str(n), a/b))
 
     ret += [
