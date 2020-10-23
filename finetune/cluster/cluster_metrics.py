@@ -73,7 +73,15 @@ class AccuracyScorer(WordLevelScorer):
     avg_dist_count = 0
     for a, b in zip(np.array_split(A_pooled_projs, num_sections), np.array_split(B_pooled_projs, num_sections)):
         sim = np.matmul(a, b.T)
-        eye = np.identity(sim.shape[0])
+        try:
+          eye = np.identity(sim.shape[0])
+        except:
+          print(a.shape)
+          print(b.shape)
+          print(A_pooled_projs.shape)
+          print(B_pooled_projs.shape)
+          print(sim.shape)
+          raise
         avg_dist_sum += (sim * eye).sum() 
         avg_dist_count += eye.sum()
         for n in Ns:
