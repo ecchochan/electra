@@ -152,7 +152,7 @@ class ClusteringTask(task.Task):
       cluster_loss = tf.reduce_mean(cluster_losses)
       losses = cluster_loss 
     else:
-      losses = (B_pooled -  A_pooled).sum()
+      losses = tf.math.reduce_sum(B_pooled -  A_pooled)
 
     return losses, dict(
         loss=losses,
