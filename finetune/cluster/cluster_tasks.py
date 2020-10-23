@@ -140,19 +140,19 @@ class ClusteringTask(task.Task):
           activation=modeling.get_activation(bert_model.bert_config.hidden_act),
           kernel_initializer=modeling.create_initializer(
               bert_model.bert_config.initializer_range))
-    print(A_pooled.shape, B_pooled.shape)
-    if is_training:
-      y_true = tf.eye(tf.shape(A_pooled)[0])
-      similarity_matrix = tf.matmul(
-        a=A_pooled_proj, b=B_pooled_proj, transpose_b=True)
+              
+    y_true = tf.eye(tf.shape(A_pooled)[0])
+    similarity_matrix = tf.matmul(
+      a=A_pooled_proj, b=B_pooled_proj, transpose_b=True)
 
-      y_true_f = tf.cast(y_true, tf.float32)
-      cluster_losses = tf.nn.sigmoid_cross_entropy_with_logits(
-          logits=similarity_matrix, labels=y_true_f)
-      cluster_loss = tf.reduce_mean(cluster_losses)
-      losses = cluster_loss 
-    else:
-      losses = tf.math.reduce_sum(B_pooled -  A_pooled)
+    y_true_f = tf.cast(y_true, tf.float32)
+    cluster_losses = tf.nn.sigmoid_cross_entropy_with_logits(
+        logits=similarity_matrix, labels=y_true_f)
+    cluster_loss = tf.reduce_mean(cluster_losses)
+    losses = cluster_loss 
+    
+    cluster_arg = tf.argmax(similarity_matrix, axis=1, output_type=tf.int32)
+    y_true_arg = tf.argmax(y_true, axis=1, output_type=tf.int32)
 
     return losses, dict(
         loss=losses,
