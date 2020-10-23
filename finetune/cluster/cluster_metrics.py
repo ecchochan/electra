@@ -85,7 +85,7 @@ class AccuracyScorer(WordLevelScorer):
         avg_dist_sum += (sim * eye).sum() 
         avg_dist_count += eye.sum()
         for n in Ns:
-            topn = sim.argsort(axis=1)[:,:n]
+            topn = sim.argsort(axis=1)[:,:n][::-1]
             ntop_scopes[n][1] += len(topn)
             for i, topns in zip(range(len(topn)), topn):
                 if i in topns:
