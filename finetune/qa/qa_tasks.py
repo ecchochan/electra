@@ -727,6 +727,9 @@ class DRCD(SQuADTask):
   def __init__(self, config: configure_finetuning.FinetuningConfig, tokenizer):
     super(DRCD, self).__init__(config, "drcd", tokenizer)
 
+  def get_test_splits(self):
+    return ["test"]
+
 
 class CMRC2018(SQuADTask):
   def __init__(self, config: configure_finetuning.FinetuningConfig, tokenizer):
