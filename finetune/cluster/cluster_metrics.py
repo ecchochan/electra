@@ -60,8 +60,8 @@ class AccuracyScorer(WordLevelScorer):
 
   def _get_results(self):
     count, correct = 0, 0
-    A_pooled_projs = np.concatenate(self._A_pooled_projs)
-    B_pooled_projs = np.concatenate(self._B_pooled_projs)
+    A_pooled_projs = np.stack(self._A_pooled_projs)
+    B_pooled_projs = np.stack(self._B_pooled_projs)
     import math
     Ns = (1, 3, 5, 10)
     ntop_scopes = {
